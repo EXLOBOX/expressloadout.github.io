@@ -32,6 +32,7 @@ header img {
 header h1 {
   color: #0a74da; /* azul profesional */
   font-size: 2rem;
+  margin-right: auto;
 }
 
 nav button {
