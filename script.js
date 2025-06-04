@@ -5,7 +5,7 @@ const texts = {
     description: "Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.",
     lockerForm: "Solicita tu Casillero",
     services: "Servicios",
-    servicesTitle: "",
+    servicesTitle: "Nuestros Servicios",
     servicesList: [
       "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
       "Casillero: Brindamos un espacio físico en USA y también en China, para que puedas recibir todo lo que quieras enviar a Panamá, desde sobres, correspondencias, compras, encomiendas, importaciones, etc.",
@@ -27,7 +27,7 @@ const texts = {
     description: "We offer courier, shopping and cargo import services from China or the USA to Panama covering the entire door-to-door logistics process, to your business, office or home.",
     lockerForm: "Request your PO-box",
     services: "Services",
-    servicesTitle: "",
+    servicesTitle: "Our Services",
     servicesList: [
       "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
       "Locker: We provide a physical space in the USA and also in China, so you can receive anything you want to send to Panama, from envelopes, correspondence, purchases, parcels, imports, etc.",
