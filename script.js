@@ -3,7 +3,7 @@ const texts = {
     title: "Express Loadout",
     welcomeTitle: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros servicio honestos, confiables y de calidad",
     description: "Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.",
-    lockerformtitle: "Solicita tu Casillero",
+    lockerFormTitle: "Solicita tu Casillero",
     servicesTitle: "Servicios",
     servicesList: [
       "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
@@ -24,7 +24,7 @@ const texts = {
     title: "Express Loadout",
     welcomeTitle: "Make your imports economical, fast and easy with us — honest, reliable and quality service",
     description: "We offer courier, shopping and cargo import services from China or the USA to Panama covering the entire door-to-door logistics process, to your business, office or home.",
-    lockerformtitle: "Request your PO-box",
+    lockerFormTitle: "Request your PO-box",
     servicesTitle: "Services",
     servicesList: [
       "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
