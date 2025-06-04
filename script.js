@@ -4,6 +4,7 @@ const texts = {
     welcomeTitle: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros servicio honestos, confiables y de calidad",
     description: "Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.",
     lockerFormTitle: "Solicita tu Casillero",
+    lockerFormDescription: "Haz clic en el siguiente enlace para solicitar tu casillero en USA o China.",
     services: "Servicios",
     servicesTitle: "Nuestros Servicios",
     servicesList: [
@@ -26,6 +27,7 @@ const texts = {
     welcomeTitle: "Make your imports economical, fast and easy with us — honest, reliable and quality service",
     description: "We offer courier, shopping and cargo import services from China or the USA to Panama covering the entire door-to-door logistics process, to your business, office or home.",
     lockerFormTitle: "Request your PO-box",
+    lockerFormDescription: "Click the link below to request your PO-box in the USA or China.",
     services: "Services",
     servicesTitle: "Our Services",
     servicesList: [
@@ -50,6 +52,7 @@ function setLanguage(lang) {
   document.getElementById('welcome-title').textContent = texts[lang].welcomeTitle;
   document.getElementById('description').textContent = texts[lang].description;
   document.getElementById('locker-form-title').textContent = texts[lang].lockerFormTitle;
+  document.getElementById('locker-form-description').textContent = texts[lang].lockerFormDescription;
   document.getElementById('services-title').textContent = texts[lang].servicesTitle;
 
   const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
