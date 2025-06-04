@@ -6,7 +6,8 @@ const texts = {
     lockerFormTitle: "Solicita tu Casillero",
     lockerFormDescription: "Haz clic en el siguiente enlace para solicitar tu casillero en USA o China.",
     lockerFormLink: "Solicita tu casillero",
-      
+    whatsappButtonCall: "📱 Escríbenos por WhatsApp",
+    
     servicesTitle: "Nuestros Servicios",
     servicesList: [
       "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
@@ -30,6 +31,7 @@ const texts = {
     lockerFormTitle: "Request your PO-box",
     lockerFormDescription: "Click the link below to request your PO-box in the USA or China.",
     lockerFormLink: "Request your locker",
+    whatsappButtonCall: "📱 Write us on WhatsApp",
     servicesTitle: "Our Services",
     servicesList: [
       "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
