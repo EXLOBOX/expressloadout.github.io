@@ -49,6 +49,7 @@ function setLanguage(lang) {
   document.getElementById('title').textContent = texts[lang].title;
   document.getElementById('welcome-title').textContent = texts[lang].welcomeTitle;
   document.getElementById('description').textContent = texts[lang].description;
+  document.getElementById('locker-form').textContent = texts[lang].lockerForm;
   document.getElementById('services-title').textContent = texts[lang].servicesTitle;
 
   const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
