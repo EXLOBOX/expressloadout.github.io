@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Casillero | Express Loadout</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="img/logo.png" type="image/png">
+</head>
+<body>
+  <header>
+    <img src="img/logo.png" alt="Logo Express Loadout" class="logo" />
+    <h1>Express Loadout</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="locker-form">
+      <h2>Solicita tu Casillero</h2>
+      <p>Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
+
+      <form action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
+        <input type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
+        <input type="email" name="Correo Electrónico" placeholder="Correo Electrónico" required>
+        <input type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required>
+        <input type="text" name="Identificación o RUC" placeholder="Número de Identificación o RUC" required>
+        
+        <button type="submit">Solicitar Casillero</button>
+
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://expressloadout.com/gracias.html">
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Express Loadout</p>
+  </footer>
+</body>
+</html>
