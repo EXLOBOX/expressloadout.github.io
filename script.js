@@ -3,6 +3,7 @@ const texts = {
     title: "Express Loadout",
     welcomeTitle: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros servicio honestos, confiables y de calidad",
     description: "Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.",
+    lockerformtitle: "Solicita tu Casillero",
     servicesTitle: "Servicios",
     servicesList: [
       "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
