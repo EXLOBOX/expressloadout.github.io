@@ -118,4 +118,36 @@ footer {
   nav {
     margin-top: 10px;
   }
+#services {
+  margin-top: 40px;
+}
+
+#services-title {
+  font-size: 1.8rem;
+  color: #0a74da;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.service {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.service h3 {
+  color: #0a74da;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.service p {
+  font-size: 1rem;
+  color: #444;
+}
+
+  
 }
