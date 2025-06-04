@@ -50,6 +50,43 @@ const texts = {
   }
 };
 
+const translations = {
+  es: {
+    title: "Bienvenido",
+    description: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros: servicios honestos, confiables y de calidad.",
+    services_title: "Nuestros Servicios",
+    service1: "Compras por internet sin necesidad de tener tarjeta de crédito. Lo compramos por ti y te asesoramos gratis.",
+    service2: "Casillero en USA y China para recibir tus compras e importaciones desde sobres hasta carga.",
+    service3: "Freight Marítimo desde USA o China hasta Panamá desde 20 lbs. Tú eliges el peso máximo.",
+    service4: "Freight Aéreo sin costos por manejo ni cargos sorpresa. Tarifas competitivas.",
+    contact: "Contáctanos",
+    form_title: "Solicita tu Casillero",
+    form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
+    name: "Nombre y Apellido",
+    email: "Correo Electrónico",
+    phone: "Número de Celular (WhatsApp)",
+    id: "Número de Identificación o RUC",
+    submit: "Solicitar Casillero"
+  },
+  en: {
+    title: "Welcome",
+    description: "Make your imports economical, fast, and simple with us: honest, reliable, and quality service.",
+    services_title: "Our Services",
+    service1: "Online purchases without needing a credit card. We buy for you and provide free assistance.",
+    service2: "Locker in USA and China to receive your purchases and imports from letters to cargo.",
+    service3: "Maritime Freight from USA or China to Panama starting at 20 lbs. You choose the max weight.",
+    service4: "Air Freight with no handling fees or hidden charges. Ridiculously low rates.",
+    contact: "Contact Us",
+    form_title: "Request Your Locker",
+    form_description: "Fill out this form to register and request your locker in the USA or China.",
+    name: "Full Name",
+    email: "Email Address",
+    phone: "Phone Number (WhatsApp)",
+    id: "ID or RUC Number",
+    submit: "Request Locker"
+  }
+}
+
 function setLanguage(lang) {
   document.getElementById('title').textContent = texts[lang].title;
   document.getElementById('welcome-title').textContent = texts[lang].welcomeTitle;
@@ -80,6 +117,28 @@ function setLanguage(lang) {
   contactItems[3].innerHTML = texts[lang].contactList.facebook + '<a href="https://www.facebook.com/ExpressLoadout/" target="_blank">ExpressLoadout</a>';
   */
 
+function setLanguage(lang) {
+  document.getElementById("title").textContent = translations[lang].title;
+  document.getElementById("description").textContent = translations[lang].description;
+
+  // Si tienes secciones con IDs como services_title, service1, etc., las traducimos:
+  const keys = [
+    "services_title", "service1", "service2", "service3", "service4",
+    "contact", "form_title", "form_description", "name", "email", "phone", "id", "submit"
+  ];
+  keys.forEach(key => {
+    const el = document.getElementById(key);
+    if (el) {
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        el.placeholder = translations[lang][key];
+      } else if (el.tagName === "BUTTON") {
+        el.textContent = translations[lang][key];
+      } else {
+        el.textContent = translations[lang][key];
+      }
+    }
+  });
+}
   document.querySelector('footer p').textContent = texts[lang].footer;
 }
 
