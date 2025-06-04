@@ -3,23 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mi Sitio Bilingüe</title>
+  <title>Express Loadout</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1 id="title">Bienvenido</h1>
+    <h1 id="title">Express Loadout</h1>
     <nav>
       <button onclick="setLanguage('es')">Español</button>
       <button onclick="setLanguage('en')">English</button>
     </nav>
   </header>
   <main>
-    <p id="description">Este es un sitio web de ejemplo en dos idiomas.</p>
+    <section>
+      <h2 id="welcome-title">Haz tus importaciones de forma económica, rápida y sencilla con nosotros servicio honestos, confiables y de calidad</h2>
+      <p id="description">
+        Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.
+      </p>
+    </section>
+
+    <section>
+      <h3 id="services-title">Servicios</h3>
+      <ul>
+        <li>
+          <strong>Compras:</strong> compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).
+        </li>
+        <li>
+          <strong>Casillero:</strong> Brindamos un espacio físico en USA y también en China, para que puedas recibir todo lo que quieras enviar a Panamá, desde sobres, correspondencias, compras, encomiendas, importaciones, etc.
+        </li>
+        <li>
+          <strong>Freight Marítimo:</strong> traemos tu carga marítima pesada desde Estados Unidos o China hasta Panamá, desde 20 lbs mínimo (tú eliges el peso máximo), nosotros lo traemos hasta donde tú elijas.
+        </li>
+        <li>
+          <strong>Freight Aéreo:</strong> traemos tu carga o paquetería aérea desde Estados Unidos hasta Panamá, sin costos por manejo, sin cargos sorpresa a una tarifa tan ridícula.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Contacto</h3>
+      <ul>
+        <li>WhatsApp: <a href="https://wa.me/50765210278" target="_blank">+507 6521 0278</a></li>
+        <li>Email: <a href="mailto:exlo@expressloadout.com">exlo@expressloadout.com</a></li>
+        <li>Instagram: <a href="https://www.instagram.com/expressloadout" target="_blank">expressloadout</a></li>
+        <li>Facebook: <a href="https://www.facebook.com/ExpressLoadout/" target="_blank">ExpressLoadout</a></li>
+      </ul>
+    </section>
   </main>
+
   <footer>
-    <p>&copy; 2025 Mi Negocio</p>
+    <p>&copy; 2025 Express Loadout</p>
   </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
