@@ -24,6 +24,7 @@ const texts = {
     title: "Express Loadout",
     welcomeTitle: "Make your imports economical, fast and easy with us — honest, reliable and quality service",
     description: "We offer courier, shopping and cargo import services from China or the USA to Panama covering the entire door-to-door logistics process, to your business, office or home.",
+    lockerformtitle: "Request your PO-box",
     servicesTitle: "Services",
     servicesList: [
       "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
