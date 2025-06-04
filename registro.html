@@ -18,16 +18,16 @@
 
   <main>
     <section id="locker-form">
-      <h2>Solicita tu Casillero</h2>
-      <p>Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
+      <h2 id="form_title">Solicita tu Casillero</h2>
+      <p id="form_description">Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
 
       <form action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
-        <input type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
-        <input type="email" name="Correo Electrónico" placeholder="Correo Electrónico" required>
-        <input type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required>
-        <input type="text" name="Identificación o RUC" placeholder="Número de Identificación o RUC" required>
+        <input id="name" type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
+        <input id="email" type="email" name="Correo Electrónico" placeholder="Correo Electrónico" required>
+        <input id="phone" type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required>
+        <input id="id" type="text" name="Identificación o RUC" placeholder="Número de Identificación o RUC" required>
         
-        <button type="submit">Solicitar Casillero</button>
+        <button type="submit" id="submit">Solicitar Casillero</button>
 
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_next" value="https://expressloadout.com/gracias.html">
