@@ -5,7 +5,8 @@ const texts = {
     description: "Ofrecemos servicios de mensajería, compras e importaciones de carga desde China o USA hasta Panamá cubriendo todo el proceso logístico puerta a puerta, hasta tu negocio, oficina o hogar.",
     lockerFormTitle: "Solicita tu Casillero",
     lockerFormDescription: "Haz clic en el siguiente enlace para solicitar tu casillero en USA o China.",
-  
+    lockerFormLink: "Solicita tu casillero",
+      
     servicesTitle: "Nuestros Servicios",
     servicesList: [
       "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
@@ -28,7 +29,7 @@ const texts = {
     description: "We offer courier, shopping and cargo import services from China or the USA to Panama covering the entire door-to-door logistics process, to your business, office or home.",
     lockerFormTitle: "Request your PO-box",
     lockerFormDescription: "Click the link below to request your PO-box in the USA or China.",
-
+    lockerFormLink: "Request your locker",
     servicesTitle: "Our Services",
     servicesList: [
       "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
@@ -53,6 +54,7 @@ function setLanguage(lang) {
   document.getElementById('description').textContent = texts[lang].description;
   document.getElementById('locker-form-title').textContent = texts[lang].lockerFormTitle;
   document.getElementById('locker-form-description').textContent = texts[lang].lockerFormDescription;
+  document.getElementById('locker-form-link').textContent = texts[lang].lockerFormLink;
   document.getElementById('services-title').textContent = texts[lang].servicesTitle;
 
   const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
