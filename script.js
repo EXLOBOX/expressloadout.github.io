@@ -55,6 +55,7 @@ function setLanguage(lang) {
   document.getElementById('locker-form-title').textContent = texts[lang].lockerFormTitle;
   document.getElementById('locker-form-description').textContent = texts[lang].lockerFormDescription;
   document.getElementById('locker-form-link').textContent = texts[lang].lockerFormLink;
+  document.getElementById('whatsapp-button-call').textContent = texts[lang].whatsappButtonCall;
   document.getElementById('services-title').textContent = texts[lang].servicesTitle;
 
   const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
