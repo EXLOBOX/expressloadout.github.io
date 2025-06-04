@@ -76,6 +76,13 @@ ul {
 ul li {
   margin-bottom: 10px;
 }
+  
+section ul li a {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #0a74da;
+}
 
 /* Enlaces */
 a {
