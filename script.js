@@ -31,14 +31,7 @@ const texts = {
       email: "Email: ",
       instagram: "Instagram: ",
       facebook: "Facebook: ",
-      title: "Solicita tu Casillero",
-      
-  description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
-  name: "Nombre y Apellido",
-  email: "Correo Electrónico",
-  phone: "Número de Celular (WhatsApp)",
-  id: "Número de Identificación o RUC",
-  submit: "Solicitar Casillero"
+      title: "Solicita tu Casillero"
       
     },
     footer: "© 2025 Express Loadout"
@@ -74,14 +67,7 @@ const texts = {
       email: "Email: ",
       instagram: "Instagram: ",
       facebook: "Facebook: ",
-       title: "Request Your Locker",
-      
-  description: "Fill out this form to register and request your locker in the USA or China.",
-  name: "Full Name",
-  email: "Email Address",
-  phone: "Phone Number (WhatsApp)",
-  id: "ID or RUC Number",
-  submit: "Request Locker"
+       title: "Request Your Locker"
       
     },
     footer: "© 2025 Express Loadout"
