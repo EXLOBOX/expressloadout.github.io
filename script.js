@@ -9,12 +9,22 @@ const texts = {
     whatsappButtonCall: "📱 Escríbenos por WhatsApp",
     
     servicesTitle: "Nuestros Servicios",
-    servicesList: [
-      "Compras: compras por internet sin necesidad de tener tarjeta de crédito (lo compramos por ti), te asesoramos y asistimos totalmente gratis (sin costos adicionales por manejo al recibir tus compras).",
-      "Casillero: Brindamos un espacio físico en USA y también en China, para que puedas recibir todo lo que quieras enviar a Panamá, desde sobres, correspondencias, compras, encomiendas, importaciones, etc.",
-      "Freight Marítimo: traemos tu carga marítima pesada desde Estados Unidos o China hasta Panamá, desde 20 lbs mínimo (tú eliges el peso máximo), nosotros lo traemos hasta donde tú elijas.",
-      "Freight Aéreo: traemos tu carga o paquetería aérea desde Estados Unidos hasta Panamá, sin costos por manejo, sin cargos sorpresa a una tarifa tan ridícula."
-    ],
+    service1: "Compras.",
+    service11: "Compras por internet sin necesidad de tener tarjeta de crédito. Lo compramos por ti y te asesoramos gratis.",
+    service2: "Casillero.",
+    service22: "Casillero en USA y China para recibir tus compras e importaciones desde sobres hasta carga.",
+    service3: "Freight Marítimo",
+    service33: "Freight Marítimo desde USA o China hasta Panamá desde 20 lbs. Tú eliges el peso máximo.",
+    service4: "Freight Aéreo",
+    service44: "Freight Aéreo sin costos por manejo ni cargos sorpresa. Tarifas competitivas.",
+    contact: "Contáctanos",
+    form_title: "Solicita tu Casillero",
+    form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
+    name: "Nombre y Apellido",
+    email: "Correo Electrónico",
+    phone: "Número de Celular (WhatsApp)",
+    id: "Número de Identificación o RUC",
+    submit: "Solicitar Casillero",
     contactTitle: "Contacto",
     contactList: {
       whatsapp: "WhatsApp: ",
@@ -33,49 +43,6 @@ const texts = {
     lockerFormLink: "Request your locker",
     whatsappButtonCall: "📱 Write us on WhatsApp",
     servicesTitle: "Our Services",
-    servicesList: [
-      "Shopping: Online purchases without the need for a credit card (we buy it for you), we advise and assist you totally free (no additional handling fees upon receiving your purchases).",
-      "Locker: We provide a physical space in the USA and also in China, so you can receive anything you want to send to Panama, from envelopes, correspondence, purchases, parcels, imports, etc.",
-      "Sea Freight: We bring your heavy sea cargo from the United States or China to Panama, minimum 20 lbs (you choose the maximum weight), we bring it wherever you want.",
-      "Air Freight: We bring your air cargo or parcels from the United States to Panama, no handling fees, no surprise charges at a ridiculously low rate."
-    ],
-    contactTitle: "Contact",
-    contactList: {
-      whatsapp: "WhatsApp: ",
-      email: "Email: ",
-      instagram: "Instagram: ",
-      facebook: "Facebook: "
-    },
-    footer: "© 2025 Express Loadout"
-  }
-};
-
-const translations = {
-  es: {
-    title: "Bienvenido",
-    description: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros: servicios honestos, confiables y de calidad.",
-    services_title: "Nuestros Servicios",
-    service1: "Compras.",
-    service11: "Compras por internet sin necesidad de tener tarjeta de crédito. Lo compramos por ti y te asesoramos gratis.",
-    service2: "Casillero.",
-    service22: "Casillero en USA y China para recibir tus compras e importaciones desde sobres hasta carga.",
-    service3: "Freight Marítimo",
-    service33: "Freight Marítimo desde USA o China hasta Panamá desde 20 lbs. Tú eliges el peso máximo.",
-    service4: "Freight Aéreo",
-    service44: "Freight Aéreo sin costos por manejo ni cargos sorpresa. Tarifas competitivas.",
-    contact: "Contáctanos",
-    form_title: "Solicita tu Casillero",
-    form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
-    name: "Nombre y Apellido",
-    email: "Correo Electrónico",
-    phone: "Número de Celular (WhatsApp)",
-    id: "Número de Identificación o RUC",
-    submit: "Solicitar Casillero"
-  },
-  en: {
-    title: "Welcome",
-    description: "Make your imports economical, fast, and simple with us: honest, reliable, and quality service.",
-    services_title: "Our Services",
     service1: "online shoppin.",
     service11: "Online purchases without needing a credit card. We buy for you and provide free assistance.",
     service2: "PO-Box.",
@@ -91,7 +58,30 @@ const translations = {
     email: "Email Address",
     phone: "Phone Number (WhatsApp)",
     id: "ID or RUC Number",
-    submit: "Request Locker"
+    submit: "Request Locker",
+    contactTitle: "Contact",
+    contactList: {
+      whatsapp: "WhatsApp: ",
+      email: "Email: ",
+      instagram: "Instagram: ",
+      facebook: "Facebook: "
+    },
+    footer: "© 2025 Express Loadout"
+  }
+};
+
+const translations = {
+  es: {
+  
+    description: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros: servicios honestos, confiables y de calidad.",
+    services_title: "Nuestros Servicios",
+    
+  },
+  en: {
+    title: "Welcome",
+    description: "Make your imports economical, fast, and simple with us: honest, reliable, and quality service.",
+    services_title: "Our Services",
+    
   }
 }
 
