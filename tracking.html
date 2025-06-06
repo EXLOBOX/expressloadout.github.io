@@ -33,10 +33,25 @@
   <main>
     <section class="tracking-section">
       <h2>Rastrear mi paquete y transportista</h2>
-      <!-- Integración 17Track Widget -->
+      <!-- Integración 17Track API Widget -->
       <div style="max-width:500px;margin:auto;">
-        <!-- Puedes cambiar el widget de 17Track por otro universal si lo prefieres -->
-        <iframe src="https://t.17track.net/es#nums=" style="width:100%;height:400px;border:none;" title="Rastreo Universal 17Track"></iframe>
+        <!-- Widget oficial 17Track con API Key personalizada -->
+        <!-- Puedes cambiar el idioma en 'lang' y personalizar el widget -->
+        <div id="seventeentrack-widget"></div>
+        <script src="https://widget.17track.net/widget.js?apikey=708C2EF0CA32A784D0432D8572AB883A"></script>
+        <script>
+          window.addEventListener('DOMContentLoaded', function() {
+            if (window.SeventeenTrackWidget) {
+              window.SeventeenTrackWidget.init({
+                element: '#seventeentrack-widget',
+                apikey: '708C2EF0CA32A784D0432D8572AB883A',
+                lang: 'es', // Cambia a 'en' si lo deseas
+                theme: 'light',
+                responsive: true
+              });
+            }
+          });
+        </script>
       </div>
     </section>
     <section class="tracking-section">
