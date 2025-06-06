@@ -107,9 +107,11 @@ const tiendasTranslations = {
 };
 
 function setStoresLang(lang) {
-  if (!document.getElementById('nav-stores')) return;
+  // Solo aplicar traducción si estamos en tiendas.html
+  if (!document.body || !window.location.pathname.endsWith('tiendas.html')) return;
   const t = tiendasTranslations[lang] || tiendasTranslations['es'];
-  document.getElementById('nav-stores').textContent = t.navStores;
+  const navStores = document.getElementById('nav-stores');
+  if (navStores) navStores.textContent = t.navStores;
   const h2s = document.querySelectorAll('main section h2');
   if (h2s[0]) h2s[0].textContent = t.storesTitle;
   if (h2s[1]) h2s[1].textContent = t.recommended;
@@ -140,6 +142,24 @@ function setLanguage(lang) {
     }
   });
 
+  // Traducción para locker-form-description y locker-form-title en caso de que existan duplicados fuera del scope de ids
+  const lockerFormTitle = document.getElementById('locker-form-title');
+  if (lockerFormTitle && texts[lang]['lockerFormTitle']) {
+    lockerFormTitle.textContent = texts[lang]['lockerFormTitle'];
+  }
+  const lockerFormDescription = document.getElementById('locker-form-description');
+  if (lockerFormDescription && texts[lang]['lockerFormDescription']) {
+    lockerFormDescription.textContent = texts[lang]['lockerFormDescription'];
+  }
+  const lockerFormLink = document.getElementById('locker-form-link');
+  if (lockerFormLink && texts[lang]['lockerFormLink']) {
+    lockerFormLink.textContent = texts[lang]['lockerFormLink'];
+  }
+  const whatsappButtonCall = document.getElementById('whatsapp-button-call');
+  if (whatsappButtonCall && texts[lang]['whatsappButtonCall']) {
+    whatsappButtonCall.textContent = texts[lang]['whatsappButtonCall'];
+  }
+
   // Traducción para gracias.html
   const thanksIds = ['thanks-title', 'thanks-desc', 'back-home'];
   thanksIds.forEach(key => {
@@ -152,6 +172,28 @@ function setLanguage(lang) {
       }
     }
   });
+
+  // Traducción para tracking.html (encabezados y botones)
+  const trackingTitle = document.querySelector('.tracking-section h2');
+  if (trackingTitle && trackingTitle.textContent.match(/Rastrear mi paquete|Track my package/)) {
+    trackingTitle.textContent = lang === 'en' ? 'Track my package and carrier' : 'Rastrear mi paquete y transportista';
+  }
+  const warehouseTitle = document.querySelectorAll('.tracking-section h2')[1];
+  if (warehouseTitle) {
+    warehouseTitle.textContent = lang === 'en' ? 'Confirm warehouse reception, paste Tracking' : 'Confirmar recepción Warehouse, pegar Tracking';
+  }
+  const panamaTitle = document.querySelectorAll('.tracking-section h2')[2];
+  if (panamaTitle) {
+    panamaTitle.textContent = lang === 'en' ? 'Confirm Panama reception, paste Tracking' : 'Confirmar recepción Panamá, pegar Tracking';
+  }
+  const warehouseBtn = document.querySelector('#warehouse-confirm-form button');
+  if (warehouseBtn) {
+    warehouseBtn.textContent = lang === 'en' ? 'Confirm Warehouse Reception' : 'Confirmar Recepción Warehouse';
+  }
+  const panamaBtn = document.querySelector('#panama-confirm-form button');
+  if (panamaBtn) {
+    panamaBtn.textContent = lang === 'en' ? 'Confirm Panama Reception' : 'Confirmar Recepción Panamá';
+  }
 
   setStoresLang(lang);
 }
