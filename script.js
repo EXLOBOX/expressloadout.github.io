@@ -16,6 +16,8 @@ const texts = {
     service33: "Traemos tu carga marítima desde China o USA desde 20 lbs mínimo, tú eliges el peso. Nosotros la llevamos hasta tu hogar o negocio.",
     service4: "✈️ Freight Aéreo",
     service44: "Carga o paquetería aérea desde Estados Unidos hasta Panamá, sin costos por manejo ni cargos ocultos, con tarifa baja.",
+    service5: "🤝 Importaciones",
+    service55: "Traemos compras al por mayor, asesorándote y gestionando todo el proceso logístico, desde selección del proveedor, negociación, hasta la entrega final en Panamá.",
     form_title: "Solicita tu Casillero",
     form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
     name: "Nombre y Apellido",
@@ -57,6 +59,8 @@ const texts = {
     service33: "We bring your ocean freight from China or the USA starting at 20 lbs minimum, you choose the weight. We deliver it to your home or business.",
     service4: "✈️ Air Freight",
     service44: "Air cargo or packages from the United States to Panama, with no handling fees or hidden charges, at a low rate.",
+    service5: "🤝 Imports",
+    service55: "We bring wholesale purchases, advising and managing the entire logistics process, from supplier selection, negotiation, to final delivery in Panama.",
     contact: "Contact Us",
     form_title: "Request Your Locker",
     form_description: "Fill out this form to register and request your locker in the USA or China.",
@@ -125,6 +129,7 @@ function setLanguage(lang) {
   const ids = [
     'title', 'welcome-title', 'description', 'locker-form-title', 'locker-form-description', 'locker-form-link',
     'whatsapp-button-call', 'services-title', 'service1', 'service11', 'service2', 'service22', 'service3', 'service33', 'service4', 'service44',
+    'service5', 'service55',
     'form_title', 'form_description', 'name', 'email', 'phone', 'id', 'submit',
     'testimonials-title', 'testimonial1-text', 'testimonial1-author', 'testimonial2-text', 'testimonial2-author', 'testimonial3-text', 'testimonial3-author',
     'contact-title', 'contact-whatsapp', 'contact-email', 'contact-instagram', 'contact-facebook', 'footer'
