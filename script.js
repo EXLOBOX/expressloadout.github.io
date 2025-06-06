@@ -132,6 +132,8 @@ function setLanguage(lang) {
     if (el && texts[lang][key] !== undefined) {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         el.placeholder = texts[lang][key];
+      } else if (el.tagName === 'A' && key === 'locker-form-link') {
+        el.textContent = texts[lang][key];
       } else {
         el.textContent = texts[lang][key];
       }
