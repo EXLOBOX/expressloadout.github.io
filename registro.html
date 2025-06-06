@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registro de Casillero | Express Loadout</title>
+  <title>Registro de Casillero | Express Loadout Panamá</title>
+  <meta name="description" content="Regístrate y solicita tu casillero en USA o China con Express Loadout. Importa fácil, rápido y seguro a Panamá. ¡Sin tarjeta de crédito!" />
+  <meta name="keywords" content="registro casillero, casillero Panamá, casillero USA, casillero China, compras por internet, importaciones, Express Loadout" />
+  <meta name="author" content="Express Loadout" />
+  <meta property="og:title" content="Registro de Casillero | Express Loadout Panamá" />
+  <meta property="og:description" content="Solicita tu casillero en USA o China y recibe tus compras en Panamá. Servicio rápido, seguro y económico." />
+  <meta property="og:image" content="https://expressloadout.com/images/LOGO%20Amarillo%202x2%20-%20Alteracion.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://expressloadout.com/registro.html" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://expressloadout.com/registro.html" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="img/logo.png" type="image/png">
+  <link rel="icon" href="images/logo.png" type="image/png">
 </head>
 <body>
   <header>
-  
     <img src="images/LOGO Amarillo 2x2 - Alteracion.png" alt="Logo Express Loadout" style="height: 60px; margin-right: 15px;">
-    <h1>Express Loadout</h1>
+    <h1 id="title">Express Loadout</h1>
     <nav>
-      <a href="index.html">Inicio</a>
-      
-      <button onclick="setLanguage('es')">Español</button>
-      <button onclick="setLanguage('en')">English</button>
-
-      
+      <a href="index2.html">Inicio</a>
+      <button id="btn-es" type="button">Español</button>
+      <button id="btn-en" type="button">English</button>
     </nav>
   </header>
 
@@ -26,15 +32,12 @@
     <section id="locker-form">
       <h2 id="form_title">Solicita tu Casillero</h2>
       <p id="form_description">Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
-
       <form action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
         <input id="name" type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
         <input id="email" type="email" name="Correo Electrónico" placeholder="Correo Electrónico" required>
-        <input id="phone" type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required>
+        <input id="phone" type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required pattern="[0-9+]{8,15}" title="Ingresa un número válido.">
         <input id="id" type="text" name="Identificación o RUC" placeholder="Número de Identificación o RUC" required>
-        
         <button type="submit" id="submit">Solicitar Casillero</button>
-
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_next" value="https://expressloadout.com/gracias.html">
       </form>
@@ -42,7 +45,15 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Express Loadout</p>
+    <p id="footer">&copy; 2025 Express Loadout</p>
   </footer>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      setLanguage('es');
+      document.getElementById('btn-es').onclick = function() { setLanguage('es'); };
+      document.getElementById('btn-en').onclick = function() { setLanguage('en'); };
+    });
+  </script>
 </body>
 </html>

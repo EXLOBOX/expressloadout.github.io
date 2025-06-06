@@ -8,7 +8,7 @@ const texts = {
     lockerFormLink: "Solicita tu casillero",
     whatsappButtonCall: "📱 Escríbenos por WhatsApp",
     servicesTitle: "Nuestros Servicios",
-    service1: "🛒 Comprasss",
+    service1: "🛒 Compras",
     service11: "Compras por internet sin necesidad de tener tarjeta de crédito. Te asesoramos y asistimos gratis, sin costos adicionales por manejo.",
     service2: "📦 Casillero",
     service22: "Te damos una dirección en USA o China para que recibas tus compras, sobres, paquetes o importaciones hasta Panamá.",
@@ -16,7 +16,6 @@ const texts = {
     service33: "Traemos tu carga marítima desde China o USA desde 20 lbs mínimo, tú eliges el peso. Nosotros la llevamos hasta tu hogar o negocio.",
     service4: "✈️ Freight Aéreo",
     service44: "Carga o paquetería aérea desde Estados Unidos hasta Panamá, sin costos por manejo ni cargos ocultos, con tarifa baja.",
-    contact: "Contáctanos",
     form_title: "Solicita tu Casillero",
     form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
     name: "Nombre y Apellido",
@@ -29,13 +28,6 @@ const texts = {
     contactEmail: "📧 Email: exlo@expressloadout.com",
     contactInstagram: "📸 Instagram",
     contactFacebook: "📘 Facebook",
-    contactList: {
-      whatsapp: "WhatsApp: ",
-      email: "Email: ",
-      instagram: "Instagram: ",
-      facebook: "Facebook: ",
-      title: "Solicita tu Casillero"
-    },
     footer: "© 2025 Express Loadout",
     testimonialsTitle: "Clientes Felices",
     testimonial1Text: "“Con Express Loadout importé desde China sin complicaciones 10 reformers para mi gimnacio de pilates. Fueron rápidos, honestos, transparentes y hasta me ayudaron a subir toda la carga a mi negocio en un segundo piso. ¡Recomendados!”",
@@ -43,7 +35,10 @@ const texts = {
     testimonial2Text: "“Necesitaba comprar unos equipos en Amazon y ellos se encargaron de todo. Muy profesionales y atentos principalmente el joven Jonathan muy diligente.”",
     testimonial2Author: "– Jennifer Rodriguez., Emprendedora",
     testimonial3Text: "“Usé su casillero en USA y recibí todo en mi casa no solo Panamá, hasta Boquete Chiriqui sin costos ocultos. Excelente servicio.”",
-    testimonial3Author: "– Lena E., Cliente frecuente"
+    testimonial3Author: "– Lena E., Cliente frecuente",
+    thanksTitle: "¡Gracias por tu registro!",
+    thanksDesc: "Hemos recibido tu solicitud de casillero.<br>Pronto nos pondremos en contacto contigo para darte la bienvenida y los siguientes pasos.",
+    backHome: "Volver al inicio"
   },
   en: {
     title: "Express Loadout",
@@ -54,7 +49,7 @@ const texts = {
     lockerFormLink: "Request your locker",
     whatsappButtonCall: "📱 Write us on WhatsApp",
     servicesTitle: "Our Services",
-    service1: "🛒 Shoppinggg",
+    service1: "🛒 Shopping",
     service11: "Online shopping without needing a credit card. We advise and assist you for free, with no extra handling fees.",
     service2: "📦 Locker",
     service22: "We provide you with a USA or China address to receive your purchases, letters, packages, or imports to Panama.",
@@ -70,18 +65,11 @@ const texts = {
     phone: "Phone Number (WhatsApp)",
     id: "ID or RUC Number",
     submit: "Request Locker",
-    contactTitle: "Contactttt",
+    contactTitle: "Contact",
     contactWhatsapp: "📱 WhatsApp: +507 6521-0278",
     contactEmail: "📧 Email: exlo@expressloadout.com",
     contactInstagram: "📸 Instagram",
     contactFacebook: "📘 Facebook",
-    contactList: {
-      whatsapp: "WhatsApp: ",
-      email: "Email: ",
-      instagram: "Instagram: ",
-      facebook: "Facebook: ",
-      title: "Request Your Locker"
-    },
     footer: "© 2025 Express Loadout",
     testimonialsTitle: "Happy Clients",
     testimonial1Text: "“With Express Loadout I imported 10 reformers for my pilates studio from China without complications. They were fast, honest, transparent and even helped me carry all the cargo to my business on a second floor. Highly recommended!”",
@@ -89,73 +77,45 @@ const texts = {
     testimonial2Text: "“I needed to buy some equipment on Amazon and they took care of everything. Very professional and attentive, especially Jonathan who was very diligent.”",
     testimonial2Author: "– Jennifer Rodriguez, Entrepreneur",
     testimonial3Text: "“I used their USA locker and received everything at my house, not just in Panama, but even in Boquete, Chiriqui with no hidden costs. Excellent service.”",
-    testimonial3Author: "– Lena E., Frequent customer"
+    testimonial3Author: "– Lena E., Frequent customer",
+    thanksTitle: "Thank you for your registration!",
+    thanksDesc: "We have received your locker request.<br>We will contact you soon to welcome you and explain the next steps.",
+    backHome: "Back to home"
   }
 };
 
 function setLanguage(lang) {
-  document.getElementById('title').textContent = texts[lang].title;
-  document.getElementById('welcome-title').textContent = texts[lang].welcomeTitle;
-  document.getElementById('description').textContent = texts[lang].description;
-  document.getElementById('locker-form-title').textContent = texts[lang].lockerFormTitle;
-  document.getElementById('locker-form-description').textContent = texts[lang].lockerFormDescription;
-  document.getElementById('locker-form-link').textContent = texts[lang].lockerFormLink;
-  document.getElementById('whatsapp-button-call').textContent = texts[lang].whatsappButtonCall;
-  document.getElementById('services-title').textContent = texts[lang].servicesTitle;
-
-  // Servicios principales
-  const serviceKeys = ['service1', 'service2', 'service3', 'service4'];
-  const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
-  if (servicesUl) {
-    servicesUl.innerHTML = '';
-    serviceKeys.forEach(key => {
-      const li = document.createElement('li');
-      li.textContent = texts[lang][key];
-      servicesUl.appendChild(li);
-    });
-  }
-
-  // Título de contacto
-  const contactTitle = document.querySelector('main section:nth-of-type(3) h3');
-  if (contactTitle) {
-    contactTitle.textContent = texts[lang].contactTitle;
-  }
-
-  // Footer
-  const footer = document.querySelector('footer p');
-  if (footer) {
-    footer.textContent = texts[lang].footer;
-  }
-
-  // Formulario
-  const formKeys = ['form_title', 'form_description', 'name', 'email', 'phone', 'id', 'submit'];
-  formKeys.forEach(key => {
+  // Verifica que los elementos existen antes de asignar
+  const ids = [
+    'title', 'welcome-title', 'description', 'locker-form-title', 'locker-form-description', 'locker-form-link',
+    'whatsapp-button-call', 'services-title', 'service1', 'service11', 'service2', 'service22', 'service3', 'service33', 'service4', 'service44',
+    'form_title', 'form_description', 'name', 'email', 'phone', 'id', 'submit',
+    'testimonials-title', 'testimonial1-text', 'testimonial1-author', 'testimonial2-text', 'testimonial2-author', 'testimonial3-text', 'testimonial3-author',
+    'contact-title', 'contact-whatsapp', 'contact-email', 'contact-instagram', 'contact-facebook', 'footer'
+  ];
+  ids.forEach(key => {
     const el = document.getElementById(key);
-    if (el) {
+    if (el && texts[lang][key] !== undefined) {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         el.placeholder = texts[lang][key];
-      } else if (el.tagName === 'BUTTON') {
-        el.textContent = texts[lang][key];
       } else {
         el.textContent = texts[lang][key];
       }
     }
   });
 
-  document.getElementById('testimonials-title').textContent = texts[lang].testimonialsTitle;
-  document.getElementById('testimonial1-text').textContent = texts[lang].testimonial1Text;
-  document.getElementById('testimonial1-author').textContent = texts[lang].testimonial1Author;
-  document.getElementById('testimonial2-text').textContent = texts[lang].testimonial2Text;
-  document.getElementById('testimonial2-author').textContent = texts[lang].testimonial2Author;
-  document.getElementById('testimonial3-text').textContent = texts[lang].testimonial3Text;
-  document.getElementById('testimonial3-author').textContent = texts[lang].testimonial3Author;
-
-  // Enlaces de contacto
-  document.getElementById('contact-title').textContent = texts[lang].contactTitle;
-  document.getElementById('contact-whatsapp').textContent = texts[lang].contactWhatsapp;
-  document.getElementById('contact-email').textContent = texts[lang].contactEmail;
-  document.getElementById('contact-instagram').textContent = texts[lang].contactInstagram;
-  document.getElementById('contact-facebook').textContent = texts[lang].contactFacebook;
+  // Traducción para gracias.html
+  const thanksIds = ['thanks-title', 'thanks-desc', 'back-home'];
+  thanksIds.forEach(key => {
+    const el = document.getElementById(key);
+    if (el && texts[lang][key] !== undefined) {
+      if (key === 'thanks-desc') {
+        el.innerHTML = texts[lang][key];
+      } else {
+        el.textContent = texts[lang][key];
+      }
+    }
+  });
 }
 
 // Idioma por defecto
