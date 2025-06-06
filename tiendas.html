@@ -124,61 +124,61 @@
   </header>
   <main>
     <section>
-      <h2 style="margin-bottom:18px;">Algunas de las tiendas</h2>
+      <h2 style="margin-bottom:18px;" id="stores-title">Algunas de las tiendas</h2>
       <div class="stores-grid">
         <!-- Iconos de tiendas: se usa favicon automático si no hay logo SVG -->
         <div class="store-card" onclick="window.open('https://www.amazon.com/', '_blank')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" />
-          <div>Amazon</div>
+          <div class="trans-store-name">Amazon</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.ebay.com/', '_blank')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg" alt="Ebay" />
-          <div>Ebay</div>
+          <div class="trans-store-name">Ebay</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.temu.com/', '_blank')">
           <img src="https://www.temu.com/favicon.ico" alt="TEMU" />
-          <div>TEMU</div>
+          <div class="trans-store-name">TEMU</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.aliexpress.com/', '_blank')">
           <img src="https://www.aliexpress.com/favicon.ico" alt="Aliexpress" />
-          <div>Aliexpress</div>
+          <div class="trans-store-name">Aliexpress</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.shein.com/', '_blank')">
           <img src="https://www.shein.com/favicon.ico" alt="SHEIN" />
-          <div>SHEIN</div>
+          <div class="trans-store-name">SHEIN</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.rockauto.com/', '_blank')">
           <img src="https://www.rockauto.com/favicon.ico" alt="RockAuto" />
-          <div>RockAuto</div>
+          <div class="trans-store-name">RockAuto</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.wayfair.com/', '_blank')">
           <img src="https://www.wayfair.com/favicon.ico" alt="WayFair" />
-          <div>WayFair</div>
+          <div class="trans-store-name">WayFair</div>
         </div>
         <div class="store-card" onclick="window.open('https://world.taobao.com/', '_blank')">
           <img src="https://world.taobao.com/favicon.ico" alt="Taobao" onerror="this.onerror=null;this.src='https://img.alicdn.com/imgextra/i4/O1CN01Qw1QwK1wQw1QwK1Qw_!!6000000000000-2-tps-200-200.png';" />
-          <div>Taobao</div>
+          <div class="trans-store-name">Taobao</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.sephora.com/', '_blank')">
           <img src="https://www.sephora.com/favicon.ico" alt="SEPHORA" onerror="this.onerror=null;this.src='https://www.sephora.com/img/ufe/icons/favicon-192.png';" />
-          <div>SEPHORA</div>
+          <div class="trans-store-name">SEPHORA</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.romwe.com/', '_blank')">
           <img src="https://www.romwe.com/favicon.ico" alt="ROWme" />
-          <div>ROWme</div>
+          <div class="trans-store-name">ROWme</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.alibaba.com/', '_blank')">
           <img src="https://www.alibaba.com/favicon.ico" alt="alibaba" />
-          <div>alibaba</div>
+          <div class="trans-store-name">alibaba</div>
         </div>
         <div class="store-card" onclick="window.open('https://www.made-in-china.com/', '_blank')">
           <img src="https://www.made-in-china.com/favicon.ico" alt="MadeInChina" />
-          <div>MadeInChina</div>
+          <div class="trans-store-name">MadeInChina</div>
         </div>
       </div>
     </section>
     <section>
-      <h2 style="margin-bottom:18px;">Productos recomendados</h2>
+      <h2 style="margin-bottom:18px;" id="recommended">Productos recomendados</h2>
       <div class="carousel-container">
         <button class="carousel-nav left" onclick="scrollCarousel(-1)">&#8592;</button>
         <div class="carousel" id="carousel">
@@ -186,25 +186,25 @@
           <div class="carousel-item">
             <a href="https://www.amazon.com/dp/B09G3HRMVB?tag=tuafiliado-20" target="_blank">
               <img src="https://m.media-amazon.com/images/I/71p11yQwQzL._AC_SL1500_.jpg" alt="Echo Dot 4ta Gen" />
-              <div>Echo Dot 4ta Gen</div>
+              <div class="trans-product-name">Echo Dot 4ta Gen</div>
             </a>
           </div>
           <div class="carousel-item">
             <a href="https://www.amazon.com/dp/B07FZ8S74R?tag=tuafiliado-20" target="_blank">
               <img src="https://m.media-amazon.com/images/I/61CGHv6kmWL._AC_SL1500_.jpg" alt="Nintendo Switch" />
-              <div>Nintendo Switch</div>
+              <div class="trans-product-name">Nintendo Switch</div>
             </a>
           </div>
           <div class="carousel-item">
             <a href="https://www.amazon.com/dp/B08N5WRWNW?tag=tuafiliado-20" target="_blank">
               <img src="https://m.media-amazon.com/images/I/81vpsIs58WL._AC_SL1500_.jpg" alt="Kindle Paperwhite" />
-              <div>Kindle Paperwhite</div>
+              <div class="trans-product-name">Kindle Paperwhite</div>
             </a>
           </div>
         </div>
         <button class="carousel-nav right" onclick="scrollCarousel(1)">&#8594;</button>
       </div>
-      <h3 style="margin-top:30px;">Otros productos</h3>
+      <h3 style="margin-top:30px;" id="other-products">Otros productos</h3>
       <div id="otros-productos" style="min-height:60px;"> <!-- Aquí puedes agregar más productos o categorías -->
       </div>
     </section>
