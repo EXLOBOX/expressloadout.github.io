@@ -36,6 +36,7 @@
       <a href="index2.html" id="nav-home" class="nav-link">Inicio</a>
       <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
       <a href="bloq.html" id="nav-blog" class="nav-link">Blog</a>
+      <a href="tiendas.html" id="nav-stores" class="nav-link">Tiendas</a>
       <span class="lang-switch">
         <button onclick="setLanguage('es')" class="lang-btn">ES</button>
         <button onclick="setLanguage('en')" class="lang-btn">EN</button>
@@ -80,9 +81,6 @@
     // Puedes agregar/quitar objetos del array según tus necesidades
     const AMAZON_LINKS = [
       { url: 'https://www.amazon.com/-/es/', textES: 'Amazon USA (Español)', textEN: 'Amazon USA (Spanish)' },
-      { url: 'https://www.amazon.com/', textES: 'Amazon USA (Inglés)', textEN: 'Amazon USA (English)' },
-      { url: 'https://www.amazon.com.mx/', textES: 'Amazon México', textEN: 'Amazon Mexico' },
-      { url: 'https://www.amazon.es/', textES: 'Amazon España', textEN: 'Amazon Spain' },
       { url: 'https://www.amazon.com/s?k=ofertas', textES: 'Ofertas en Amazon USA', textEN: 'Deals on Amazon USA' }
     ];
 
@@ -137,6 +135,7 @@
       document.getElementById('nav-home').textContent = lang === 'en' ? 'Home' : 'Inicio';
       document.getElementById('nav-register').textContent = lang === 'en' ? 'Register' : 'Solicita tu Casillero';
       document.getElementById('nav-blog').textContent = lang === 'en' ? 'Blog' : 'Blog';
+      document.getElementById('nav-stores').textContent = lang === 'en' ? 'Stores' : 'Tiendas';
       document.getElementById('news-title').textContent = lang === 'en' ? 'News & Updates' : 'Noticias y Novedades';
       document.getElementById('news-url').placeholder = lang === 'en' ? 'Paste your news source link (RSS or web) here' : 'Pega aquí el enlace de tu fuente de noticias (RSS o web)';
       document.getElementById('btn-load-news').textContent = lang === 'en' ? 'Load News' : 'Cargar Noticias';

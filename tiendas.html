@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tiendas | Express Loadout</title>
+  <meta name="description" content="Algunas de las mejores tiendas para comprar online y productos recomendados por Express Loadout." />
+  <meta name="keywords" content="tiendas, compras, Amazon, Ebay, TEMU, Aliexpress, SHEIN, RockAuto, WayFair, Taobao, SEPHORA, FAFUL, ROWme, alibaba, MadeInChina, productos recomendados, Express Loadout" />
+  <meta name="author" content="Express Loadout" />
+  <meta property="og:title" content="Tiendas | Express Loadout" />
+  <meta property="og:description" content="Algunas de las mejores tiendas para comprar online y productos recomendados por Express Loadout." />
+  <meta property="og:image" content="images/banner%20Open%20Grap%20OG%20TwitterCards.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://expressloadout.com/tiendas.html" />
+  <link rel="icon" href="images/LOGO%20Favicon.png" type="image/png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .stores-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .store-card {
+      background: #fffbe6;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 18px 16px 10px 16px;
+      width: 120px;
+      text-align: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      border: 1px solid #ffe066;
+    }
+    .store-card:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.13);
+      background: #fff9c4;
+    }
+    .store-card img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+    .carousel-container {
+      max-width: 700px;
+      margin: 0 auto 30px auto;
+      position: relative;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 18px;
+      scroll-behavior: smooth;
+      padding: 10px 0;
+    }
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+    .carousel-item {
+      min-width: 160px;
+      background: #f5f9ff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #e0e7ef;
+    }
+    .carousel-item img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #ffe066;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1.3rem;
+      color: #b8860b;
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .carousel-nav.left { left: -40px; }
+    .carousel-nav.right { right: -40px; }
+    @media (max-width: 800px) {
+      .carousel-nav.left { left: 0; }
+      .carousel-nav.right { right: 0; }
+    }
+    @media (max-width: 600px) {
+      .stores-grid { gap: 10px; }
+      .store-card { width: 90px; padding: 10px 4px 6px 4px; }
+      .store-card img { width: 32px; height: 32px; }
+      .carousel-item { min-width: 120px; padding: 6px; }
+      .carousel-item img { width: 60px; height: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/LOGO Amarillo 2x2 - Alteracion.png" alt="Logo Express Loadout" style="height: 60px; margin-right: 15px;">
+    <h1 id="title">Express Loadout</h1>
+    <nav class="navbar">
+      <a href="index2.html" id="nav-home" class="nav-link">Inicio</a>
+      <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
+      <a href="bloq.html" id="nav-blog" class="nav-link">Blog</a>
+      <a href="tracking.html" id="nav-tracking" class="nav-link">Tracking</a>
+      <a href="tiendas.html" id="nav-stores" class="nav-link active">Tiendas</a>
+      <span class="lang-switch">
+        <button onclick="setLanguage('es')" class="lang-btn">ES</button>
+        <button onclick="setLanguage('en')" class="lang-btn">EN</button>
+      </span>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <h2 style="margin-bottom:18px;">Algunas de las tiendas</h2>
+      <div class="stores-grid">
+        <!-- Puedes cambiar los iconos por imágenes locales si lo deseas -->
+        <div class="store-card" onclick="window.open('https://www.amazon.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" />
+          <div>Amazon</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.ebay.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg" alt="Ebay" />
+          <div>Ebay</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.temu.com/', '_blank')">
+          <img src="https://seeklogo.com/images/T/temu-logo-6B0C1B6D2C-seeklogo.com.png" alt="TEMU" />
+          <div>TEMU</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.aliexpress.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/AliExpress_logo.svg" alt="Aliexpress" />
+          <div>Aliexpress</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.shein.com/', '_blank')">
+          <img src="https://seeklogo.com/images/S/shein-logo-0F5E6C6C2C-seeklogo.com.png" alt="SHEIN" />
+          <div>SHEIN</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.rockauto.com/', '_blank')">
+          <img src="https://www.rockauto.com/graphics/rockauto_logo.svg" alt="RockAuto" />
+          <div>RockAuto</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.wayfair.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Wayfair_logo.svg" alt="WayFair" />
+          <div>WayFair</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://world.taobao.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Taobao_logo.svg" alt="Taobao" />
+          <div>Taobao</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.sephora.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Sephora_logo.svg" alt="SEPHORA" />
+          <div>SEPHORA</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.fafoul.com/', '_blank')">
+          <img src="https://www.fafoul.com/favicon.ico" alt="FAFUL" />
+          <div>FAFUL</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.romwe.com/', '_blank')">
+          <img src="https://is4-ssl.mzstatic.com/image/thumb/Purple126/v4/2d/2e/7e/2d2e7e2e-2e2e-2e2e-2e2e-2e2e7e2e2e2e/AppIcon-0-1x_U007emarketing-0-7-0-85-220.png/246x0w.png" alt="ROWme" />
+          <div>ROWme</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.alibaba.com/', '_blank')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Alibaba_Logo.svg" alt="alibaba" />
+          <div>alibaba</div>
+        </div>
+        <div class="store-card" onclick="window.open('https://www.made-in-china.com/', '_blank')">
+          <img src="https://img.made-in-china.com/img/logo.png" alt="MadeInChina" />
+          <div>MadeInChina</div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2 style="margin-bottom:18px;">Productos recomendados</h2>
+      <div class="carousel-container">
+        <button class="carousel-nav left" onclick="scrollCarousel(-1)">&#8592;</button>
+        <div class="carousel" id="carousel">
+          <!-- Ejemplo de producto Amazon Afiliados -->
+          <div class="carousel-item">
+            <a href="https://www.amazon.com/dp/B09G3HRMVB?tag=tuafiliado-20" target="_blank">
+              <img src="https://m.media-amazon.com/images/I/71p11yQwQzL._AC_SL1500_.jpg" alt="Echo Dot 4ta Gen" />
+              <div>Echo Dot 4ta Gen</div>
+            </a>
+          </div>
+          <div class="carousel-item">
+            <a href="https://www.amazon.com/dp/B07FZ8S74R?tag=tuafiliado-20" target="_blank">
+              <img src="https://m.media-amazon.com/images/I/61CGHv6kmWL._AC_SL1500_.jpg" alt="Nintendo Switch" />
+              <div>Nintendo Switch</div>
+            </a>
+          </div>
+          <div class="carousel-item">
+            <a href="https://www.amazon.com/dp/B08N5WRWNW?tag=tuafiliado-20" target="_blank">
+              <img src="https://m.media-amazon.com/images/I/81vpsIs58WL._AC_SL1500_.jpg" alt="Kindle Paperwhite" />
+              <div>Kindle Paperwhite</div>
+            </a>
+          </div>
+        </div>
+        <button class="carousel-nav right" onclick="scrollCarousel(1)">&#8594;</button>
+      </div>
+      <h3 style="margin-top:30px;">Otros productos</h3>
+      <div id="otros-productos" style="min-height:60px;"> <!-- Aquí puedes agregar más productos o categorías -->
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2025 Express Loadout</p>
+  </footer>
+  <script src="script.js"></script>
+  <script>
+    // Carrusel simple para productos recomendados
+    function scrollCarousel(dir) {
+      const carousel = document.getElementById('carousel');
+      const scrollAmount = 180; // px
+      carousel.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

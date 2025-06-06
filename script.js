@@ -84,6 +84,40 @@ const texts = {
   }
 };
 
+// Traducción para tiendas.html
+const tiendasTranslations = {
+  es: {
+    navStores: 'Tiendas',
+    storesTitle: 'Algunas de las tiendas',
+    recommended: 'Productos recomendados',
+    otherProducts: 'Otros productos',
+    stores: [
+      'Amazon','Ebay','TEMU','Aliexpress','SHEIN','RockAuto','WayFair','Taobao','SEPHORA','FAFUL','ROWme','alibaba','MadeInChina'
+    ]
+  },
+  en: {
+    navStores: 'Stores',
+    storesTitle: 'Some of the stores',
+    recommended: 'Recommended products',
+    otherProducts: 'Other products',
+    stores: [
+      'Amazon','Ebay','TEMU','Aliexpress','SHEIN','RockAuto','WayFair','Taobao','SEPHORA','FAFUL','ROWme','alibaba','MadeInChina'
+    ]
+  }
+};
+
+function setStoresLang(lang) {
+  if (!document.getElementById('nav-stores')) return;
+  const t = tiendasTranslations[lang] || tiendasTranslations['es'];
+  document.getElementById('nav-stores').textContent = t.navStores;
+  const h2s = document.querySelectorAll('main section h2');
+  if (h2s[0]) h2s[0].textContent = t.storesTitle;
+  if (h2s[1]) h2s[1].textContent = t.recommended;
+  const h3 = document.querySelector('main section h3');
+  if (h3) h3.textContent = t.otherProducts;
+}
+
+// Integración con el selector de idioma global
 function setLanguage(lang) {
   // Verifica que los elementos existen antes de asignar
   const ids = [
@@ -116,7 +150,13 @@ function setLanguage(lang) {
       }
     }
   });
+
+  setStoresLang(lang);
 }
 
-// Idioma por defecto
-setLanguage('es');
+document.addEventListener('DOMContentLoaded', function() {
+  // Idioma por defecto
+  let lang = localStorage.getItem('lang') || 'es';
+  setLanguage(lang);
+  setStoresLang(lang);
+});
