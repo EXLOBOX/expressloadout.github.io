@@ -7,16 +7,15 @@ const texts = {
     lockerFormDescription: "Haz clic en el siguiente enlace para solicitar tu casillero en USA o China.",
     lockerFormLink: "Solicita tu casillero",
     whatsappButtonCall: "📱 Escríbenos por WhatsApp",
-    
     servicesTitle: "Nuestros Servicios",
-    service1: "Compras.",
-    service11: "Compras por internet sin necesidad de tener tarjeta de crédito. Lo compramos por ti y te asesoramos gratis.",
-    service2: "Casillero.",
-    service22: "Casillero en USA y China para recibir tus compras e importaciones desde sobres hasta carga.",
-    service3: "Freight Marítimo",
-    service33: "Freight Marítimo desde USA o China hasta Panamá desde 20 lbs. Tú eliges el peso máximo.",
-    service4: "Freight Aéreo",
-    service44: "Freight Aéreo sin costos por manejo ni cargos sorpresa. Tarifas competitivas.",
+    service1: "🛒 Comprasss",
+    service11: "Compras por internet sin necesidad de tener tarjeta de crédito. Te asesoramos y asistimos gratis, sin costos adicionales por manejo.",
+    service2: "📦 Casillero",
+    service22: "Te damos una dirección en USA o China para que recibas tus compras, sobres, paquetes o importaciones hasta Panamá.",
+    service3: "🚢 Freight Marítimo",
+    service33: "Traemos tu carga marítima desde China o USA desde 20 lbs mínimo, tú eliges el peso. Nosotros la llevamos hasta tu hogar o negocio.",
+    service4: "✈️ Freight Aéreo",
+    service44: "Carga o paquetería aérea desde Estados Unidos hasta Panamá, sin costos por manejo ni cargos ocultos, con tarifa baja.",
     contact: "Contáctanos",
     form_title: "Solicita tu Casillero",
     form_description: "Llena este formulario para registrarte y solicitar tu casillero en USA o China.",
@@ -26,15 +25,25 @@ const texts = {
     id: "Número de Identificación o RUC",
     submit: "Solicitar Casillero",
     contactTitle: "Contacto",
+    contactWhatsapp: "📱 WhatsApp: +507 6521-0278",
+    contactEmail: "📧 Email: exlo@expressloadout.com",
+    contactInstagram: "📸 Instagram",
+    contactFacebook: "📘 Facebook",
     contactList: {
       whatsapp: "WhatsApp: ",
       email: "Email: ",
       instagram: "Instagram: ",
       facebook: "Facebook: ",
       title: "Solicita tu Casillero"
-      
     },
-    footer: "© 2025 Express Loadout"
+    footer: "© 2025 Express Loadout",
+    testimonialsTitle: "Clientes Felices",
+    testimonial1Text: "“Con Express Loadout importé desde China sin complicaciones 10 reformers para mi gimnacio de pilates. Fueron rápidos, honestos, transparentes y hasta me ayudaron a subir toda la carga a mi negocio en un segundo piso. ¡Recomendados!”",
+    testimonial1Author: "– Adriana S., Dueña de negocios",
+    testimonial2Text: "“Necesitaba comprar unos equipos en Amazon y ellos se encargaron de todo. Muy profesionales y atentos principalmente el joven Jonathan muy diligente.”",
+    testimonial2Author: "– Jennifer Rodriguez., Emprendedora",
+    testimonial3Text: "“Usé su casillero en USA y recibí todo en mi casa no solo Panamá, hasta Boquete Chiriqui sin costos ocultos. Excelente servicio.”",
+    testimonial3Author: "– Lena E., Cliente frecuente"
   },
   en: {
     title: "Express Loadout",
@@ -45,14 +54,14 @@ const texts = {
     lockerFormLink: "Request your locker",
     whatsappButtonCall: "📱 Write us on WhatsApp",
     servicesTitle: "Our Services",
-    service1: "online shoppin.",
-    service11: "Online purchases without needing a credit card. We buy for you and provide free assistance.",
-    service2: "PO-Box.",
-    service22: "Locker in USA and China to receive your purchases and imports from letters to cargo.",
-    service3: "Ocean Freight",
-    service33: "Maritime Freight from USA or China to Panama starting at 20 lbs. You choose the max weight.",
-    service4: "Air Freight",
-    service44: "Air Freight with no handling fees or hidden charges. Ridiculously low rates.",
+    service1: "🛒 Shoppinggg",
+    service11: "Online shopping without needing a credit card. We advise and assist you for free, with no extra handling fees.",
+    service2: "📦 Locker",
+    service22: "We provide you with a USA or China address to receive your purchases, letters, packages, or imports to Panama.",
+    service3: "🚢 Ocean Freight",
+    service33: "We bring your ocean freight from China or the USA starting at 20 lbs minimum, you choose the weight. We deliver it to your home or business.",
+    service4: "✈️ Air Freight",
+    service44: "Air cargo or packages from the United States to Panama, with no handling fees or hidden charges, at a low rate.",
     contact: "Contact Us",
     form_title: "Request Your Locker",
     form_description: "Fill out this form to register and request your locker in the USA or China.",
@@ -61,33 +70,28 @@ const texts = {
     phone: "Phone Number (WhatsApp)",
     id: "ID or RUC Number",
     submit: "Request Locker",
-    contactTitle: "Contact",
+    contactTitle: "Contactttt",
+    contactWhatsapp: "📱 WhatsApp: +507 6521-0278",
+    contactEmail: "📧 Email: exlo@expressloadout.com",
+    contactInstagram: "📸 Instagram",
+    contactFacebook: "📘 Facebook",
     contactList: {
       whatsapp: "WhatsApp: ",
       email: "Email: ",
       instagram: "Instagram: ",
       facebook: "Facebook: ",
-       title: "Request Your Locker"
-      
+      title: "Request Your Locker"
     },
-    footer: "© 2025 Express Loadout"
+    footer: "© 2025 Express Loadout",
+    testimonialsTitle: "Happy Clients",
+    testimonial1Text: "“With Express Loadout I imported 10 reformers for my pilates studio from China without complications. They were fast, honest, transparent and even helped me carry all the cargo to my business on a second floor. Highly recommended!”",
+    testimonial1Author: "– Adriana S., Business Owner",
+    testimonial2Text: "“I needed to buy some equipment on Amazon and they took care of everything. Very professional and attentive, especially Jonathan who was very diligent.”",
+    testimonial2Author: "– Jennifer Rodriguez, Entrepreneur",
+    testimonial3Text: "“I used their USA locker and received everything at my house, not just in Panama, but even in Boquete, Chiriqui with no hidden costs. Excellent service.”",
+    testimonial3Author: "– Lena E., Frequent customer"
   }
 };
-
-const translations = {
-  es: {
-  
-    description: "Haz tus importaciones de forma económica, rápida y sencilla con nosotros: servicios honestos, confiables y de calidad.",
-    services_title: "Nuestros Servicios",
-    
-  },
-  en: {
-    title: "Welcome",
-    description: "Make your imports economical, fast, and simple with us: honest, reliable, and quality service.",
-    services_title: "Our Services",
-    
-  }
-}
 
 function setLanguage(lang) {
   document.getElementById('title').textContent = texts[lang].title;
@@ -99,50 +103,60 @@ function setLanguage(lang) {
   document.getElementById('whatsapp-button-call').textContent = texts[lang].whatsappButtonCall;
   document.getElementById('services-title').textContent = texts[lang].servicesTitle;
 
+  // Servicios principales
+  const serviceKeys = ['service1', 'service2', 'service3', 'service4'];
   const servicesUl = document.querySelector('main section:nth-of-type(2) ul');
-  servicesUl.innerHTML = '';
-  texts[lang].servicesList.forEach(service => {
-    const li = document.createElement('li');
-    li.textContent = service;
-    servicesUl.appendChild(li);
-  });
+  if (servicesUl) {
+    servicesUl.innerHTML = '';
+    serviceKeys.forEach(key => {
+      const li = document.createElement('li');
+      li.textContent = texts[lang][key];
+      servicesUl.appendChild(li);
+    });
+  }
 
-  // Contact section titles and links remain in Spanish, but we can translate the section title
-  document.querySelector('main section:nth-of-type(3) h3').textContent = texts[lang].contactTitle;
+  // Título de contacto
+  const contactTitle = document.querySelector('main section:nth-of-type(3) h3');
+  if (contactTitle) {
+    contactTitle.textContent = texts[lang].contactTitle;
+  }
 
-  // Contact list labels stay the same but if you want to translate them, uncomment below and add translations
-  /*
-  const contactItems = document.querySelectorAll('main section:nth-of-type(3) ul li');
-  contactItems[0].innerHTML = texts[lang].contactList.whatsapp + '<a href="https://wa.me/50765210278" target="_blank">+507 6521 0278</a>';
-  contactItems[1].innerHTML = texts[lang].contactList.email + '<a href="mailto:exlo@expressloadout.com">exlo@expressloadout.com</a>';
-  contactItems[2].innerHTML = texts[lang].contactList.instagram + '<a href="https://www.instagram.com/expressloadout" target="_blank">expressloadout</a>';
-  contactItems[3].innerHTML = texts[lang].contactList.facebook + '<a href="https://www.facebook.com/ExpressLoadout/" target="_blank">ExpressLoadout</a>';
-  */
+  // Footer
+  const footer = document.querySelector('footer p');
+  if (footer) {
+    footer.textContent = texts[lang].footer;
+  }
 
-function setLanguage(lang) {
-  document.getElementById("title").textContent = translations[lang].title;
-  document.getElementById("description").textContent = translations[lang].description;
-
-  // Si tienes secciones con IDs como services_title, service1, etc., las traducimos:
-  const keys = [
-    "services_title", "service1", "service2", "service3", "service4",
-    "contact", "form_title", "form_description", "name", "email", "phone", "id", "submit"
-  ];
-  keys.forEach(key => {
+  // Formulario
+  const formKeys = ['form_title', 'form_description', 'name', 'email', 'phone', 'id', 'submit'];
+  formKeys.forEach(key => {
     const el = document.getElementById(key);
     if (el) {
-      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-        el.placeholder = translations[lang][key];
-      } else if (el.tagName === "BUTTON") {
-        el.textContent = translations[lang][key];
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = texts[lang][key];
+      } else if (el.tagName === 'BUTTON') {
+        el.textContent = texts[lang][key];
       } else {
-        el.textContent = translations[lang][key];
+        el.textContent = texts[lang][key];
       }
     }
   });
-}
-  document.querySelector('footer p').textContent = texts[lang].footer;
+
+  document.getElementById('testimonials-title').textContent = texts[lang].testimonialsTitle;
+  document.getElementById('testimonial1-text').textContent = texts[lang].testimonial1Text;
+  document.getElementById('testimonial1-author').textContent = texts[lang].testimonial1Author;
+  document.getElementById('testimonial2-text').textContent = texts[lang].testimonial2Text;
+  document.getElementById('testimonial2-author').textContent = texts[lang].testimonial2Author;
+  document.getElementById('testimonial3-text').textContent = texts[lang].testimonial3Text;
+  document.getElementById('testimonial3-author').textContent = texts[lang].testimonial3Author;
+
+  // Enlaces de contacto
+  document.getElementById('contact-title').textContent = texts[lang].contactTitle;
+  document.getElementById('contact-whatsapp').textContent = texts[lang].contactWhatsapp;
+  document.getElementById('contact-email').textContent = texts[lang].contactEmail;
+  document.getElementById('contact-instagram').textContent = texts[lang].contactInstagram;
+  document.getElementById('contact-facebook').textContent = texts[lang].contactFacebook;
 }
 
-// Set default language to Spanish
+// Idioma por defecto
 setLanguage('es');
