@@ -59,6 +59,61 @@ nav button:hover {
   background-color: #064d9c;
 }
 
+/* Navbar styles for a professional look */
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #fffbe6;
+  padding: 0.5rem 2rem;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 1.5rem;
+}
+.nav-link {
+  color: #222;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-link:hover, .nav-link.active {
+  background: #ffe066;
+  color: #b8860b;
+}
+.lang-switch {
+  margin-left: auto;
+  display: flex;
+  gap: 0.3rem;
+}
+.lang-btn {
+  background: #ffe066;
+  border: none;
+  color: #b8860b;
+  font-weight: bold;
+  padding: 0.2rem 0.7rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lang-btn:hover {
+  background: #ffd700;
+}
+@media (max-width: 700px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  .lang-switch {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
 /* Secciones principales */
 main section {
   margin-top: 30px;

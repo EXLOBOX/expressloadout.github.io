@@ -34,14 +34,21 @@
     gtag('js', new Date());
     gtag('config', 'G-KGXD5X4FGD');
   </script>
+  <link rel="icon" href="images/LOGO%20Favicon.png" type="image/png">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <img src="images/LOGO Amarillo 2x2 - Alteracion.png" alt="Logo Express Loadout" style="height: 60px; margin-right: 15px;">
     <h1 id="title">Express Loadout</h1>
-    <nav style="text-align:center; margin-top:10px;">
-      <button id="btn-es" type="button">Español</button>
-      <button id="btn-en" type="button">English</button>
+    <nav class="navbar">
+      <a href="index2.html" id="nav-home" class="nav-link">Inicio</a>
+      <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
+      <a href="bloq.html" id="nav-blog" class="nav-link">Blog</a>
+      <span class="lang-switch">
+        <button onclick="setLanguage('es')" class="lang-btn">ES</button>
+        <button onclick="setLanguage('en')" class="lang-btn">EN</button>
+      </span>
     </nav>
   </header>
   <main style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
