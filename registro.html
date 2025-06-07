@@ -57,11 +57,10 @@
   </header>
 
   <main>
-    <section id="locker-form"style="display: flex; align-items: center; gap: 32px; flex-wrap: wrap;">
-      <div style="flex: 1 1 320px; min-width: 260px;">
-      <h2 id="form_title">Solicita tu Casillero</h2>
-      <p id="form_description">Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
-      <form action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
+    <section class="registro-flex">
+      <form class="registro-form" action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
+        <h2 id="form_title">Solicita tu Casillero</h2>
+        <p id="form_description">Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
         <input id="name" type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
         <input id="email" type="email" name="Correo Electrónico" placeholder="Correo Electrónico" required>
         <input id="phone" type="text" name="Número de Celular" placeholder="Número de Celular (WhatsApp)" required pattern="[0-9+]{8,15}" title="Ingresa un número válido.">
@@ -70,8 +69,8 @@
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_next" value="https://expressloadout.com/gracias.html">
       </form>
-      <div style="flex: 0 0 220px; display: flex; justify-content: center; align-items: center; min-width: 260px;">
-        <img src="images/signin logo.svg" alt="signin logo" style="max-width: 300px; width: 100%; height: auto; display: block;" />
+      <div class="registro-img">
+        <img src="images/signin logo.svg" alt="signin logo" />
       </div>
     </section>
   </main>

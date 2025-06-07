@@ -137,43 +137,25 @@ const translations = {
 };
 
 function setLanguage(lang) {
-  var ids = Object.keys(translations[lang]);
-  for (var i = 0; i < ids.length; i++) {
-    var el = document.getElementById(ids[i]);
-    if (el && translations[lang][ids[i]] !== undefined) {
-      if (ids[i] === 'thanks-desc') {
-        el.innerHTML = translations[lang][ids[i]];
+  if (!translations[lang]) return;
+  Object.keys(translations[lang]).forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = translations[lang][id];
+      } else if (el.tagName === 'BUTTON') {
+        el.textContent = translations[lang][id];
       } else {
-        el.textContent = translations[lang][ids[i]];
+        el.innerHTML = translations[lang][id];
       }
     }
-  }
-  // Tiendas: translate store names
-  var storeKeys = [
-    'store-amazon','store-ebay','store-temu','store-aliexpress','store-shein','store-rockauto','store-wayfair','store-taobao','store-sephora','store-romwe','store-alibaba','store-madeinchina'
-  ];
-  var storeEls = document.querySelectorAll('.trans-store-name');
-  storeEls.forEach(function(el, idx) {
-    if (translations[lang][storeKeys[idx]]) {
-      el.textContent = translations[lang][storeKeys[idx]];
-    }
   });
-  // Tiendas: translate product names in carousel
-  var prodKeys = ['prod-echodot','prod-switch','prod-kindle'];
-  var prodEls = document.querySelectorAll('.trans-product-name');
-  prodEls.forEach(function(el, idx) {
-    if (translations[lang][prodKeys[idx]]) {
-      el.textContent = translations[lang][prodKeys[idx]];
-    }
-  });
-}
-
-function setLangFromSelector(lang) {
+  // Guarda preferencia
   localStorage.setItem('lang', lang);
-  setLanguage(lang);
 }
 
+// Al cargar la página, aplica el idioma guardado o español por defecto
 document.addEventListener('DOMContentLoaded', function() {
-  var lang = localStorage.getItem('lang') || 'es';
+  const lang = localStorage.getItem('lang') || 'es';
   setLanguage(lang);
 });

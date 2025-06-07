@@ -267,6 +267,75 @@ footer {
   }
 }
 
+/* Formulario registro bonito */
+.registro-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  margin: 40px 0;
+}
+.registro-form {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 4px 24px #0001;
+  padding: 32px 28px;
+  min-width: 320px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.registro-form h2 {
+  margin-bottom: 0;
+  font-size: 1.5rem;
+  color: #1a237e;
+}
+.registro-form p {
+  margin-top: 0;
+  color: #444;
+  font-size: 1rem;
+}
+.registro-form input {
+  border-radius: 18px;
+  border: 1.5px solid #e0e0e0;
+  padding: 12px 16px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  margin-bottom: 2px;
+}
+.registro-form input:focus {
+  border: 1.5px solid #1a237e;
+  background: #f5f7fa;
+}
+.registro-form button {
+  border-radius: 18px;
+  background: #ffb300;
+  color: #222;
+  border: none;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.registro-form button:hover {
+  background: #ffa000;
+}
+.registro-img img {
+  max-width: 320px;
+  width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px #0002;
+}
+@media (max-width: 900px) {
+  .registro-flex { flex-direction: column; gap: 24px; }
+  .registro-img img { max-width: 220px; }
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
   body {
