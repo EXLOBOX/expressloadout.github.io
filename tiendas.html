@@ -113,9 +113,9 @@
     <nav class="navbar">
       <a href="index.html" id="nav-home" class="nav-link">Inicio</a>
       <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
-      <a href="bloq.html" id="nav-blog" class="nav-link">Blog</a>
+      <a href="blog.html" id="nav-blog" class="nav-link">Blog</a>
       <a href="tracking.html" id="nav-tracking" class="nav-link">Tracking</a>
-      <a href="tiendas.html" id="nav-stores" class="nav-link active">Tiendas</a>
+      <a href="tiendas.html" id="nav-stores" class="nav-link">Tiendas</a>
       <span class="lang-switch">
         <button onclick="setLanguage('es')" class="lang-btn">ES</button>
         <button onclick="setLanguage('en')" class="lang-btn">EN</button>
@@ -225,6 +225,17 @@
   </footer>
   <script src="script.js"></script>
   <script>
+        // Resalta el enlace activo en el navbar según la URL
+const path = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.classList.remove('active');
+  if (link.getAttribute('href') === path) {
+    link.classList.add('active');
+  }
+  if ((path === '' || path === 'index.html') && link.getAttribute('href') === 'index.html') {
+    link.classList.add('active');
+  }
+});
     // Carrusel simple para productos recomendados
     function scrollCarousel(dir) {
       const carousel = document.getElementById('carousel');

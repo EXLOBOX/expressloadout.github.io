@@ -46,9 +46,9 @@
     <nav class="navbar">
       <a href="index.html" id="nav-home" class="nav-link">Inicio</a>
       <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
-      <a href="bloq.html" id="nav-blog" class="nav-link">Blog</a>
-      <a href="tracking.html" id="nav-tracking" class="nav-link">Tracking</a>
-      <a href="tiendas.html" id="nav-stores" class="nav-link active">Tiendas</a>
+      <a href="blog.html" id="nav-blog" class="nav-link">Blog</a>
+      <a href="tracking.html" id="nav-tracking" class="nav-link active">Tracking</a>
+      <a href="tiendas.html" id="nav-stores" class="nav-link">Tiendas</a>
       <span class="lang-switch">
         <button onclick="setLanguage('es')" class="lang-btn">ES</button>
         <button onclick="setLanguage('en')" class="lang-btn">EN</button>
@@ -95,6 +95,21 @@
       setLanguage('es');
       document.getElementById('btn-es').onclick = function() { setLanguage('es'); };
       document.getElementById('btn-en').onclick = function() { setLanguage('en'); };
+    });
+  </script>
+  <script>
+    // Resalta el enlace activo en el navbar según la URL
+    document.addEventListener('DOMContentLoaded', function() {
+      const path = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === path) {
+          link.classList.add('active');
+        }
+        if ((path === '' || path === 'index.html') && link.getAttribute('href') === 'index.html') {
+          link.classList.add('active');
+        }
+      });
     });
   </script>
 </body>
