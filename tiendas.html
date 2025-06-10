@@ -255,23 +255,56 @@
   </footer>
   <script src="script.js"></script>
   <script>
-        // Resalta el enlace activo en el navbar según la URL
-const path = window.location.pathname.split('/').pop() || 'index.html';
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.classList.remove('active');
-  if (link.getAttribute('href') === path) {
-    link.classList.add('active');
-  }
-  if ((path === '' || path === 'index.html') && link.getAttribute('href') === 'index.html') {
-    link.classList.add('active');
-  }
-});
-    // Carrusel simple para productos recomendados
-    function scrollCarousel(dir) {
-      const carousel = document.getElementById('carousel');
-      const scrollAmount = 180; // px
-      carousel.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+  // Resalta el enlace activo en el navbar según la URL
+  const path = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === path) {
+      link.classList.add('active');
     }
+    if ((path === '' || path === 'index.html') && link.getAttribute('href') === 'index.html') {
+      link.classList.add('active');
+    }
+  });
+
+  // Carrusel simple para productos recomendados
+  function scrollCarousel(dir) {
+    const carousel = document.getElementById('carousel');
+    const scrollAmount = 180; // px
+    carousel.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+  }
+
+  // --- Carrusel automático, suave e infinito real ---
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('carousel');
+    let speed = 0.5; // px por frame
+    let running = true;
+
+    // Duplicar los items para efecto infinito
+    carousel.innerHTML += carousel.innerHTML;
+
+    function animate() {
+      if (!running) return;
+      // Si el scroll llega a la mitad (donde empieza la copia), vuelve al inicio
+      if (carousel.scrollLeft >= carousel.scrollWidth / 2) {
+        carousel.scrollLeft = 0;
+      } else {
+        carousel.scrollLeft += speed;
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Pausa el auto-scroll al pasar el mouse
+    carousel.addEventListener('mouseenter', () => running = false);
+    carousel.addEventListener('mouseleave', () => {
+      if (!running) {
+        running = true;
+        animate();
+      }
+    });
+  });
   </script>
 </body>
 </html>
