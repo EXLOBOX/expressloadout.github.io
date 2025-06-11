@@ -145,18 +145,15 @@ document.getElementById("registro-form").addEventListener("submit", function (e)
     },
     body: JSON.stringify({ data: [data] })
   })
-  .then(response => {
+  .then(response => response.json().then(json => {
+    console.log("SheetDB response:", json);
     if (!response.ok) {
-      // Si SheetDB responde con error, muestra el mensaje
-      return response.json().then(err => {
-        console.error("SheetDB error:", err);
-        // Envía igual el formulario a FormSubmit
-        HTMLFormElement.prototype.submit.call(form);
-      });
+      console.error("SheetDB error:", json);
+      HTMLFormElement.prototype.submit.call(form);
+      return;
     }
-    // Si todo bien, envía el formulario a FormSubmit
     HTMLFormElement.prototype.submit.call(form);
-  })
+  }))
   .catch(error => {
     console.error("Error de red o fetch:", error);
     alert("Hubo un problema al enviar tus datos.");
