@@ -135,6 +135,8 @@ document.getElementById("registro-form").addEventListener("submit", function (e)
     "L_link": ""
   };
 
+  console.log("Datos enviados a SheetDB:", data);
+
   fetch("https://sheetdb.io/api/v1/76gm33pgdx2fr", {
     method: "POST",
     headers: {
