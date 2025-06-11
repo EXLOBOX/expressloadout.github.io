@@ -120,19 +120,16 @@ document.getElementById("registro-form").addEventListener("submit", function (e)
   const formData = new FormData(form);
 
   const data = {
+    "CODIGO": "",
     "Nombre y Apellido": formData.get("Nombre y Apellido"),
     "Correo Electrónico": formData.get("Correo Electrónico"),
     "Número de Celular": formData.get("Número de Celular"),
-    "Identificación o RUC": formData.get("Identificación o RUC"),
-    "CODIGO": "",
-    "NOMBRE/EMPRESA": "",
-    "Email": "",
-    "Tel": "",
     "PO-box_A": "",
     "PO-box_M": "",
     "Tarifa A": "",
     "tipo": "",
     "Tarifa M": "",
+    "Identificación o RUC": formData.get("Identificación o RUC"),
     "ID_RUC": "",
     "Location": "",
     "L_link": ""
