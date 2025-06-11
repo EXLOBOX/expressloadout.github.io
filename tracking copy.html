@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tracking | Express Loadout</title>
+  <meta name="description" content="Rastrea tu paquete y confirma la recepción en warehouse y Panamá con Express Loadout." />
+  <meta name="keywords" content="tracking, rastreo, paquete, warehouse, Panamá, Express Loadout, 17Track" />
+  <meta name="author" content="Express Loadout" />
+  <meta property="og:title" content="Tracking | Express Loadout" />
+  <meta property="og:description" content="Rastrea tu paquete y confirma la recepción en warehouse y Panamá con Express Loadout." />
+  <meta property="og:image" content="images/banner%20Open%20Grap%20OG%20TwitterCards.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://expressloadout.com/tracking.html" />
+  <link rel="icon" href="images/LOGO%20Favicon.png" type="image/png">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <img src="images/LOGO Amarillo 2x2 - Alteracion.png" alt="Logo Express Loadout" style="height: 60px; margin-right: 15px;">
+    <h1 id="title">Express Loadout</h1>
+    <nav class="navbar">
+      <a href="index.html" id="nav-home" class="nav-link">Inicio</a>
+      <a href="registro.html" id="nav-register" class="nav-link">Registro</a>
+      <a href="blog.html" id="nav-blog" class="nav-link">Blog</a>
+      <a href="tracking.html" id="nav-tracking" class="nav-link">Tracking</a>
+      <a href="tiendas.html" id="nav-stores" class="nav-link">Tiendas</a>
+      <span class="lang-switch">
+        <button onclick="setLanguage('es')" class="lang-btn">ES</button>
+        <button onclick="setLanguage('en')" class="lang-btn">EN</button>
+      </span>
+    </nav>
+  </header>
+  <main>
+    <section class="tracking-section">
+      <h2>Rastrear mi paquete y transportista</h2>
+      <!-- Integración 17Track API Widget -->
+      <div style="max-width:500px;margin:auto;">
+        <!-- Widget oficial 17Track con API Key personalizada -->
+         <h2>Rastrea tu paquete</h2>
+<input type="text" id="trackingNumber" placeholder="Ingresa tu número de seguimiento">
+<button onclick="trackPackage()">Rastrear</button>
+
+<pre id="result" style="background:#f4f4f4; padding:10px;"></pre>
+
+<script src="17track.js"></script>
+        <!-- Puedes cambiar el idioma en 'lang' y personalizar el widget -->
+        <div id="seventeentrack-widget"></div>
+        <script src="https://widget.17track.net/widget.js?apikey=708C2EF0CA32A784D0432D8572AB883A"></script>
+        <script>
+          window.addEventListener('DOMContentLoaded', function() {
+            if (window.SeventeenTrackWidget) {
+              window.SeventeenTrackWidget.init({
+                element: '#seventeentrack-widget',
+                apikey: '708C2EF0CA32A784D0432D8572AB883A',
+                lang: 'en', // Cambia a 'en' si lo deseas
+                theme: 'light',
+                responsive: true
+              });
+            }
+          });
+        </script>
+      </div>
+    </section>
+    <section class="tracking-section">
+      <h2>Confirmar recepción Warehouse, pegar Tracking</h2>
+      <!-- Aquí puedes integrar tu API o formulario de confirmación -->
+      <form id="warehouse-confirm-form" style="max-width:500px;margin:auto;">
+        <label for="warehouse-tracking">Tracking Number:</label>
+        <input type="text" id="warehouse-tracking" name="warehouse-tracking" placeholder="Pega tu número de tracking aquí" required style="width:100%;margin-bottom:10px;">
+        <button type="submit" class="btn">Confirmar Recepción Warehouse</button>
+      </form>
+      <!-- Comentario: Integra aquí tu API para procesar la confirmación de warehouse -->
+    </section>
+    <section class="tracking-section">
+      <h2>Confirmar recepción Panamá, pegar Tracking</h2>
+      <!-- Aquí puedes integrar tu API o formulario de confirmación -->
+      <form id="panama-confirm-form" style="max-width:500px;margin:auto;">
+        <label for="panama-tracking">Tracking Number:</label>
+        <input type="text" id="panama-tracking" name="panama-tracking" placeholder="Pega tu número de tracking aquí" required style="width:100%;margin-bottom:10px;">
+        <button type="submit" class="btn">Confirmar Recepción Panamá</button>
+      </form>
+      <!-- Comentario: Integra aquí tu API para procesar la confirmación en Panamá -->
+    </section>
+  </main>
+  <footer>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+      <img src="images/LOGO%20Favicon.png" alt="favicon" style="height: 22px; width: 22px; vertical-align: middle; border-radius: 4px; margin-right: 4px;">
+      <span style="flex:1; text-align:center; font-size: 0.98rem; color: #666; min-width: 180px;">© 2025 Express Loadout. Todos los derechos reservados.</span>
+      <span style="display: flex; align-items: center; gap: 12px;">
+        <a href="https://www.instagram.com/expressloadout" target="_blank" rel="noopener" title="Instagram" style="display:inline-block;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#fff"/><path d="M12 7.2A4.8 4.8 0 1 0 12 16.8A4.8 4.8 0 1 0 12 7.2Z" stroke="#C13584" stroke-width="1.5"/><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="4.25" stroke="#C13584" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.1" fill="#C13584"/></svg>
+        </a>
+        <a href="https://www.facebook.com/ExpressLoadout/" target="_blank" rel="noopener" title="Facebook" style="display:inline-block;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#fff"/><path d="M15.5 8.5H14V7.5C14 7.22 14.22 7 14.5 7H15.5V5H14.5C13.12 5 12 6.12 12 7.5V8.5H10V11H12V19H14V11H15.5L16 8.5H14Z" fill="#1877F3"/></svg>
+        </a>
+      </span>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+    <script>
+    // Resalta el enlace activo en el navbar según la URL
+const path = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.classList.remove('active');
+  if (link.getAttribute('href') === path) {
+    link.classList.add('active');
+  }
+  if ((path === '' || path === 'index.html') && link.getAttribute('href') === 'index.html') {
+    link.classList.add('active');
+  }
+});
+  </script>
+</body>
+</html>
