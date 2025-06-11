@@ -147,13 +147,13 @@ document.getElementById("registro-form").addEventListener("submit", function (e)
   })
   .then(response => {
     // Envía también el formulario a FormSubmit
-    form.submit();
+    HTMLFormElement.prototype.submit.call(form);
   })
   .catch(error => {
     console.error("Error:", error);
     alert("Hubo un problema al enviar tus datos.");
     // Si falla SheetDB, igual envía el formulario a FormSubmit
-    form.submit();
+    HTMLFormElement.prototype.submit.call(form);
   });
 });
 </script>
