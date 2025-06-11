@@ -58,7 +58,7 @@
 
   <main>
     <section class="registro-flex">
-      <form class="registro-form" action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
+      <form class="registro-form" id="registro-form" action="https://formsubmit.co/exlo@expressloadout.com" method="POST">
         <h2 id="form_title">Solicita tu Casillero</h2>
         <p id="form_description">Llena este formulario para registrarte y solicitar tu casillero en USA o China.</p>
         <input id="name" type="text" name="Nombre y Apellido" placeholder="Nombre y Apellido" required>
@@ -112,5 +112,50 @@
       });
     });
   </script>
+  <script>
+document.getElementById("registro-form").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  const data = {
+    "Nombre y Apellido": formData.get("Nombre y Apellido"),
+    "Correo Electrónico": formData.get("Correo Electrónico"),
+    "Número de Celular": formData.get("Número de Celular"),
+    "Identificación o RUC": formData.get("Identificación o RUC"),
+    "CODIGO": "",
+    "NOMBRE/EMPRESA": "",
+    "Email": "",
+    "Tel": "",
+    "PO-box_A": "",
+    "PO-box_M": "",
+    "Tarifa A": "",
+    "tipo": "",
+    "Tarifa M": "",
+    "ID_RUC": "",
+    "Location": "",
+    "L_link": ""
+  };
+
+  fetch("https://sheetdb.io/api/v1/76gm33pgdx2fr", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ data })
+  })
+  .then(response => {
+    // Envía también el formulario a FormSubmit
+    form.submit();
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("Hubo un problema al enviar tus datos.");
+    // Si falla SheetDB, igual envía el formulario a FormSubmit
+    form.submit();
+  });
+});
+</script>
 </body>
 </html>
