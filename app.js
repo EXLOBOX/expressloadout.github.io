@@ -1005,7 +1005,7 @@ function copyFullWarehouseAddress(type = 'usa') {
   if (type === 'china') {
     text = `ALMACÉN CHINA:\nCONSIGNATARIO: NOVA PTY - ${name} ${code}\nCIUDAD: Guangzhou\nDISTRITO: Baiyun District\nPROVINCIA: Guangdong\nPAÍS: China\nCÓDIGO POSTAL: 510440`;
   } else {
-    text = `ALMACÉN MIAMI, USA:\nNOMBRE: ${name} ${code}\nDIRECCIÓN LÍNEA 1: 8306 NW 68th St\nLÍNEA 2 (CASILLERO): ${code}\nCIUDAD: Miami\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33166\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
+    text = `ALMACÉN MIAMI, USA:\nNOMBRE: ${name} ${code}\nDIRECCIÓN LÍNEA 1: 1970 NW 82nd Ave\nLÍNEA 2 (CASILLERO): ${code}\nCIUDAD: Doral\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33191\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
   }
 
   navigator.clipboard.writeText(text).then(() => {
@@ -1018,7 +1018,7 @@ function copyAddressSnippet(type = 'usa') {
   if (type === 'china') {
     snippet = 'Guangzhou, Baiyun District, Guangdong, China (Zip: 510440) | NOVA PTY - [Tu Nombre + EXLO-PA]';
   } else {
-    snippet = '8306 NW 68th St, [Tu Nombre + EXLO-PA], Miami, FL 33166';
+    snippet = '1970 NW 82nd Ave, [Tu Nombre + EXLO-PA], Doral, FL 33191';
   }
   navigator.clipboard.writeText(snippet).then(() => {
     alert('✅ Dirección copiada: ' + snippet);
