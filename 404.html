@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 - Módulo en Maniobras Logísticas | Express Loadout Panamá</title>
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" type="image/png" href="images/LOGO_Favicon.png" />
+
+  <!-- Fonts: Space Grotesk & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" />
+
+  <style>
+    :root {
+      --bg-base: #080b10;
+      --bg-card: rgba(14, 21, 34, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --brand-yellow: #f59e0b;
+      --brand-yellow-glow: rgba(245, 158, 11, 0.4);
+      --text-heading: #f8fafc;
+      --text-main: #cbd5e1;
+      --text-muted: #8492a6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Fondo de cuadrícula táctica */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-radial {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(37, 99, 235, 0.05) 50%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .error-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 780px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.15);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--brand-yellow);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+
+    .flashing-beacon {
+      width: 8px;
+      height: 8px;
+      background-color: var(--brand-yellow);
+      border-radius: 50%;
+      animation: beaconFlash 1.2s infinite;
+    }
+
+    @keyframes beaconFlash {
+      0%, 100% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); box-shadow: 0 0 10px var(--brand-yellow); }
+    }
+
+    /* =========================================================================
+       ILUSTRACIÓN VECTORIAL: GRÚA PÓRTICA DE PUERTO LOGÍSTICO (GANTRY CRANE)
+       ========================================================================= */
+    .crane-stage {
+      width: 100%;
+      height: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0 24px;
+      position: relative;
+    }
+
+    .crane-svg {
+      width: 100%;
+      max-width: 520px;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Animación del cable y contenedor levantándose */
+    .crane-cable-group {
+      animation: craneHoist 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes craneHoist {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-18px); }
+      100% { transform: translateY(-34px); }
+    }
+
+    .crane-trolley {
+      animation: trolleyTraverse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes trolleyTraverse {
+      0% { transform: translateX(0px); }
+      100% { transform: translateX(28px); }
+    }
+
+    .error-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-heading);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .error-lead {
+      font-size: 1.05rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+
+    /* Franja de Advertencia / Obra Táctica */
+    .hazard-stripe {
+      height: 6px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        -45deg,
+        #f59e0b,
+        #f59e0b 14px,
+        #111827 14px,
+        #111827 28px
+      );
+      border-radius: 3px;
+      margin-bottom: 30px;
+      opacity: 0.85;
+    }
+
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #090d14;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(245, 158, 11, 0.55);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: var(--text-heading);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--brand-yellow);
+      color: var(--brand-yellow);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .btn-whatsapp {
+      background: #25D366;
+      color: #fff;
+    }
+
+    .btn-whatsapp:hover {
+      background: #1ebc59;
+      transform: translateY(-2px);
+    }
+
+    .footer-note {
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .error-card { padding: 26px 18px; }
+      .error-title { font-size: 1.6rem; }
+      .error-lead { font-size: 0.92rem; }
+      .crane-stage { height: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-radial"></div>
+
+  <main class="error-card">
+    <div class="status-badge">
+      <span class="flashing-beacon"></span>
+      <span>404 • ZONA DE MANIOBRAS LOGÍSTICAS</span>
+    </div>
+
+    <!-- ESCENARIO DE GRÚA PÓRTICA INDUSTRIAL (STS CONTAINER GANTRY CRANE) -->
+    <div class="crane-stage" aria-label="Ilustración animada de Grúa Pórtica descargando contenedor">
+      <svg class="crane-svg" viewBox="0 0 540 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Gradiente del Contenedor de Carga -->
+          <linearGradient id="containerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f59e0b" />
+            <stop offset="100%" stop-color="#b45309" />
+          </linearGradient>
+          <!-- Gradiente de la Grúa Gunmetal -->
+          <linearGradient id="craneSteel" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#334155" />
+            <stop offset="50%" stop-color="#64748b" />
+            <stop offset="100%" stop-color="#1e293b" />
+          </linearGradient>
+        </defs>
+
+        <!-- Rieles y Base del Muelle -->
+        <line x1="20" y1="220" x2="520" y2="220" stroke="#334155" stroke-width="4" stroke-dasharray="10 6" />
+        <line x1="10" y1="226" x2="530" y2="226" stroke="#1e293b" stroke-width="6" />
+
+        <!-- Pilares / Patas Inclinadas de la Grúa Pórtica (A-Frame) -->
+        <!-- Pata Izquierda -->
+        <line x1="120" y1="220" x2="180" y2="50" stroke="url(#craneSteel)" stroke-width="9" stroke-linecap="round" />
+        <line x1="80" y1="220" x2="180" y2="50" stroke="url(#craneSteel)" stroke-width="7" />
+        <!-- Pata Derecha -->
+        <line x1="420" y1="220" x2="360" y2="50" stroke="url(#craneSteel)" stroke-width="9" stroke-linecap="round" />
+        <line x1="460" y1="220" x2="360" y2="50" stroke="url(#craneSteel)" stroke-width="7" />
+
+        <!-- Estructuras Cruzadas de Refuerzo (Vigas X) -->
+        <line x1="105" y1="160" x2="170" y2="100" stroke="#475569" stroke-width="3" />
+        <line x1="170" y1="160" x2="125" y2="100" stroke="#475569" stroke-width="3" />
+        <line x1="370" y1="160" x2="435" y2="100" stroke="#475569" stroke-width="3" />
+        <line x1="435" y1="160" x2="390" y2="100" stroke="#475569" stroke-width="3" />
+
+        <!-- Viga Horizontal Superior / Pluma Principal (Boom Arm) -->
+        <rect x="40" y="38" width="460" height="18" rx="3" fill="url(#craneSteel)" stroke="#f59e0b" stroke-width="1.5" />
+        <!-- Celosía superior de la pluma -->
+        <line x1="50" y1="38" x2="180" y2="14" stroke="#64748b" stroke-width="4" />
+        <line x1="490" y1="38" x2="360" y2="14" stroke="#64748b" stroke-width="4" />
+        <line x1="180" y1="14" x2="360" y2="14" stroke="#64748b" stroke-width="5" />
+        <circle cx="180" cy="14" r="5" fill="#f59e0b" />
+        <circle cx="360" cy="14" r="5" fill="#f59e0b" />
+
+        <!-- Baliza Superior de Advertencia -->
+        <circle cx="270" cy="12" r="4" fill="#ef4444" />
+        <circle cx="270" cy="12" r="8" fill="#ef4444" opacity="0.4" />
+
+        <!-- GRUPO MÓVIL: CARRO DE TRASLACIÓN (TROLLEY) + CABLES + CONTENEDOR -->
+        <g class="crane-trolley">
+          <!-- Carro de Traslación (Trolley) montado en riel -->
+          <rect x="245" y="48" width="50" height="14" rx="3" fill="#0f172a" stroke="#f59e0b" stroke-width="2" />
+          <circle cx="255" cy="46" r="4" fill="#cbd5e1" />
+          <circle cx="285" cy="46" r="4" fill="#cbd5e1" />
+
+          <!-- Cables de Acero y Spreader (Bastidor) con Animación de Elevación -->
+          <g class="crane-cable-group">
+            <!-- Cables -->
+            <line x1="258" y1="62" x2="258" y2="110" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3 2" />
+            <line x1="282" y1="62" x2="282" y2="110" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3 2" />
+
+            <!-- Spreader / Bastidor de Acople -->
+            <rect x="238" y="110" width="64" height="8" rx="2" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" />
+            <circle cx="242" cy="114" r="2.5" fill="#22c55e" />
+            <circle cx="298" cy="114" r="2.5" fill="#22c55e" />
+
+            <!-- CONTENEDOR INTERNACIONAL DE CARGA EXLO -->
+            <g id="shipping-container">
+              <!-- Cuerpo del Contenedor -->
+              <rect x="230" y="118" width="80" height="42" rx="4" fill="url(#containerGrad)" stroke="#d97706" stroke-width="1.5" />
+              <!-- Corrugaciones del contenedor -->
+              <line x1="242" y1="120" x2="242" y2="158" stroke="#78350f" stroke-width="2" />
+              <line x1="254" y1="120" x2="254" y2="158" stroke="#78350f" stroke-width="2" />
+              <line x1="266" y1="120" x2="266" y2="158" stroke="#78350f" stroke-width="2" />
+              <line x1="278" y1="120" x2="278" y2="158" stroke="#78350f" stroke-width="2" />
+              <line x1="290" y1="120" x2="290" y2="158" stroke="#78350f" stroke-width="2" />
+              <line x1="302" y1="120" x2="302" y2="158" stroke="#78350f" stroke-width="2" />
+
+              <!-- Placa / Identificador del Contenedor -->
+              <rect x="246" y="128" width="48" height="18" rx="2" fill="#090d14" opacity="0.9" />
+              <text x="270" y="141" fill="#fbbf24" font-family="'Space Grotesk', sans-serif" font-size="8.5" font-weight="bold" text-anchor="middle" letter-spacing="0.5">EXLO-PA</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- Otros Contenedores Estibados en Muelle -->
+        <rect x="130" y="184" width="60" height="36" rx="2" fill="#2563eb" opacity="0.75" />
+        <rect x="135" y="152" width="50" height="32" rx="2" fill="#10b981" opacity="0.8" />
+        <rect x="350" y="184" width="65" height="36" rx="2" fill="#dc2626" opacity="0.75" />
+      </svg>
+    </div>
+
+    <!-- Franja de seguridad táctica -->
+    <div class="hazard-stripe"></div>
+
+    <h1 class="error-title">Estamos Descargando y Mejorando este Módulo</h1>
+    <p class="error-lead">
+      La ruta o módulo al que intentas acceder se encuentra actualmente en <strong>proceso de construcción y mantenimiento operativo</strong> por parte del equipo de logística de Express Loadout.
+    </p>
+
+    <div class="action-buttons">
+      <a href="index.html" class="btn btn-primary">
+        <i class="ph ph-house"></i>
+        <span>Volver al Inicio</span>
+      </a>
+      <a href="index.html#tracking" class="btn btn-outline">
+        <i class="ph ph-navigation-arrow"></i>
+        <span>Rastrear mi Paquete</span>
+      </a>
+      <a href="https://wa.me/50765210278?text=Hola%20Express%20Loadout,%20encontré%20un%20módulo%20en%20mantenimiento%20y%20necesito%20ayuda." target="_blank" rel="noopener" class="btn btn-whatsapp">
+        <i class="ph ph-whatsapp-logo"></i>
+        <span>Asistencia WhatsApp (+507)</span>
+      </a>
+    </div>
+
+    <div class="footer-note">
+      <i class="ph-fill ph-shield-check" style="color:var(--brand-yellow);"></i>
+      <span>Express Loadout Panamá • Seguridad Portuaria & Logística Digital</span>
+    </div>
+  </main>
+</body>
+</html>
