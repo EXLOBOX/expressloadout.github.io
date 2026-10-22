@@ -934,14 +934,110 @@ button, input, select, textarea {
 .calc-guarantee-note {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  padding: 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   color: #6ee7b7;
-  margin-top: 24px;
+  margin-top: 20px;
+  line-height: 1.5;
+}
+
+.calc-season-advisory {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: #93c5fd;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.calc-china-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: #fde68a;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.calc-consult-box {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.calc-consult-link {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #60a5fa;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--trans-fast);
+}
+
+.calc-consult-link:hover {
+  color: var(--brand-yellow);
+  text-decoration: underline;
+}
+
+/* Selector mini de Bodega en el Hero */
+.address-tabs-mini {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.addr-tab-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all var(--trans-fast);
+}
+
+.addr-tab-btn:hover, .addr-tab-btn.active {
+  background: var(--brand-yellow);
+  color: #000;
+  border-color: var(--brand-yellow);
+}
+
+/* Badge de evento pendiente o por confirmar */
+.countdown-pending-badge {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fde68a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .calc-big-price {
@@ -2607,6 +2703,8 @@ button, input, select, textarea {
 .tag-temu { color: #f97316; border: 1px solid rgba(249, 115, 22, 0.4); }
 .tag-alibaba { color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
 .tag-madeinchina { color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); }
+.tag-shein { color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.4); }
+.tag-walmart { color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
 
 .event-title {
   font-family: 'Space Grotesk', sans-serif;

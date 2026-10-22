@@ -6,7 +6,7 @@
   
   <!-- SEO Técnico Principal -->
   <title>Express Loadout | Casillero en USA y China, Compras e Importaciones a Panamá</title>
-  <meta name="description" content="Casillero internacional en Miami (USA) y China con entregas en toda Panamá. Tarifas claras sin cargos ocultos. Carga aérea 3-5 días y marítima desde 20 lbs. ¡Abre tu casillero gratis hoy!" />
+  <meta name="description" content="Casillero internacional en Miami (USA) y China con entregas en toda Panamá. Tarifas claras sin cargos ocultos. Carga aérea 3-5 días y marítima desde 25 lbs. ¡Abre tu casillero gratis hoy!" />
   <meta name="keywords" content="casillero Panamá, casillero Miami Panamá, casillero China Panamá, compras por internet Panamá, flete aéreo Panamá, flete marítimo Panamá, importar de China, compras Amazon Panamá, courier Panamá, Express Loadout" />
   <meta name="author" content="Express Loadout Panamá" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -103,7 +103,7 @@
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Carga Marítima Consolidada (desde 20 lbs)"
+                "name": "Carga Marítima Consolidada (desde 25 lbs)"
               }
             },
             {
@@ -304,7 +304,7 @@
             </div>
             <div class="metric-divider"></div>
             <div class="metric-item">
-              <div class="metric-value">20 <span class="metric-unit">lbs</span></div>
+              <div class="metric-value">25 <span class="metric-unit">lbs</span></div>
               <div class="metric-label">Mínimo Marítimo USA/China</div>
             </div>
             <div class="metric-divider"></div>
@@ -350,17 +350,40 @@
               <!-- Renderizado dinámico vía JS -->
             </div>
 
-            <!-- Mini Address Preview -->
+            <!-- Mini Address Preview con Selector Miami / China -->
             <div class="quick-address-box">
-              <div class="address-header">
-                <span class="address-tag"><i class="ph ph-map-pin"></i> Tu Bodega en Miami:</span>
-                <button class="copy-btn" onclick="copyAddressSnippet()" title="Copiar dirección">
-                  <i class="ph ph-copy"></i> Copiar
+              <div class="address-tabs-mini">
+                <button type="button" class="addr-tab-btn active" id="addr-tab-usa" onclick="switchHeroAddress('usa')">
+                  <i class="ph ph-map-pin"></i> Bodega Miami (USA)
+                </button>
+                <button type="button" class="addr-tab-btn" id="addr-tab-china" onclick="switchHeroAddress('china')">
+                  <i class="ph ph-warehouse"></i> Bodega Guangzhou (China)
                 </button>
               </div>
-              <code class="address-snippet">
-                8306 NW 68th St, [Tu Nombre + EXLO-PA], Miami, FL 33166
-              </code>
+
+              <div id="hero-addr-usa-content">
+                <div class="address-header">
+                  <span class="address-tag">Dirección Miami (Base de Datos Proveedores):</span>
+                  <button class="copy-btn" onclick="copyAddressSnippet('usa')" title="Copiar dirección">
+                    <i class="ph ph-copy"></i> Copiar
+                  </button>
+                </div>
+                <code class="address-snippet">
+                  8306 NW 68th St, [Tu Nombre + EXLO-PA], Miami, FL 33166
+                </code>
+              </div>
+
+              <div id="hero-addr-china-content" class="hidden">
+                <div class="address-header">
+                  <span class="address-tag">Dirección Guangzhou (NOVA Shipping):</span>
+                  <button class="copy-btn" onclick="copyAddressSnippet('china')" title="Copiar dirección">
+                    <i class="ph ph-copy"></i> Copiar
+                  </button>
+                </div>
+                <code class="address-snippet">
+                  Guangzhou, Distrito Baiyun, Guangdong, China (Zip: 510440) • Casillero: NOVA PTY - [Tu Nombre + EXLO-PA]
+                </code>
+              </div>
             </div>
           </div>
         </div>
@@ -420,16 +443,16 @@
                   <i class="ph ph-rocket-launch"></i> Aéreo Express (3-5 d)
                 </button>
                 <button type="button" class="segment-btn" data-mode="sea">
-                  <i class="ph ph-anchor"></i> Marítimo Económico
+                  <i class="ph ph-anchor"></i> Marítimo (Mín. 25 lbs / CBM)
                 </button>
               </div>
             </div>
 
-            <!-- Input de Peso -->
-            <div class="form-group">
+            <!-- Input de Peso (Libras) -->
+            <div class="form-group" id="weight-input-group">
               <div class="label-with-tooltip">
-                <label for="calc-weight" class="form-label">Peso estimado (Libras / lbs):</label>
-                <span class="tooltip-badge" title="1 kg equivale a 2.2 lbs">1 kg ≈ 2.2 lbs</span>
+                <label for="calc-weight" class="form-label" id="calc-weight-label">Peso estimado (Libras / lbs):</label>
+                <span class="tooltip-badge" id="calc-weight-badge">Mínimo 25 lbs en marítimo</span>
               </div>
               <div class="input-range-wrap">
                 <input type="number" id="calc-weight" class="calc-number-input" value="10" min="1" max="5000" />
@@ -437,19 +460,49 @@
               </div>
             </div>
 
-            <!-- Destino en Panamá -->
+            <!-- Input especial para CBM China -->
+            <div class="form-group hidden" id="cbm-input-group">
+              <div class="label-with-tooltip">
+                <label for="calc-cbm" class="form-label">Volumen de la carga (Metros Cúbicos / CBM):</label>
+                <span class="tooltip-badge">1 CBM ≈ 35.3 CFT</span>
+              </div>
+              <div class="input-range-wrap">
+                <input type="number" id="calc-cbm" class="calc-number-input" value="1.0" step="0.1" min="0.1" max="50" />
+                <input type="range" id="calc-cbm-slider" class="calc-slider" value="1.0" step="0.1" min="0.1" max="10" />
+              </div>
+            </div>
+
+            <!-- Destino en Panamá (Sin precios expuestos, solo texto limpio) -->
             <div class="form-group">
               <label for="calc-delivery" class="form-label">Lugar de Entrega:</label>
               <select id="calc-delivery" class="calc-select">
-                <option value="metro">Ciudad de Panamá (Retiro en Oficina / Almacén Central) - $0.00</option>
-                <option value="delivery-metro">Ciudad de Panamá (Delivery a Domicilio) - $3.50</option>
-                <option value="interior">Interior del País (David, Boquete, Santiago, Penonomé) - Envío Express</option>
+                <option value="metro">Ciudad de Panamá (Retiro en Oficina / Almacén Central)</option>
+                <option value="delivery-metro">Ciudad de Panamá (Entrega a Domicilio)</option>
+                <option value="interior">Interior del País (Chiriquí, Provincias Centrales, Colón)</option>
               </select>
             </div>
 
             <div class="calc-guarantee-note">
               <i class="ph ph-shield-check"></i>
-              <span><strong>Garantía Express Loadout:</strong> Sin cobro de combustible adicional ni cobros por factura de manejo.</span>
+              <div>
+                <strong>Tarifa estándar base desde $3.00/lb:</strong> Aplica para flete aéreo Miami con retiro en oficina central. Las entregas a domicilio y despachos al interior cuentan con tarifas locales flexibles y accesibles.
+              </div>
+            </div>
+
+            <div class="calc-season-advisory" id="calc-season-advisory">
+              <i class="ph ph-calendar-blank"></i>
+              <span><strong>Temporada Alta (Q4):</strong> En Noviembre y Diciembre los tiempos de tránsito internacional pueden extenderse levemente por alta demanda de fin de año.</span>
+            </div>
+
+            <div class="calc-china-disclaimer hidden" id="calc-china-disclaimer">
+              <i class="ph ph-warning-circle"></i>
+              <span><strong>Transparencia en Flete Marítimo China:</strong> El flete se liquida en CBM (Metro Cúbico) y oscila entre <strong>$275.00 y $350.00 / CBM</strong> según la fluctuación de combustible naviero (BAF). Esta calculadora muestra una estimación referencial para evitar falsas promesas. Te recomendamos solicitar cotización formal previa al embarque.</span>
+            </div>
+
+            <div class="calc-consult-box">
+              <a href="https://wa.me/50765210278?text=Hola%20Express%20Loadout,%20deseo%20consultar%20tarifas%20de%20delivery%20o%20cotizaci%C3%B3n%20especial." target="_blank" rel="noopener" class="calc-consult-link">
+                <i class="ph ph-whatsapp-logo"></i> ¿Deseas consultar delivery a tu zona o tarifas de volumen? Escríbenos por WhatsApp
+              </a>
             </div>
           </div>
 
@@ -461,18 +514,18 @@
 
             <div class="calc-big-price">
               <span class="currency">$</span>
-              <span class="price-val" id="calc-total-price">35.00</span>
+              <span class="price-val" id="calc-total-price">30.00</span>
               <span class="price-unit">USD</span>
             </div>
 
             <div class="calc-breakdown-list">
               <div class="breakdown-row">
                 <span class="breakdown-label">Servicio Seleccionado:</span>
-                <span class="breakdown-val" id="calc-res-service">Aéreo Miami Express</span>
+                <span class="breakdown-val" id="calc-res-service">Aéreo Express Miami</span>
               </div>
               <div class="breakdown-row">
                 <span class="breakdown-label">Tarifa por libra:</span>
-                <span class="breakdown-val" id="calc-res-rate">$3.50 / lb</span>
+                <span class="breakdown-val" id="calc-res-rate">$3.00 / lb</span>
               </div>
               <div class="breakdown-row">
                 <span class="breakdown-label">Tiempo Estimado de Entrega:</span>
@@ -548,9 +601,9 @@
             <div class="service-icon-wrap icon-blue">
               <i class="ph ph-boat"></i>
             </div>
-            <h3 class="service-title">Freight Marítimo (Desde 20 lbs)</h3>
+            <h3 class="service-title">Freight Marítimo (Desde 25 lbs)</h3>
             <p class="service-text">
-              La alternativa más rentable para carga pesada, equipos industriales, mobiliario o mercancía comercial. Tarifa calculada por volumen o peso mínimo accesible desde 20 lbs.
+              La alternativa más rentable para carga pesada, equipos industriales, mobiliario o mercancía comercial. Tarifa calculada por volumen o peso mínimo accesible desde 25 lbs.
             </p>
             <ul class="service-check-list">
               <li><i class="ph ph-check"></i> Rutas desde Miami y puertos de China</li>
@@ -727,7 +780,7 @@
           <div class="tips-body">
             <h4 class="tips-title">Consejos para comprar sin problemas desde Panamá:</h4>
             <p class="tips-text">
-              Recuerda siempre colocar tu nombre completo y el código de casillero <code>EXLO-PA-XXXX</code> en la línea 2 de dirección (Address Line 2) en Amazon, eBay o Temu. Si compras mercancía pesada (más de 20 lbs), infórmanos antes para catalogarla por flete marítimo y ahorrar hasta un 60% en el flete.
+              Recuerda siempre colocar tu nombre completo y el código de casillero <code>EXLO-PA-XXXX</code> en la línea 2 de dirección (Address Line 2) en Amazon, eBay o Temu. Si compras mercancía pesada (más de 25 lbs), infórmanos antes para catalogarla por flete marítimo y ahorrar hasta un 60% en el flete.
             </p>
           </div>
         </div>
@@ -753,6 +806,8 @@
           <button class="event-filter-btn active" data-platform="all" onclick="filterEvents('all')">Todos los Eventos</button>
           <button class="event-filter-btn" data-platform="amazon" onclick="filterEvents('amazon')"><i class="ph ph-shopping-bag"></i> Amazon</button>
           <button class="event-filter-btn" data-platform="aliexpress" onclick="filterEvents('aliexpress')"><i class="ph ph-package"></i> AliExpress 11.11</button>
+          <button class="event-filter-btn" data-platform="shein" onclick="filterEvents('shein')"><i class="ph ph-t-shirt"></i> SHEIN</button>
+          <button class="event-filter-btn" data-platform="walmart" onclick="filterEvents('walmart')"><i class="ph ph-storefront"></i> Walmart</button>
           <button class="event-filter-btn" data-platform="temu" onclick="filterEvents('temu')"><i class="ph ph-lightning"></i> TEMU</button>
           <button class="event-filter-btn" data-platform="alibaba" onclick="filterEvents('alibaba')"><i class="ph ph-factory"></i> Alibaba & Made-in-China</button>
         </div>
@@ -990,7 +1045,7 @@
                     <label class="check-container">
                       <input type="checkbox" name="interest" value="Maritimo" />
                       <span class="checkmark"></span>
-                      <span>Carga Marítima Pesada / Comercial (+20 lbs)</span>
+                      <span>Carga Marítima Pesada / Comercial (+25 lbs)</span>
                     </label>
                   </div>
                 </div>
@@ -1039,24 +1094,48 @@
                 </div>
 
                 <div class="casillero-address-card">
-                  <div class="address-row">
-                    <strong>Nombre en Paquete:</strong>
-                    <span id="gen-client-name">Carlos Mendoza EXLO-PA-8492</span>
+                  <div class="address-box-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                      <strong style="color:var(--brand-yellow);"><i class="ph ph-map-pin"></i> 1. Tu Dirección en Miami (USA):</strong>
+                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('usa')"><i class="ph ph-copy"></i> Copiar USA</button>
+                    </div>
+                    <div class="address-row">
+                      <span>Nombre en Paquete:</span>
+                      <strong id="gen-client-name">Carlos Mendoza EXLO-PA-8492</strong>
+                    </div>
+                    <div class="address-row">
+                      <span>Dirección Bodega:</span>
+                      <span>8306 NW 68th St, Medley, FL 33166</span>
+                    </div>
+                    <div class="address-row">
+                      <span>Teléfono Warehouse:</span>
+                      <span>+1 (786) 615-5555</span>
+                    </div>
                   </div>
-                  <div class="address-row">
-                    <strong>Dirección Bodega Miami:</strong>
-                    <span>8306 NW 68th St, Medley, FL 33166</span>
-                  </div>
-                  <div class="address-row">
-                    <strong>Teléfono Warehouse:</strong>
-                    <span>+1 (786) 615-5555</span>
+
+                  <hr style="border:none; border-top:1px dashed var(--border-subtle); margin:12px 0;" />
+
+                  <div class="address-box-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                      <strong style="color:#60a5fa;"><i class="ph ph-warehouse"></i> 2. Tu Dirección en Guangzhou (China):</strong>
+                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('china')"><i class="ph ph-copy"></i> Copiar China</button>
+                    </div>
+                    <div class="address-row">
+                      <span>Ubicación Bodega:</span>
+                      <span>Guangzhou, Distrito Baiyun, Guangdong, China</span>
+                    </div>
+                    <div class="address-row">
+                      <span>Código Postal (Zip):</span>
+                      <span>510440</span>
+                    </div>
+                    <div class="address-row">
+                      <span>Código de Casillero:</span>
+                      <strong id="gen-client-china">NOVA PTY - EXLO-PA-8492</strong>
+                    </div>
                   </div>
                 </div>
 
                 <div class="success-actions">
-                  <button class="btn btn-accent btn-block" onclick="copyFullWarehouseAddress()">
-                    <i class="ph ph-copy"></i> Copiar Dirección de Envío Completa
-                  </button>
                   <a href="" id="whatsapp-welcome-link" target="_blank" class="btn btn-whatsapp btn-block" style="margin-top:10px;">
                     <i class="ph ph-whatsapp-logo"></i> Confirmar con un Asesor por WhatsApp
                   </a>
@@ -1191,7 +1270,7 @@
               <li><a href="#servicios">Casillero Miami (USA)</a></li>
               <li><a href="#servicios">Casillero China</a></li>
               <li><a href="#servicios">Freight Aéreo Express</a></li>
-              <li><a href="#servicios">Carga Marítima (+20 lbs)</a></li>
+              <li><a href="#servicios">Carga Marítima (+25 lbs)</a></li>
               <li><a href="#servicios">Compras Asistidas sin Tarjeta</a></li>
               <li><a href="#servicios">Importaciones B2B al Por Mayor</a></li>
             </ul>
@@ -1339,7 +1418,7 @@
                 <select id="case-mode" class="form-input">
                   <option value="China • Marítimo">China • Marítimo (Barco)</option>
                   <option value="Miami, USA • Aéreo">Miami, USA • Aéreo Express</option>
-                  <option value="USA • Marítimo">USA • Marítimo (+20 lbs)</option>
+                  <option value="USA • Marítimo">USA • Marítimo (+25 lbs)</option>
                   <option value="Compra Asistida">Compra Asistida por Internet</option>
                 </select>
               </div>
@@ -1479,8 +1558,8 @@
           <form id="rates-form" onsubmit="handleSaveRates(event)">
             <div class="form-group-grid">
               <div class="form-group">
-                <label class="form-label">Aéreo Miami ($ por libra):</label>
-                <input type="number" step="0.10" id="rate-air-usa" class="form-input" value="3.50" required />
+                <label class="form-label">Aéreo Miami Estándar ($ por libra):</label>
+                <input type="number" step="0.10" id="rate-air-usa" class="form-input" value="3.00" required />
               </div>
               <div class="form-group">
                 <label class="form-label">Aéreo China ($ por libra):</label>
@@ -1488,19 +1567,24 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label class="form-label">Marítimo USA ($ por libra / Mín. 25 lbs):</label>
+              <input type="number" step="0.10" id="rate-sea-usa" class="form-input" value="1.75" required />
+            </div>
+
             <div class="form-group-grid">
               <div class="form-group">
-                <label class="form-label">Marítimo USA ($ por libra / base):</label>
-                <input type="number" step="0.10" id="rate-sea-usa" class="form-input" value="1.75" required />
+                <label class="form-label">Marítimo China Mínimo ($ por CBM):</label>
+                <input type="number" step="5.00" id="rate-sea-china-min" class="form-input" value="275.00" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Marítimo China ($ por libra / base):</label>
-                <input type="number" step="0.10" id="rate-sea-china" class="form-input" value="1.25" required />
+                <label class="form-label">Marítimo China Máximo ($ por CBM):</label>
+                <input type="number" step="5.00" id="rate-sea-china-max" class="form-input" value="350.00" required />
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Costo Delivery a Domicilio en Panamá ($):</label>
+              <label class="form-label">Costo Referencial Delivery Domicilio Panamá ($):</label>
               <input type="number" step="0.50" id="rate-delivery-fee" class="form-input" value="3.50" required />
             </div>
 

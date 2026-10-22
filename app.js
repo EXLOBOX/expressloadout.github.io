@@ -7,21 +7,22 @@
 // ESTADO GLOBAL & PERSISTENCIA (LOCALSTORAGE)
 // =============================================================================
 const STORAGE_KEYS = {
-  CASES: 'exlo_success_cases_v2',
-  RATES: 'exlo_tariffs_v2',
+  CASES: 'exlo_success_cases_v3',
+  RATES: 'exlo_tariffs_v3',
   GAS_URL: 'exlo_gas_webhook_url',
   THEME: 'exlo_active_theme',
-  EVENTS: 'exlo_events_v2',
-  SUBSCRIBERS: 'exlo_event_subscribers_v2'
+  EVENTS: 'exlo_events_v3',
+  SUBSCRIBERS: 'exlo_event_subscribers_v3'
 };
 
-// Eventos y Fechas Clave Mundiales (Amazon, AliExpress, Temu, Alibaba, Made-in-China)
+// Eventos y Fechas Clave Mundiales (Amazon, AliExpress, Shein, Walmart, Temu, Alibaba)
 const defaultEvents = [
   {
     id: 'evt-1',
     platform: 'aliexpress',
     title: 'AliExpress 11.11 • Global Shopping Festival',
     date: '2026-11-11T00:00:00',
+    hasTimer: true,
     discount: 'Hasta 80% OFF • Millones de Ofertas',
     logisticsTip: 'Evento cumbre mundial. Para compras voluminosas o carga pesada, despacha por flete marítimo antes del 15 de Noviembre para recibir antes de Navidad en Panamá.',
     url: 'https://www.aliexpress.com',
@@ -32,8 +33,9 @@ const defaultEvents = [
     platform: 'amazon',
     title: 'Amazon Black Friday & Cyber Monday 2026',
     date: '2026-11-27T00:00:00',
+    hasTimer: true,
     discount: 'Descuentos Relámpago en Electrónica & Prime',
-    logisticsTip: 'Mayor volumen del año en Miami. Despacha vía Aéreo Express (3-5 días) con casillero EXLO-PA para tener tus regalos listos sin demoras.',
+    logisticsTip: 'Mayor volumen del año en Miami. Despacha vía Aéreo Express con casillero EXLO-PA para tener tus regalos listos sin demoras.',
     url: 'https://www.amazon.com',
     badge: 'Black Friday Global'
   },
@@ -42,50 +44,66 @@ const defaultEvents = [
     platform: 'amazon',
     title: 'Amazon Prime Day & Big Deals 2026',
     date: '2026-07-14T00:00:00',
+    hasTimer: true,
     discount: 'Hasta 70% OFF Exclusivo Membresía Prime',
-    logisticsTip: 'Laptops, smart home, calzado y ropa. Los paquetes llegan en 24h a nuestra bodega de Miami y en 4 días hábiles están en Panamá.',
+    logisticsTip: 'Laptops, smart home, calzado y ropa. Los paquetes llegan en 24h a nuestra bodega de Miami y en 3 a 5 días hábiles están en Panamá.',
     url: 'https://www.amazon.com/primeday',
     badge: 'Prime Day Exclusivo'
   },
   {
     id: 'evt-4',
-    platform: 'temu',
-    title: 'TEMU Super Flash Fest & Cuponera Directa',
-    date: '2026-08-20T00:00:00',
-    discount: 'Precios Directos de Fábrica desde $0.99',
-    logisticsTip: 'Excelente para accesorios, novedades y paquetes livianos. Coloca tu código EXLO-PA en la dirección para clasificación inmediata.',
-    url: 'https://www.temu.com',
-    badge: 'Precios de Fábrica'
+    platform: 'shein',
+    title: 'SHEIN Mega Sale & Flash Friday',
+    date: '',
+    hasTimer: false,
+    discount: 'Descuentos por confirmar por la tienda',
+    logisticsTip: 'Ideal para ropa, accesorios y calzado. Los paquetes se consolidan en Miami para entrega ágil en Panamá.',
+    url: 'https://www.shein.com',
+    badge: 'Fecha por Confirmar'
   },
   {
     id: 'evt-5',
-    platform: 'alibaba',
-    title: 'Alibaba Super September & March Expo B2B',
-    date: '2026-09-01T00:00:00',
-    discount: 'Muestras Gratis & Contenedores LCL Compartidos',
-    logisticsTip: 'Pensado para importadores y comercios en Panamá. Te asesoramos en la verificación de proveedores y consolidamos flete marítimo desde 20 lbs.',
-    url: 'https://www.alibaba.com',
-    badge: 'Feria Mayorista B2B'
+    platform: 'walmart',
+    title: 'Walmart Deals & Early Black Friday',
+    date: '',
+    hasTimer: false,
+    discount: 'Ofertas de temporada por confirmar',
+    logisticsTip: 'Excelente para juguetes, electrónica y hogar. Se despacha directo a nuestro casillero Miami con entrega ágil en Panamá.',
+    url: 'https://www.walmart.com',
+    badge: 'Fecha por Confirmar'
   },
   {
     id: 'evt-6',
-    platform: 'madeinchina',
-    title: 'Made-in-China Industrial Sourcing Days',
-    date: '2026-10-15T00:00:00',
-    discount: 'Fabricantes de Maquinaria, Ferretería & Repuestos',
-    logisticsTip: 'Ideal para maquinaria pesada e industrial. Coordinamos inspección en origen y transporte marítimo directo a tu bodega o taller en Panamá.',
-    url: 'https://www.made-in-china.com',
-    badge: 'Sourcing Industrial'
+    platform: 'temu',
+    title: 'TEMU Super Flash Fest & Cuponera Directa',
+    date: '',
+    hasTimer: false,
+    discount: 'Precios de fábrica en accesorios y novedades',
+    logisticsTip: 'Excelente para accesorios, novedades y paquetes livianos. Coloca tu código EXLO-PA en la dirección para clasificación inmediata.',
+    url: 'https://www.temu.com',
+    badge: 'Fecha por Confirmar'
+  },
+  {
+    id: 'evt-7',
+    platform: 'alibaba',
+    title: 'Alibaba Super September & March Expo B2B',
+    date: '',
+    hasTimer: false,
+    discount: 'Muestras Gratis & Contenedores LCL Compartidos',
+    logisticsTip: 'Pensado para importadores y comercios en Panamá. Te asesoramos en la verificación de proveedores y flete marítimo en CBM.',
+    url: 'https://www.alibaba.com',
+    badge: 'Fecha por Confirmar'
   }
 ];
 
 // Tarifas por defecto (Ajustables desde el CMS)
 const defaultRates = {
-  airUsa: 3.50,       // $ / lb
+  airUsa: 3.00,       // $ / lb (Tarifa estándar base)
   airChina: 7.50,     // $ / lb
-  seaUsa: 1.75,       // $ / lb (base)
-  seaChina: 1.25,     // $ / lb (base min 20 lbs)
-  deliveryMetro: 3.50 // Domicilio Panamá
+  seaUsa: 1.75,       // $ / lb (mínimo 25 lbs)
+  seaChinaMin: 275.00,// $ / CBM min
+  seaChinaMax: 350.00,// $ / CBM max
+  deliveryMetro: 3.50 // Domicilio Panamá (opcional)
 };
 
 // Casos de éxito iniciales basados en testimonios reales de Express Loadout
@@ -207,6 +225,7 @@ let calcState = {
   origin: 'usa',
   mode: 'air',
   weight: 10,
+  cbm: 1.0,
   delivery: 'metro'
 };
 
@@ -215,6 +234,8 @@ function initCalculator() {
   const modeBtns = document.querySelectorAll('#calc-mode .segment-btn');
   const weightInput = document.getElementById('calc-weight');
   const weightSlider = document.getElementById('calc-weight-slider');
+  const cbmInput = document.getElementById('calc-cbm');
+  const cbmSlider = document.getElementById('calc-cbm-slider');
   const deliverySelect = document.getElementById('calc-delivery');
 
   originBtns.forEach(btn => {
@@ -251,6 +272,22 @@ function initCalculator() {
     });
   }
 
+  if (cbmInput && cbmSlider) {
+    cbmInput.addEventListener('input', (e) => {
+      let val = Math.max(0.1, parseFloat(e.target.value) || 0.1);
+      calcState.cbm = val;
+      cbmSlider.value = Math.min(10, val);
+      updateCalculator();
+    });
+
+    cbmSlider.addEventListener('input', (e) => {
+      let val = parseFloat(e.target.value) || 0.1;
+      calcState.cbm = val;
+      cbmInput.value = val;
+      updateCalculator();
+    });
+  }
+
   if (deliverySelect) {
     deliverySelect.addEventListener('change', (e) => {
       calcState.delivery = e.target.value;
@@ -262,64 +299,93 @@ function initCalculator() {
 }
 
 function updateCalculator() {
-  let ratePerLb = 0;
-  let transitDays = '';
-  let serviceName = '';
+  const weightGroup = document.getElementById('weight-input-group');
+  const cbmGroup = document.getElementById('cbm-input-group');
+  const chinaDisclaimer = document.getElementById('calc-china-disclaimer');
+  const seasonAdvisory = document.getElementById('calc-season-advisory');
 
-  if (calcState.origin === 'usa') {
-    if (calcState.mode === 'air') {
-      ratePerLb = currentRates.airUsa;
-      transitDays = '3 a 5 días hábiles';
-      serviceName = 'Aéreo Express Miami';
-    } else {
-      ratePerLb = currentRates.seaUsa;
-      transitDays = '12 a 18 días hábiles';
-      serviceName = 'Marítimo USA (+20 lbs)';
-    }
-  } else { // China
-    if (calcState.mode === 'air') {
-      ratePerLb = currentRates.airChina;
-      transitDays = '7 a 10 días hábiles';
-      serviceName = 'Aéreo Express China';
-    } else {
-      ratePerLb = currentRates.seaChina;
-      transitDays = '30 a 45 días (Consolidado)';
-      serviceName = 'Marítimo Económico China';
-    }
-  }
-
-  // Mínimo de 20 lbs para marítimo recomendado
-  let effectiveWeight = calcState.weight;
-  if (calcState.mode === 'sea' && effectiveWeight < 20) {
-    // Si es marítimo y menos de 20 lbs, se calcula con base de 20 lbs mínima
-    effectiveWeight = 20;
-  }
-
-  let subtotal = effectiveWeight * ratePerLb;
-
-  // Cargo adicional de delivery si aplica
-  let deliveryFee = 0;
-  let deliveryText = 'Retiro en Oficina Panamá ($0.00)';
-  if (calcState.delivery === 'delivery-metro') {
-    deliveryFee = currentRates.deliveryMetro;
-    deliveryText = `Entrega a Domicilio Capital (+$${deliveryFee.toFixed(2)})`;
-  } else if (calcState.delivery === 'interior') {
-    deliveryFee = 5.00;
-    deliveryText = 'Despacho al Interior (Uno Express / Ferguson)';
-  }
-
-  let total = subtotal + deliveryFee;
-
-  // Actualizar DOM
   const priceElem = document.getElementById('calc-total-price');
   const serviceElem = document.getElementById('calc-res-service');
   const rateElem = document.getElementById('calc-res-rate');
   const timeElem = document.getElementById('calc-res-time');
   const delElem = document.getElementById('calc-res-delivery');
 
-  if (priceElem) priceElem.innerText = total.toFixed(2);
+  const isChinaSea = (calcState.origin === 'china' && calcState.mode === 'sea');
+
+  // Alternar entre control de peso (Libras) o CBM (Metros Cúbicos)
+  if (isChinaSea) {
+    if (weightGroup) weightGroup.classList.add('hidden');
+    if (cbmGroup) cbmGroup.classList.remove('hidden');
+    if (chinaDisclaimer) chinaDisclaimer.classList.remove('hidden');
+  } else {
+    if (weightGroup) weightGroup.classList.remove('hidden');
+    if (cbmGroup) cbmGroup.classList.add('hidden');
+    if (chinaDisclaimer) chinaDisclaimer.classList.add('hidden');
+  }
+
+  // Notificación de temporada alta para envíos aéreos
+  if (seasonAdvisory) {
+    if (calcState.mode === 'air') {
+      seasonAdvisory.classList.remove('hidden');
+    } else {
+      seasonAdvisory.classList.add('hidden');
+    }
+  }
+
+  let rateDisplay = '';
+  let transitDays = '';
+  let serviceName = '';
+  let priceDisplay = '0.00';
+
+  if (calcState.origin === 'usa') {
+    if (calcState.mode === 'air') {
+      const rate = currentRates.airUsa || 3.00;
+      serviceName = 'Aéreo Express Miami';
+      rateDisplay = `$${rate.toFixed(2)} / lb`;
+      transitDays = '3 a 5 días hábiles';
+      const total = calcState.weight * rate;
+      priceDisplay = total.toFixed(2);
+    } else {
+      const rate = currentRates.seaUsa || 1.75;
+      serviceName = 'Marítimo Miami (Mín. 25 lbs)';
+      rateDisplay = `$${rate.toFixed(2)} / lb (Mín. 25 lbs)`;
+      transitDays = '12 a 18 días hábiles';
+      const effectiveWeight = Math.max(25, calcState.weight);
+      const total = effectiveWeight * rate;
+      priceDisplay = total.toFixed(2);
+    }
+  } else { // China
+    if (calcState.mode === 'air') {
+      const rate = currentRates.airChina || 7.50;
+      serviceName = 'Aéreo Express China';
+      rateDisplay = `$${rate.toFixed(2)} / lb`;
+      transitDays = '7 a 10 días hábiles';
+      const total = calcState.weight * rate;
+      priceDisplay = total.toFixed(2);
+    } else {
+      const minRate = currentRates.seaChinaMin || 275.00;
+      const maxRate = currentRates.seaChinaMax || 350.00;
+      serviceName = 'Marítimo China (Consolidado LCL)';
+      rateDisplay = `$${minRate.toFixed(0)} - $${maxRate.toFixed(0)} / CBM`;
+      transitDays = '30 a 45 días (Consolidado)';
+      const minTotal = (calcState.cbm * minRate).toFixed(0);
+      const maxTotal = (calcState.cbm * maxRate).toFixed(0);
+      priceDisplay = `${minTotal} - ${maxTotal}`;
+    }
+  }
+
+  // Texto limpio de entrega
+  let deliveryText = 'Retiro en Oficina / Almacén Central ($0.00)';
+  if (calcState.delivery === 'delivery-metro') {
+    deliveryText = 'Entrega a Domicilio Capital (Tarifa accesible según zona)';
+  } else if (calcState.delivery === 'interior') {
+    deliveryText = 'Despacho al Interior (Uno Express / Ferguson / Flete local)';
+  }
+
+  // Actualizar DOM
+  if (priceElem) priceElem.innerText = priceDisplay;
   if (serviceElem) serviceElem.innerText = serviceName;
-  if (rateElem) rateElem.innerText = `$${ratePerLb.toFixed(2)} / lb`;
+  if (rateElem) rateElem.innerText = rateDisplay;
   if (timeElem) timeElem.innerText = transitDays;
   if (delElem) delElem.innerText = deliveryText;
 }
@@ -543,7 +609,7 @@ const HERO_LOGISTICS_SVGS = [
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{COLOR}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1Z"/></svg>',
   // 2: Camión Repartidor / Delivery Nacional
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{COLOR}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-2.48-3.09A2 2 0 0 0 17.74 9H14"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
-  // 3: Barco de Carga Marítima (+20 lbs China/USA)
+  // 3: Barco de Carga Marítima (+25 lbs USA / CBM China)
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{COLOR}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7"/><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"/><path d="M12 10V4"/></svg>',
   // 4: Pin GPS / Almacén Panamá & Chiriquí
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{COLOR}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>',
@@ -912,18 +978,48 @@ function sendToGasWebhook(data) {
   }).catch(e => console.warn('GAS webhook post:', e));
 }
 
-function copyFullWarehouseAddress() {
+function switchHeroAddress(type) {
+  const usaTab = document.getElementById('addr-tab-usa');
+  const chinaTab = document.getElementById('addr-tab-china');
+  const usaContent = document.getElementById('hero-addr-usa-content');
+  const chinaContent = document.getElementById('hero-addr-china-content');
+
+  if (type === 'china') {
+    if (usaTab) usaTab.classList.remove('active');
+    if (chinaTab) chinaTab.classList.add('active');
+    if (usaContent) usaContent.classList.add('hidden');
+    if (chinaContent) chinaContent.classList.remove('hidden');
+  } else {
+    if (usaTab) usaTab.classList.add('active');
+    if (chinaTab) chinaTab.classList.remove('active');
+    if (usaContent) usaContent.classList.remove('hidden');
+    if (chinaContent) chinaContent.classList.add('hidden');
+  }
+}
+
+function copyFullWarehouseAddress(type = 'usa') {
   const code = document.getElementById('generated-casillero-code')?.innerText || 'EXLO-PA';
   const name = document.getElementById('reg-name')?.value || 'Tu Nombre';
-  const text = `NOMBRE: ${name} ${code}\nDIRECCIÓN LÍNEA 1: 8306 NW 68th St\nLÍNEA 2 (CASILLERO): ${code}\nCIUDAD: Miami\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33166\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
+  let text = '';
+
+  if (type === 'china') {
+    text = `ALMACÉN CHINA:\nCONSIGNATARIO: NOVA PTY - ${name} ${code}\nCIUDAD: Guangzhou\nDISTRITO: Baiyun District\nPROVINCIA: Guangdong\nPAÍS: China\nCÓDIGO POSTAL: 510440`;
+  } else {
+    text = `ALMACÉN MIAMI, USA:\nNOMBRE: ${name} ${code}\nDIRECCIÓN LÍNEA 1: 8306 NW 68th St\nLÍNEA 2 (CASILLERO): ${code}\nCIUDAD: Miami\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33166\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
+  }
 
   navigator.clipboard.writeText(text).then(() => {
-    alert('✅ Dirección completa copiada al portapapeles. ¡Pégala en tu cuenta de Amazon o eBay!');
+    alert('✅ Dirección completa copiada al portapapeles.');
   });
 }
 
-function copyAddressSnippet() {
-  const snippet = '8306 NW 68th St, [Tu Nombre + EXLO-PA], Miami, FL 33166';
+function copyAddressSnippet(type = 'usa') {
+  let snippet = '';
+  if (type === 'china') {
+    snippet = 'Guangzhou, Baiyun District, Guangdong, China (Zip: 510440) | NOVA PTY - [Tu Nombre + EXLO-PA]';
+  } else {
+    snippet = '8306 NW 68th St, [Tu Nombre + EXLO-PA], Miami, FL 33166';
+  }
   navigator.clipboard.writeText(snippet).then(() => {
     alert('✅ Dirección copiada: ' + snippet);
   });
@@ -1124,22 +1220,25 @@ function loadRatesInAdmin() {
   const rUsaAir = document.getElementById('rate-air-usa');
   const rChinaAir = document.getElementById('rate-air-china');
   const rUsaSea = document.getElementById('rate-sea-usa');
-  const rChinaSea = document.getElementById('rate-sea-china');
+  const rChinaSeaMin = document.getElementById('rate-sea-china-min');
+  const rChinaSeaMax = document.getElementById('rate-sea-china-max');
   const rDelivery = document.getElementById('rate-delivery-fee');
 
-  if (rUsaAir) rUsaAir.value = currentRates.airUsa;
-  if (rChinaAir) rChinaAir.value = currentRates.airChina;
-  if (rUsaSea) rUsaSea.value = currentRates.seaUsa;
-  if (rChinaSea) rChinaSea.value = currentRates.seaChina;
-  if (rDelivery) rDelivery.value = currentRates.deliveryMetro;
+  if (rUsaAir) rUsaAir.value = currentRates.airUsa || 3.00;
+  if (rChinaAir) rChinaAir.value = currentRates.airChina || 7.50;
+  if (rUsaSea) rUsaSea.value = currentRates.seaUsa || 1.75;
+  if (rChinaSeaMin) rChinaSeaMin.value = currentRates.seaChinaMin || 275.00;
+  if (rChinaSeaMax) rChinaSeaMax.value = currentRates.seaChinaMax || 350.00;
+  if (rDelivery) rDelivery.value = currentRates.deliveryMetro || 3.50;
 }
 
 function handleSaveRates(e) {
   e.preventDefault();
-  currentRates.airUsa = parseFloat(document.getElementById('rate-air-usa').value) || 3.50;
+  currentRates.airUsa = parseFloat(document.getElementById('rate-air-usa').value) || 3.00;
   currentRates.airChina = parseFloat(document.getElementById('rate-air-china').value) || 7.50;
   currentRates.seaUsa = parseFloat(document.getElementById('rate-sea-usa').value) || 1.75;
-  currentRates.seaChina = parseFloat(document.getElementById('rate-sea-china').value) || 1.25;
+  currentRates.seaChinaMin = parseFloat(document.getElementById('rate-sea-china-min').value) || 275.00;
+  currentRates.seaChinaMax = parseFloat(document.getElementById('rate-sea-china-max').value) || 350.00;
   currentRates.deliveryMetro = parseFloat(document.getElementById('rate-delivery-fee').value) || 3.50;
 
   localStorage.setItem(STORAGE_KEYS.RATES, JSON.stringify(currentRates));
@@ -1296,20 +1395,12 @@ function renderEvents(platform = 'all') {
       aliexpress: 'AliExpress Direct',
       temu: 'TEMU Factory',
       alibaba: 'Alibaba B2B',
-      madeinchina: 'Made-in-China'
+      madeinchina: 'Made-in-China',
+      shein: 'SHEIN Trends',
+      walmart: 'Walmart USA'
     }[evt.platform] || evt.platform;
 
-    return `
-      <article class="event-card glass-panel" id="event-${evt.id}">
-        <div class="event-flyer-header">
-          <span class="event-platform-tag tag-${evt.platform}">
-            <i class="ph ph-calendar-blank"></i> ${platformLabel}
-          </span>
-          <h3 class="event-title">${evt.title}</h3>
-          <span class="event-discount-badge">${evt.discount}</span>
-        </div>
-
-        <div class="event-body">
+    const timerMarkup = (evt.hasTimer && evt.date) ? `
           <div class="countdown-container">
             <div class="countdown-label">
               <i class="ph ph-clock-countdown"></i> Cuenta Regresiva para la Apertura:
@@ -1333,6 +1424,25 @@ function renderEvents(platform = 'all') {
               </div>
             </div>
           </div>
+    ` : `
+          <div class="countdown-pending-badge">
+            <i class="ph ph-calendar-blank"></i>
+            <span>Fecha oficial por confirmar por la tienda • ¡Te avisaremos 24h antes al suscribirte!</span>
+          </div>
+    `;
+
+    return `
+      <article class="event-card glass-panel" id="event-${evt.id}">
+        <div class="event-flyer-header">
+          <span class="event-platform-tag tag-${evt.platform}">
+            <i class="ph ph-calendar-blank"></i> ${platformLabel}
+          </span>
+          <h3 class="event-title">${evt.title}</h3>
+          <span class="event-discount-badge">${evt.discount}</span>
+        </div>
+
+        <div class="event-body">
+          ${timerMarkup}
 
           <div class="event-logistics-note">
             <strong><i class="ph ph-shield-check"></i> Recomendación Logística Express Loadout:</strong><br>
@@ -1358,6 +1468,7 @@ function renderEvents(platform = 'all') {
 function updateCountdowns() {
   const now = Date.now();
   currentEvents.forEach(evt => {
+    if (!evt.hasTimer || !evt.date) return;
     const target = new Date(evt.date).getTime();
     let diff = target - now;
 
