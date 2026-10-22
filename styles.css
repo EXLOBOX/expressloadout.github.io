@@ -834,6 +834,85 @@ button, input, select, textarea {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.card-inner-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-inner-header-flex .card-inner-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Popover de Informacion de Tarifas (Icono 'i') */
+.info-popover-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.info-circle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--brand-yellow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.info-circle-btn:hover, .info-circle-btn:focus {
+  background: var(--brand-yellow);
+  color: #000;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+  transform: scale(1.06);
+}
+
+.info-popover-content {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 300px;
+  background: #111726;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
+  z-index: 100;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.popover-body {
+  display: flex;
+  gap: 10px;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: var(--text-main);
+}
+
+.popover-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #60a5fa;
+  font-weight: 600;
+  text-decoration: underline;
+  margin-top: 6px;
+}
+
+.popover-link:hover {
+  color: var(--brand-yellow);
+}
+
 .form-group-row {
   margin-bottom: 22px;
 }
@@ -991,6 +1070,92 @@ button, input, select, textarea {
 .calc-consult-link:hover {
   color: var(--brand-yellow);
   text-decoration: underline;
+}
+
+/* Controles de Unidad FT3 vs CBM y Modo Manual */
+.volume-unit-switch-row {
+  margin-bottom: 14px;
+}
+
+.segment-unit-switch, .segment-mode-switch {
+  margin-top: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.rate-mode-switch-wrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.rate-mode-status {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(96, 165, 250, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.volume-hint-text {
+  font-size: 0.81rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.volume-hint-text i {
+  color: var(--brand-yellow);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.manual-rate-input-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+  width: 175px;
+}
+
+.manual-rate-prefix {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brand-yellow);
+  margin-right: 4px;
+}
+
+.manual-rate-input-box .calc-number-input {
+  width: 75px;
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  font-size: 1.15rem;
+  text-align: left;
+}
+
+.manual-rate-unit {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.manual-rate-hint {
+  font-size: 0.80rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 6px;
 }
 
 /* Selector mini de Bodega en el Hero */

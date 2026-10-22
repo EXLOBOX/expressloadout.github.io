@@ -420,17 +420,38 @@
         <div class="calculator-grid">
           <!-- Formulario Calculador -->
           <div class="calc-form-card glass-panel">
-            <h3 class="card-inner-title">
-              <i class="ph ph-faders-horizontal"></i> Parámetros del Paquete
-            </h3>
+            <div class="card-inner-header-flex">
+              <h3 class="card-inner-title">
+                <i class="ph ph-faders-horizontal"></i> Parámetros del Paquete
+              </h3>
+              <!-- Icono 'i' de información de tarifas -->
+              <div class="info-popover-wrapper">
+                <button type="button" class="info-circle-btn" id="calc-info-btn" aria-label="Información de Tarifas" title="Aviso importante sobre tarifas">
+                  <i class="ph ph-info"></i>
+                </button>
+                <div class="info-popover-content hidden" id="calc-info-popover">
+                  <div class="popover-body">
+                    <i class="ph ph-warning-circle text-amber" style="font-size: 1.3rem; flex-shrink: 0;"></i>
+                    <div>
+                      <strong>Aviso de Tarifas:</strong> Las tarifas varían en base a los costos del mercado, consulta el costo de tarifa actual.
+                      <div>
+                        <a href="https://wa.me/50765210278?text=Hola%20Express%20Loadout,%20deseo%20consultar%20el%20costo%20de%20tarifa%20actual%20del%20mercado." target="_blank" rel="noopener" class="popover-link">
+                          <i class="ph ph-whatsapp-logo"></i> Consultar tarifa actual vía WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div class="form-group-row">
               <label class="form-label">Origen de la Carga:</label>
               <div class="segmented-control" id="calc-origin">
-                <button type="button" class="segment-btn active" data-origin="usa">
+                <button type="button" class="segment-btn active" data-origin="usa" id="btn-origin-usa">
                   <i class="ph ph-airplane"></i> Miami, USA
                 </button>
-                <button type="button" class="segment-btn" data-origin="china">
+                <button type="button" class="segment-btn" data-origin="china" id="btn-origin-china">
                   <i class="ph ph-boat"></i> Shenzhen, China
                 </button>
               </div>
@@ -439,20 +460,20 @@
             <div class="form-group-row">
               <label class="form-label">Modalidad de Transporte:</label>
               <div class="segmented-control" id="calc-mode">
-                <button type="button" class="segment-btn active" data-mode="air">
+                <button type="button" class="segment-btn active" data-mode="air" id="btn-mode-air">
                   <i class="ph ph-rocket-launch"></i> Aéreo Express (3-5 d)
                 </button>
-                <button type="button" class="segment-btn" data-mode="sea">
-                  <i class="ph ph-anchor"></i> Marítimo (Mín. 25 lbs / CBM)
+                <button type="button" class="segment-btn" data-mode="sea" id="btn-mode-sea">
+                  <i class="ph ph-anchor"></i> Marítimo (FT³ / CBM)
                 </button>
               </div>
             </div>
 
-            <!-- Input de Peso (Libras) -->
+            <!-- Input de Peso (Libras) - Activo para Aéreo -->
             <div class="form-group" id="weight-input-group">
               <div class="label-with-tooltip">
-                <label for="calc-weight" class="form-label" id="calc-weight-label">Peso estimado (Libras / lbs):</label>
-                <span class="tooltip-badge" id="calc-weight-badge">Mínimo 25 lbs en marítimo</span>
+                <label for="calc-weight" class="form-label" id="calc-weight-label">Peso estimado de la carga (Libras / lbs):</label>
+                <span class="tooltip-badge" id="calc-weight-badge">Tarifa estándar: $3.00 / lb</span>
               </div>
               <div class="input-range-wrap">
                 <input type="number" id="calc-weight" class="calc-number-input" value="10" min="1" max="5000" />
@@ -460,15 +481,67 @@
               </div>
             </div>
 
-            <!-- Input especial para CBM China -->
-            <div class="form-group hidden" id="cbm-input-group">
+            <!-- Parámetros Marítimos (Switch FT3 vs CBM + Input de Volumen) -->
+            <div class="form-group hidden" id="maritime-volume-group">
+              <div class="volume-unit-switch-row">
+                <div class="label-with-tooltip">
+                  <label class="form-label" style="margin-bottom:0;">Unidad de Medida de Volumen:</label>
+                  <span class="tooltip-badge" id="unit-conversion-hint">1 CBM ≈ 35.31 FT³</span>
+                </div>
+                <div class="segmented-control segment-unit-switch" id="calc-volume-unit">
+                  <button type="button" class="segment-btn active" data-unit="ft3" id="btn-unit-ft3">
+                    <i class="ph ph-cube"></i> Pies Cúbicos (FT³)
+                  </button>
+                  <button type="button" class="segment-btn" data-unit="cbm" id="btn-unit-cbm">
+                    <i class="ph ph-cube-transparent"></i> Metros Cúbicos (CBM)
+                  </button>
+                </div>
+              </div>
+
+              <div style="margin-top: 14px;">
+                <div class="label-with-tooltip">
+                  <label for="calc-volume" class="form-label" id="calc-volume-label">Volumen estimado (Pies Cúbicos / FT³):</label>
+                  <span class="tooltip-badge" id="calc-volume-rate-badge">Tarifa estándar: $15.00 / FT³</span>
+                </div>
+                <div class="input-range-wrap">
+                  <input type="number" id="calc-volume" class="calc-number-input" value="5.0" step="0.5" min="0.1" max="2000" />
+                  <input type="range" id="calc-volume-slider" class="calc-slider" value="5.0" step="0.5" min="1" max="100" />
+                </div>
+                <div class="volume-hint-text" id="volume-hint-text">
+                  <i class="ph ph-info"></i> Envíos marítimos de USA a Panamá se calculan a <strong>$15.00 por FT³</strong>. (1 FT³ suele albergar ~8 a 12 lbs de carga comercial).
+                </div>
+              </div>
+            </div>
+
+            <!-- Switch de Modo: Automático vs Manual -->
+            <div class="rate-mode-switch-wrapper">
               <div class="label-with-tooltip">
-                <label for="calc-cbm" class="form-label">Volumen de la carga (Metros Cúbicos / CBM):</label>
-                <span class="tooltip-badge">1 CBM ≈ 35.3 CFT</span>
+                <span class="form-label" style="margin-bottom:0;">Modo de Tarifa:</span>
+                <span class="rate-mode-status" id="rate-mode-status-text">Automático (Estándar)</span>
+              </div>
+              <div class="segmented-control segment-mode-switch" id="calc-rate-mode">
+                <button type="button" class="segment-btn active" data-ratemode="auto" id="btn-ratemode-auto">
+                  <i class="ph ph-magic-wand"></i> Modo Automático
+                </button>
+                <button type="button" class="segment-btn" data-ratemode="manual" id="btn-ratemode-manual">
+                  <i class="ph ph-pencil-simple-line"></i> Modo Manual
+                </button>
+              </div>
+            </div>
+
+            <!-- Input de Tarifa Manual (Visible sólo en Modo Manual) -->
+            <div class="form-group hidden" id="manual-rate-input-group">
+              <div class="label-with-tooltip">
+                <label for="calc-manual-rate" class="form-label" id="manual-rate-label">Ingresar Tarifa Manual ($ USD):</label>
+                <span class="tooltip-badge">Personalizada</span>
               </div>
               <div class="input-range-wrap">
-                <input type="number" id="calc-cbm" class="calc-number-input" value="1.0" step="0.1" min="0.1" max="50" />
-                <input type="range" id="calc-cbm-slider" class="calc-slider" value="1.0" step="0.1" min="0.1" max="10" />
+                <div class="manual-rate-input-box">
+                  <span class="manual-rate-prefix">$</span>
+                  <input type="number" id="calc-manual-rate" class="calc-number-input" value="3.00" step="0.25" min="0.01" />
+                  <span class="manual-rate-unit" id="manual-rate-unit-label">/ lb</span>
+                </div>
+                <span class="manual-rate-hint">Ingresa la tarifa convenida para recalcular en tiempo real</span>
               </div>
             </div>
 
@@ -1568,8 +1641,8 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Marítimo USA ($ por libra / Mín. 25 lbs):</label>
-              <input type="number" step="0.10" id="rate-sea-usa" class="form-input" value="1.75" required />
+              <label class="form-label">Marítimo USA Estándar ($ por FT³):</label>
+              <input type="number" step="0.50" id="rate-sea-usa" class="form-input" value="15.00" required />
             </div>
 
             <div class="form-group-grid">

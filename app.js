@@ -7,12 +7,12 @@
 // ESTADO GLOBAL & PERSISTENCIA (LOCALSTORAGE)
 // =============================================================================
 const STORAGE_KEYS = {
-  CASES: 'exlo_success_cases_v3',
-  RATES: 'exlo_tariffs_v3',
+  CASES: 'exlo_success_cases_v4',
+  RATES: 'exlo_tariffs_v4',
   GAS_URL: 'exlo_gas_webhook_url',
   THEME: 'exlo_active_theme',
-  EVENTS: 'exlo_events_v3',
-  SUBSCRIBERS: 'exlo_event_subscribers_v3'
+  EVENTS: 'exlo_events_v4',
+  SUBSCRIBERS: 'exlo_event_subscribers_v4'
 };
 
 // Eventos y Fechas Clave Mundiales (Amazon, AliExpress, Shein, Walmart, Temu, Alibaba)
@@ -98,12 +98,13 @@ const defaultEvents = [
 
 // Tarifas por defecto (Ajustables desde el CMS)
 const defaultRates = {
-  airUsa: 3.00,       // $ / lb (Tarifa estándar base)
-  airChina: 7.50,     // $ / lb
-  seaUsa: 1.75,       // $ / lb (mínimo 25 lbs)
-  seaChinaMin: 275.00,// $ / CBM min
-  seaChinaMax: 350.00,// $ / CBM max
-  deliveryMetro: 3.50 // Domicilio Panamá (opcional)
+  airUsa: 3.00,        // $ / lb (Tarifa estándar base Miami)
+  airChina: 7.50,      // $ / lb (Tarifa aéreo China)
+  seaUsaFt3: 15.00,    // $ / FT3 (Tarifa estándar marítimo Miami)
+  seaChinaMin: 275.00, // $ / CBM min
+  seaChinaMax: 350.00, // $ / CBM max
+  seaChinaBase: 300.00,// $ / CBM base referencial
+  deliveryMetro: 3.50  // Domicilio Panamá (opcional)
 };
 
 // Casos de éxito iniciales basados en testimonios reales de Express Loadout
@@ -219,43 +220,115 @@ function loadStoredData() {
 }
 
 // =============================================================================
-// CALCULADORA DE FLETES INTERACTIVA
+// CALCULADORA DE FLETES INTERACTIVA (FT3, CBM, AÉREO & MODO MANUAL)
 // =============================================================================
+const FT3_PER_CBM = 35.3147;
+
 let calcState = {
-  origin: 'usa',
-  mode: 'air',
-  weight: 10,
-  cbm: 1.0,
+  origin: 'usa',       // 'usa' | 'china'
+  mode: 'air',         // 'air' | 'sea'
+  weight: 10,          // lbs (para aéreo)
+  volume: 5.0,         // volumen (para marítimo)
+  volumeUnit: 'ft3',   // 'ft3' | 'cbm'
+  rateMode: 'auto',    // 'auto' | 'manual'
+  manualRate: 3.00,    // tarifa manual personalizada
   delivery: 'metro'
 };
 
 function initCalculator() {
   const originBtns = document.querySelectorAll('#calc-origin .segment-btn');
   const modeBtns = document.querySelectorAll('#calc-mode .segment-btn');
+  const unitBtns = document.querySelectorAll('#calc-volume-unit .segment-btn');
+  const rateModeBtns = document.querySelectorAll('#calc-rate-mode .segment-btn');
+
   const weightInput = document.getElementById('calc-weight');
   const weightSlider = document.getElementById('calc-weight-slider');
-  const cbmInput = document.getElementById('calc-cbm');
-  const cbmSlider = document.getElementById('calc-cbm-slider');
+  const volumeInput = document.getElementById('calc-volume');
+  const volumeSlider = document.getElementById('calc-volume-slider');
+  const manualRateInput = document.getElementById('calc-manual-rate');
   const deliverySelect = document.getElementById('calc-delivery');
 
+  // Popover info de tarifas 'i'
+  const infoBtn = document.getElementById('calc-info-btn');
+  const infoPopover = document.getElementById('calc-info-popover');
+  if (infoBtn && infoPopover) {
+    infoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      infoPopover.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!infoPopover.contains(e.target) && e.target !== infoBtn) {
+        infoPopover.classList.add('hidden');
+      }
+    });
+  }
+
+  // Cambio de Origen: USA vs China
   originBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       originBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       calcState.origin = btn.dataset.origin;
+
+      // Si está en marítimo, auto-ajustar unidad sugerida: China -> CBM, USA -> FT3
+      if (calcState.mode === 'sea') {
+        if (calcState.origin === 'china' && calcState.volumeUnit !== 'cbm') {
+          switchVolumeUnit('cbm');
+        } else if (calcState.origin === 'usa' && calcState.volumeUnit !== 'ft3') {
+          switchVolumeUnit('ft3');
+        }
+      }
+
+      syncDefaultManualRate();
       updateCalculator();
     });
   });
 
+  // Cambio de Modalidad: Aéreo vs Marítimo
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       modeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       calcState.mode = btn.dataset.mode;
+
+      if (calcState.mode === 'sea') {
+        // En marítimo, auto-ajustar unidad sugerida por país de origen
+        if (calcState.origin === 'china' && calcState.volumeUnit !== 'cbm') {
+          switchVolumeUnit('cbm');
+        } else if (calcState.origin === 'usa' && calcState.volumeUnit !== 'ft3') {
+          switchVolumeUnit('ft3');
+        }
+      }
+
+      syncDefaultManualRate();
       updateCalculator();
     });
   });
 
+  // Switch de Unidad de Volumen: FT3 vs CBM
+  unitBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetUnit = btn.dataset.unit;
+      if (targetUnit !== calcState.volumeUnit) {
+        switchVolumeUnit(targetUnit);
+        syncDefaultManualRate();
+        updateCalculator();
+      }
+    });
+  });
+
+  // Switch Modo Tarifa: Automático vs Manual
+  rateModeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      rateModeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calcState.rateMode = btn.dataset.ratemode;
+      syncDefaultManualRate();
+      updateCalculator();
+    });
+  });
+
+  // Inputs de Peso (Aéreo)
   if (weightInput && weightSlider) {
     weightInput.addEventListener('input', (e) => {
       let val = Math.max(1, parseFloat(e.target.value) || 1);
@@ -272,22 +345,34 @@ function initCalculator() {
     });
   }
 
-  if (cbmInput && cbmSlider) {
-    cbmInput.addEventListener('input', (e) => {
-      let val = Math.max(0.1, parseFloat(e.target.value) || 0.1);
-      calcState.cbm = val;
-      cbmSlider.value = Math.min(10, val);
+  // Inputs de Volumen (Marítimo)
+  if (volumeInput && volumeSlider) {
+    volumeInput.addEventListener('input', (e) => {
+      let minVal = calcState.volumeUnit === 'cbm' ? 0.05 : 0.5;
+      let val = Math.max(minVal, parseFloat(e.target.value) || minVal);
+      calcState.volume = val;
+      volumeSlider.value = val;
       updateCalculator();
     });
 
-    cbmSlider.addEventListener('input', (e) => {
-      let val = parseFloat(e.target.value) || 0.1;
-      calcState.cbm = val;
-      cbmInput.value = val;
+    volumeSlider.addEventListener('input', (e) => {
+      let val = parseFloat(e.target.value) || 1;
+      calcState.volume = val;
+      volumeInput.value = val;
       updateCalculator();
     });
   }
 
+  // Input de Tarifa Manual
+  if (manualRateInput) {
+    manualRateInput.addEventListener('input', (e) => {
+      let val = Math.max(0.01, parseFloat(e.target.value) || 0.01);
+      calcState.manualRate = val;
+      updateCalculator();
+    });
+  }
+
+  // Select de Delivery
   if (deliverySelect) {
     deliverySelect.addEventListener('change', (e) => {
       calcState.delivery = e.target.value;
@@ -298,11 +383,84 @@ function initCalculator() {
   updateCalculator();
 }
 
+// Función auxiliar para cambiar y convertir unidad de volumen entre FT3 y CBM
+function switchVolumeUnit(targetUnit) {
+  const volumeInput = document.getElementById('calc-volume');
+  const volumeSlider = document.getElementById('calc-volume-slider');
+  const unitBtns = document.querySelectorAll('#calc-volume-unit .segment-btn');
+
+  if (targetUnit === 'cbm' && calcState.volumeUnit === 'ft3') {
+    // Conversión de FT3 a CBM
+    calcState.volume = Math.max(0.05, parseFloat((calcState.volume / FT3_PER_CBM).toFixed(2)));
+    calcState.volumeUnit = 'cbm';
+    if (volumeInput) {
+      volumeInput.step = '0.05';
+      volumeInput.min = '0.05';
+      volumeInput.max = '50';
+      volumeInput.value = calcState.volume;
+    }
+    if (volumeSlider) {
+      volumeSlider.step = '0.05';
+      volumeSlider.min = '0.05';
+      volumeSlider.max = '10';
+      volumeSlider.value = Math.min(10, calcState.volume);
+    }
+  } else if (targetUnit === 'ft3' && calcState.volumeUnit === 'cbm') {
+    // Conversión de CBM a FT3
+    calcState.volume = Math.max(0.5, parseFloat((calcState.volume * FT3_PER_CBM).toFixed(1)));
+    calcState.volumeUnit = 'ft3';
+    if (volumeInput) {
+      volumeInput.step = '0.5';
+      volumeInput.min = '0.5';
+      volumeInput.max = '2000';
+      volumeInput.value = calcState.volume;
+    }
+    if (volumeSlider) {
+      volumeSlider.step = '0.5';
+      volumeSlider.min = '1';
+      volumeSlider.max = '100';
+      volumeSlider.value = Math.min(100, calcState.volume);
+    }
+  }
+
+  // Sincronizar botones visuales
+  unitBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.unit === calcState.volumeUnit);
+  });
+}
+
+// Sincronizar valor por defecto de tarifa manual al cambiar parámetros
+function syncDefaultManualRate() {
+  const manualRateInput = document.getElementById('calc-manual-rate');
+  if (!manualRateInput) return;
+
+  if (calcState.mode === 'air') {
+    calcState.manualRate = calcState.origin === 'usa' ? (currentRates.airUsa || 3.00) : (currentRates.airChina || 7.50);
+  } else { // sea
+    if (calcState.origin === 'usa') {
+      calcState.manualRate = calcState.volumeUnit === 'ft3' 
+        ? (currentRates.seaUsaFt3 || 15.00) 
+        : parseFloat(((currentRates.seaUsaFt3 || 15.00) * FT3_PER_CBM).toFixed(2));
+    } else { // china
+      calcState.manualRate = calcState.volumeUnit === 'cbm'
+        ? (currentRates.seaChinaBase || 300.00)
+        : parseFloat(((currentRates.seaChinaBase || 300.00) / FT3_PER_CBM).toFixed(2));
+    }
+  }
+  manualRateInput.value = calcState.manualRate;
+}
+
 function updateCalculator() {
   const weightGroup = document.getElementById('weight-input-group');
-  const cbmGroup = document.getElementById('cbm-input-group');
+  const maritimeGroup = document.getElementById('maritime-volume-group');
+  const manualRateGroup = document.getElementById('manual-rate-input-group');
   const chinaDisclaimer = document.getElementById('calc-china-disclaimer');
   const seasonAdvisory = document.getElementById('calc-season-advisory');
+  const volumeLabel = document.getElementById('calc-volume-label');
+  const volumeRateBadge = document.getElementById('calc-volume-rate-badge');
+  const volumeHintText = document.getElementById('volume-hint-text');
+  const rateModeStatus = document.getElementById('rate-mode-status-text');
+  const manualRateUnitLabel = document.getElementById('manual-rate-unit-label');
 
   const priceElem = document.getElementById('calc-total-price');
   const serviceElem = document.getElementById('calc-res-service');
@@ -310,25 +468,59 @@ function updateCalculator() {
   const timeElem = document.getElementById('calc-res-time');
   const delElem = document.getElementById('calc-res-delivery');
 
-  const isChinaSea = (calcState.origin === 'china' && calcState.mode === 'sea');
+  const isSea = (calcState.mode === 'sea');
+  const isChina = (calcState.origin === 'china');
+  const isManual = (calcState.rateMode === 'manual');
 
-  // Alternar entre control de peso (Libras) o CBM (Metros Cúbicos)
-  if (isChinaSea) {
+  // Alternar visibilidad de peso vs volumen marítimo
+  if (isSea) {
     if (weightGroup) weightGroup.classList.add('hidden');
-    if (cbmGroup) cbmGroup.classList.remove('hidden');
-    if (chinaDisclaimer) chinaDisclaimer.classList.remove('hidden');
+    if (maritimeGroup) maritimeGroup.classList.remove('hidden');
+    if (seasonAdvisory) seasonAdvisory.classList.add('hidden');
+    if (chinaDisclaimer) chinaDisclaimer.classList.toggle('hidden', !isChina);
   } else {
     if (weightGroup) weightGroup.classList.remove('hidden');
-    if (cbmGroup) cbmGroup.classList.add('hidden');
+    if (maritimeGroup) maritimeGroup.classList.add('hidden');
     if (chinaDisclaimer) chinaDisclaimer.classList.add('hidden');
+    if (seasonAdvisory) seasonAdvisory.classList.remove('hidden');
   }
 
-  // Notificación de temporada alta para envíos aéreos
-  if (seasonAdvisory) {
-    if (calcState.mode === 'air') {
-      seasonAdvisory.classList.remove('hidden');
+  // Alternar modo manual
+  if (manualRateGroup) manualRateGroup.classList.toggle('hidden', !isManual);
+  if (rateModeStatus) {
+    rateModeStatus.innerText = isManual ? 'Manual (Personalizada)' : 'Automático (Estándar)';
+  }
+
+  // Textos y etiquetas de volumen en marítimo
+  if (isSea) {
+    const isFt3 = (calcState.volumeUnit === 'ft3');
+    if (volumeLabel) {
+      volumeLabel.innerText = isFt3 
+        ? 'Volumen estimado (Pies Cúbicos / FT³):' 
+        : 'Volumen estimado (Metros Cúbicos / CBM):';
+    }
+    if (volumeRateBadge) {
+      if (isChina) {
+        volumeRateBadge.innerText = isFt3 ? 'Ref. China: ~$8.50 / FT³' : 'Ref. China: $275 - $350 / CBM';
+      } else {
+        volumeRateBadge.innerText = isFt3 ? 'Tarifa estándar: $15.00 / FT³' : 'Tarifa estándar: $529.72 / CBM';
+      }
+    }
+    if (volumeHintText) {
+      if (isChina) {
+        volumeHintText.innerHTML = `<i class="ph ph-info"></i> Flete marítimo de China a Panamá. Tarifas de mercado en CBM (~$275-$350). (1 CBM ≈ 35.31 FT³).`;
+      } else {
+        volumeHintText.innerHTML = `<i class="ph ph-info"></i> Envíos marítimos USA a Panamá se calculan a <strong>$15.00 por FT³</strong>. (1 FT³ suele albergar ~8 a 12 lbs de carga comercial regular).`;
+      }
+    }
+  }
+
+  // Etiqueta de unidad en tarifa manual
+  if (manualRateUnitLabel) {
+    if (!isSea) {
+      manualRateUnitLabel.innerText = '/ lb';
     } else {
-      seasonAdvisory.classList.add('hidden');
+      manualRateUnitLabel.innerText = calcState.volumeUnit === 'ft3' ? '/ FT³' : '/ CBM';
     }
   }
 
@@ -337,40 +529,65 @@ function updateCalculator() {
   let serviceName = '';
   let priceDisplay = '0.00';
 
-  if (calcState.origin === 'usa') {
-    if (calcState.mode === 'air') {
-      const rate = currentRates.airUsa || 3.00;
-      serviceName = 'Aéreo Express Miami';
-      rateDisplay = `$${rate.toFixed(2)} / lb`;
-      transitDays = '3 a 5 días hábiles';
-      const total = calcState.weight * rate;
-      priceDisplay = total.toFixed(2);
-    } else {
-      const rate = currentRates.seaUsa || 1.75;
-      serviceName = 'Marítimo Miami (Mín. 25 lbs)';
-      rateDisplay = `$${rate.toFixed(2)} / lb (Mín. 25 lbs)`;
+  if (!isSea) {
+    // AÉREO EXPRESS
+    transitDays = isChina ? '7 a 10 días hábiles' : '3 a 5 días hábiles';
+    serviceName = isChina ? 'Aéreo Express China' : 'Aéreo Express Miami';
+
+    const rate = isManual 
+      ? calcState.manualRate 
+      : (isChina ? (currentRates.airChina || 7.50) : (currentRates.airUsa || 3.00));
+    
+    rateDisplay = `$${rate.toFixed(2)} / lb${isManual ? ' (Manual)' : ''}`;
+    const total = calcState.weight * rate;
+    priceDisplay = total.toFixed(2);
+  } else {
+    // MARÍTIMO
+    const isFt3 = (calcState.volumeUnit === 'ft3');
+
+    if (!isChina) {
+      // MARÍTIMO MIAMI: Tarifa estándar $15 x FT3
       transitDays = '12 a 18 días hábiles';
-      const effectiveWeight = Math.max(25, calcState.weight);
-      const total = effectiveWeight * rate;
-      priceDisplay = total.toFixed(2);
-    }
-  } else { // China
-    if (calcState.mode === 'air') {
-      const rate = currentRates.airChina || 7.50;
-      serviceName = 'Aéreo Express China';
-      rateDisplay = `$${rate.toFixed(2)} / lb`;
-      transitDays = '7 a 10 días hábiles';
-      const total = calcState.weight * rate;
+      serviceName = `Marítimo Miami ($15 x FT³)`;
+
+      let rate = 0;
+      if (isManual) {
+        rate = calcState.manualRate;
+        rateDisplay = `$${rate.toFixed(2)} / ${isFt3 ? 'FT³' : 'CBM'} (Manual)`;
+      } else {
+        rate = isFt3 ? (currentRates.seaUsaFt3 || 15.00) : ((currentRates.seaUsaFt3 || 15.00) * FT3_PER_CBM);
+        rateDisplay = isFt3 ? `$15.00 / FT³` : `$${rate.toFixed(2)} / CBM ($15/FT³)`;
+      }
+
+      const total = calcState.volume * rate;
       priceDisplay = total.toFixed(2);
     } else {
-      const minRate = currentRates.seaChinaMin || 275.00;
-      const maxRate = currentRates.seaChinaMax || 350.00;
-      serviceName = 'Marítimo China (Consolidado LCL)';
-      rateDisplay = `$${minRate.toFixed(0)} - $${maxRate.toFixed(0)} / CBM`;
+      // MARÍTIMO CHINA: CBM ($275 - $350)
       transitDays = '30 a 45 días (Consolidado)';
-      const minTotal = (calcState.cbm * minRate).toFixed(0);
-      const maxTotal = (calcState.cbm * maxRate).toFixed(0);
-      priceDisplay = `${minTotal} - ${maxTotal}`;
+      serviceName = 'Marítimo China (LCL / CBM)';
+
+      if (isManual) {
+        const rate = calcState.manualRate;
+        rateDisplay = `$${rate.toFixed(2)} / ${isFt3 ? 'FT³' : 'CBM'} (Manual)`;
+        const total = calcState.volume * rate;
+        priceDisplay = total.toFixed(2);
+      } else {
+        if (!isFt3) { // CBM
+          const minRate = currentRates.seaChinaMin || 275.00;
+          const maxRate = currentRates.seaChinaMax || 350.00;
+          rateDisplay = `$${minRate.toFixed(0)} - $${maxRate.toFixed(0)} / CBM`;
+          const minTotal = (calcState.volume * minRate).toFixed(0);
+          const maxTotal = (calcState.volume * maxRate).toFixed(0);
+          priceDisplay = `${minTotal} - ${maxTotal}`;
+        } else { // FT3
+          const minRateFt3 = (currentRates.seaChinaMin || 275.00) / FT3_PER_CBM;
+          const maxRateFt3 = (currentRates.seaChinaMax || 350.00) / FT3_PER_CBM;
+          rateDisplay = `$${minRateFt3.toFixed(2)} - $${maxRateFt3.toFixed(2)} / FT³`;
+          const minTotal = (calcState.volume * minRateFt3).toFixed(0);
+          const maxTotal = (calcState.volume * maxRateFt3).toFixed(0);
+          priceDisplay = `${minTotal} - ${maxTotal}`;
+        }
+      }
     }
   }
 
@@ -1226,7 +1443,7 @@ function loadRatesInAdmin() {
 
   if (rUsaAir) rUsaAir.value = currentRates.airUsa || 3.00;
   if (rChinaAir) rChinaAir.value = currentRates.airChina || 7.50;
-  if (rUsaSea) rUsaSea.value = currentRates.seaUsa || 1.75;
+  if (rUsaSea) rUsaSea.value = currentRates.seaUsaFt3 || 15.00;
   if (rChinaSeaMin) rChinaSeaMin.value = currentRates.seaChinaMin || 275.00;
   if (rChinaSeaMax) rChinaSeaMax.value = currentRates.seaChinaMax || 350.00;
   if (rDelivery) rDelivery.value = currentRates.deliveryMetro || 3.50;
@@ -1236,7 +1453,7 @@ function handleSaveRates(e) {
   e.preventDefault();
   currentRates.airUsa = parseFloat(document.getElementById('rate-air-usa').value) || 3.00;
   currentRates.airChina = parseFloat(document.getElementById('rate-air-china').value) || 7.50;
-  currentRates.seaUsa = parseFloat(document.getElementById('rate-sea-usa').value) || 1.75;
+  currentRates.seaUsaFt3 = parseFloat(document.getElementById('rate-sea-usa').value) || 15.00;
   currentRates.seaChinaMin = parseFloat(document.getElementById('rate-sea-china-min').value) || 275.00;
   currentRates.seaChinaMax = parseFloat(document.getElementById('rate-sea-china-max').value) || 350.00;
   currentRates.deliveryMetro = parseFloat(document.getElementById('rate-delivery-fee').value) || 3.50;
