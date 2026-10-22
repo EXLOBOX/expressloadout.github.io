@@ -457,11 +457,16 @@
               </div>
             </div>
 
+            <!-- ============================================================================= -->
+            <!-- TODO: [GIT REMINDER / SERVICIO PENDIENTE]                                    -->
+            <!-- Cuando se habilite el servicio Aéreo Express desde China, reactivar opción   -->
+            <!-- en app.js y remover bloqueo de #btn-mode-air al seleccionar China.           -->
+            <!-- ============================================================================= -->
             <div class="form-group-row">
               <label class="form-label">Modalidad de Transporte:</label>
               <div class="segmented-control" id="calc-mode">
                 <button type="button" class="segment-btn active" data-mode="air" id="btn-mode-air">
-                  <i class="ph ph-rocket-launch"></i> Aéreo Express (3-5 d)
+                  <i class="ph ph-rocket-launch"></i> <span id="label-mode-air">Aéreo Express (3-5 d)</span>
                 </button>
                 <button type="button" class="segment-btn" data-mode="sea" id="btn-mode-sea">
                   <i class="ph ph-anchor"></i> Marítimo (FT³ / CBM)

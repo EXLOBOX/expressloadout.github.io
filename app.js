@@ -263,12 +263,22 @@ function initCalculator() {
     });
   }
 
+  // =============================================================================
+  // TODO: [GIT REMINDER / SERVICIO PENDIENTE]
+  // Al seleccionar Shenzhen, China se inhabilita temporalmente el servicio Aéreo Express
+  // debido a que actualmente solo se cuenta con flete marítimo consolidado desde China.
+  // Cuando se aperture la ruta aérea China -> PTY, reactivar esta opción.
+  // =============================================================================
+
   // Cambio de Origen: USA vs China
   originBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       originBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       calcState.origin = btn.dataset.origin;
+
+      // Sincronizar disponibilidad de flete aéreo (Inhabilitado temporalmente para China)
+      syncChinaAirAvailability();
 
       // Si está en marítimo, auto-ajustar unidad sugerida: China -> CBM, USA -> FT3
       if (calcState.mode === 'sea') {
@@ -287,6 +297,12 @@ function initCalculator() {
   // Cambio de Modalidad: Aéreo vs Marítimo
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      // Bloqueo preventivo si intenta activar aéreo para China
+      if (btn.dataset.mode === 'air' && calcState.origin === 'china') {
+        alert('ℹ️ El servicio Aéreo Express desde China se encuentra temporalmente en preparación. Por ahora solo contamos con despacho marítimo consolidado.');
+        return;
+      }
+
       modeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       calcState.mode = btn.dataset.mode;
@@ -380,7 +396,49 @@ function initCalculator() {
     });
   }
 
+  syncChinaAirAvailability();
   updateCalculator();
+}
+
+// =============================================================================
+// TODO: [GIT REMINDER / SERVICIO PENDIENTE CHINA AÉREO]
+// Inhabilita el botón de Aéreo Express cuando el origen seleccionado sea China.
+// =============================================================================
+function syncChinaAirAvailability() {
+  const btnAir = document.getElementById('btn-mode-air');
+  const btnSea = document.getElementById('btn-mode-sea');
+  const labelAir = document.getElementById('label-mode-air');
+
+  if (calcState.origin === 'china') {
+    if (btnAir) {
+      btnAir.disabled = true;
+      btnAir.classList.add('disabled-btn');
+      btnAir.title = 'Servicio Aéreo desde China actualmente no disponible (Solo Marítimo disponible)';
+    }
+    if (labelAir) {
+      labelAir.innerHTML = 'Aéreo <span class="segment-btn-badge-off">No disponible</span>';
+    }
+    // Forzar modalidad marítimo
+    if (calcState.mode === 'air') {
+      calcState.mode = 'sea';
+      if (btnAir) btnAir.classList.remove('active');
+      if (btnSea) btnSea.classList.add('active');
+    }
+    // Asegurar que en China Marítimo la unidad sea CBM
+    if (calcState.volumeUnit !== 'cbm') {
+      switchVolumeUnit('cbm');
+    }
+  } else {
+    // Origen Miami, USA: Habilitar Aéreo Express
+    if (btnAir) {
+      btnAir.disabled = false;
+      btnAir.classList.remove('disabled-btn');
+      btnAir.title = 'Aéreo Express Miami (3-5 días)';
+    }
+    if (labelAir) {
+      labelAir.innerText = 'Aéreo Express (3-5 d)';
+    }
+  }
 }
 
 // Función auxiliar para cambiar y convertir unidad de volumen entre FT3 y CBM
