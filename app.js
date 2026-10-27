@@ -1321,13 +1321,126 @@ function generateTacticalDemo(cleanTrack, carrierInfo) {
   };
 }
 
+// Renderizado táctico cuando una guía NO existe en la base de datos de las APIs
+function renderTacticalNotFound(trackingNumber, targetResultId, compact = false, customMsg = null) {
+  const container = document.getElementById(targetResultId);
+  if (!container) return;
+
+  const cfg = getTrackingConfig();
+  const waNum = cfg.supportWhatsapp || '50765210278';
+  const waMsg = encodeURIComponent(`Hola Express Loadout, tengo consultas sobre mi tracking ${trackingNumber} ya que no aparecen registros en el sistema.`);
+  const waUrl = `https://wa.me/${waNum}?text=${waMsg}`;
+
+  if (compact) {
+    container.innerHTML = `
+      <div class="tactical-micro-card" style="border-color: rgba(239, 68, 68, 0.45);">
+        <div class="tactical-micro-header">
+          <div class="tactical-track-id-group">
+            <span class="tactical-carrier-badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border-color:rgba(239, 68, 68, 0.35);">
+              <i class="ph ph-warning-circle"></i> No Encontrado
+            </span>
+            <span class="tactical-micro-tracknum">${trackingNumber}</span>
+          </div>
+          <button type="button" class="tactical-micro-close" onclick="closeHeroTrackResult()" title="Cerrar"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="tactical-micro-body" style="flex-direction:column; align-items:flex-start; gap:6px;">
+          <div style="font-size:0.83rem; color:#cbd5e1; line-height:1.4;">
+            ${customMsg || `No se encontraron registros activos en la red logística para la guía <strong style="color:#fff; font-family:Consolas, monospace;">${trackingNumber}</strong>.`}
+          </div>
+          <div style="font-size:0.75rem; color:#94a3b8; line-height:1.3;">
+            Si el paquete fue entregado hoy en Miami, por favor permite de 2 a 4 horas hábiles para su procesamiento en bodega.
+          </div>
+        </div>
+
+        <div class="tactical-micro-actions" style="margin-top:10px;">
+          <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-sm btn-block" style="background:linear-gradient(135deg, #22c55e, #16a34a); border:none;">
+            <i class="ph ph-whatsapp-logo"></i> Consultar a Soporte
+          </a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Vista Completa para sección #tracking
+  container.innerHTML = `
+    <div class="tactical-track-card" style="border-color: rgba(245, 158, 11, 0.35);">
+      <!-- HUD HEADER -->
+      <div class="tactical-hud-header">
+        <div class="tactical-track-id-group">
+          <span class="tactical-carrier-badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border-color:rgba(239, 68, 68, 0.35);">
+            <i class="ph ph-warning-circle"></i> Guía No Localizada
+          </span>
+          <button type="button" class="tactical-number-btn" onclick="copyTrackingNumber('${trackingNumber}', this)" title="Haz clic para copiar">
+            <i class="ph ph-copy"></i>
+            <span>${trackingNumber}</span>
+          </button>
+        </div>
+        <div class="tactical-status-pill" style="background:rgba(239, 68, 68, 0.12); border-color:rgba(239, 68, 68, 0.35); color:#f87171;">
+          <span class="tactical-radar-dot" style="background:#f87171;"></span>
+          <span>Sin Registros de Bodega</span>
+        </div>
+      </div>
+
+      <!-- BANNER CENTRAL NOT FOUND -->
+      <div style="padding: 28px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.8rem; color: #fbbf24;">
+          <i class="ph ph-magnifying-glass"></i>
+        </div>
+        <h3 style="color:#ffffff; font-size:1.3rem; font-weight:700; margin:0 0 8px 0;">No se encontraron movimientos registrados</h3>
+        <p style="color:#94a3b8; font-size:0.92rem; max-width:540px; margin:0 auto; line-height:1.5;">
+          ${customMsg || `El número <strong style="color:#f8fafc; font-family:Consolas, monospace;">${trackingNumber}</strong> no presenta registros de recepción en el sistema de bodega (ElizaApp / Nelcon Cargo), despacho aduanal (Kappa Logistics) ni couriers internacionales.`}
+        </p>
+      </div>
+
+      <!-- GUÍA DE AYUDA / CHECKLIST TÁCTICO -->
+      <div style="padding: 22px 24px; background: rgba(15, 23, 42, 0.45); border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+        <h4 style="color:#fbbf24; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.06em; margin:0 0 14px 0; display:flex; align-items:center; gap:8px;">
+          <i class="ph ph-info"></i> Causas habituales y cómo proceder:
+        </h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+          <div style="background:rgba(30, 41, 59, 0.5); border:1px solid rgba(255, 255, 255, 0.06); border-radius:10px; padding:12px 14px;">
+            <strong style="color:#fff; font-size:0.85rem; display:block; margin-bottom:4px;">⏱️ Carga recibida recientemente en Miami</strong>
+            <span style="color:#94a3b8; font-size:0.8rem; line-height:1.4; display:block;">Si el courier (Amazon, UPS, FedEx) entregó el paquete hoy, requiere de 2 a 4 horas hábiles para su desempaque, pesaje y registro oficial en sistema.</span>
+          </div>
+          <div style="background:rgba(30, 41, 59, 0.5); border:1px solid rgba(255, 255, 255, 0.06); border-radius:10px; padding:12px 14px;">
+            <strong style="color:#fff; font-size:0.85rem; display:block; margin-bottom:4px;">🚛 En tránsito local dentro de USA</strong>
+            <span style="color:#94a3b8; font-size:0.8rem; line-height:1.4; display:block;">Si la tienda o vendedor acaba de despachar la compra, el paquete aún se encuentra viajando por carretera antes de arribar a nuestra bodega en Doral (FL 33191).</span>
+          </div>
+          <div style="background:rgba(30, 41, 59, 0.5); border:1px solid rgba(255, 255, 255, 0.06); border-radius:10px; padding:12px 14px;">
+            <strong style="color:#fff; font-size:0.85rem; display:block; margin-bottom:4px;">🔍 Verificación de caracteres</strong>
+            <span style="color:#94a3b8; font-size:0.8rem; line-height:1.4; display:block;">Verifica que no existan espacios adicionales, guiones omitidos o caracteres confundidos (ej: la letra O en lugar del número 0).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="tactical-actions-row">
+        <a href="${waUrl}" target="_blank" rel="noopener" class="tactical-action-btn whatsapp" style="flex:1;">
+          <i class="ph ph-whatsapp-logo"></i> Consultar a Soporte con este Tracking
+        </a>
+        <a href="https://t.17track.net/es#nums=${encodeURIComponent(trackingNumber)}" target="_blank" rel="noopener" class="tactical-action-btn carrier" style="flex:1;">
+          <i class="ph ph-arrow-square-out"></i> Probar en Portal 17Track Global
+        </a>
+      </div>
+    </div>
+  `;
+}
+
 // Ejecución del rastreo y renderizado del visualizador
 async function executeTacticalTracking(trackNum, targetResultId) {
   const resultBox = document.getElementById(targetResultId);
   if (!resultBox) return;
 
-  const cleanTrack = trackNum.trim().toUpperCase();
-  if (!cleanTrack) return;
+  const rawTrack = String(trackNum || '').trim();
+  const cleanTrack = rawTrack.toUpperCase().replace(/\s+/g, '');
+  
+  if (!cleanTrack || cleanTrack.length < 3) {
+    resultBox.classList.remove('hidden');
+    renderTacticalNotFound(rawTrack || 'VACÍO', targetResultId, targetResultId === 'quick-track-result', 'Por favor ingresa un número de guía o tracking válido (mínimo 3 caracteres).');
+    return;
+  }
 
   // Si estamos en el Hero, ocultar la caja de direcciones para evitar estiramiento del fondo
   if (targetResultId === 'quick-track-result') {
@@ -1406,11 +1519,19 @@ async function executeTacticalTracking(trackNum, targetResultId) {
       }
     }
   } catch (err) {
-    console.warn('Fallo en consulta API remota, generando vista táctica inteligente:', err);
+    console.warn('Fallo en consulta API remota:', err);
   }
 
+  // SI NO HAY RESULTADO DE LA API:
   if (!trackingResult) {
-    trackingResult = generateTacticalDemo(cleanTrack, carrierInfo);
+    if (cfg.provider === 'demo') {
+      trackingResult = generateTacticalDemo(cleanTrack, carrierInfo);
+      renderTacticalVisualizer(trackingResult, targetResultId, targetResultId === 'quick-track-result');
+    } else {
+      // Estado Oficial: Guía No Encontrada (sin simulación falsa en producción)
+      renderTacticalNotFound(cleanTrack, targetResultId, targetResultId === 'quick-track-result');
+    }
+    return;
   }
 
   renderTacticalVisualizer(trackingResult, targetResultId, targetResultId === 'quick-track-result');
