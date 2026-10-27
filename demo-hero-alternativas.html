@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparador Visual - Alternativas Hero Spotlight</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Estilos propios del Hero simulado */
+    .hero-stage {
+      position: relative;
+      background-color: #090d14;
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 480px;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Malla de partículas en canvas */
+    .mock-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.85;
+    }
+
+    /* MODO 0: PROBLEMA ACTUAL (Con la línea de corte a 380px) */
+    .glow-actual {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 340px; /* Caja corta que se interrumpe */
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(37, 99, 235, 0.09) 50%, rgba(9, 13, 20, 0.05) 75%);
+      pointer-events: none;
+      z-index: 0;
+      /* Simulación del corte visible de la caja */
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    .cutoff-marker {
+      position: absolute;
+      top: 280px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(239, 68, 68, 0.7);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cutoff-label {
+      background: #ef4444;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: 12px;
+      letter-spacing: 0.05em;
+      transform: translateY(-50%);
+    }
+
+    /* ALTERNATIVA 1: FADE-TO-ZERO SUAVE (RECOMENDADA) */
+    .glow-alt1 {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse 70% 50% at 50% 25%, rgba(245, 158, 11, 0.16) 0%, rgba(37, 99, 235, 0.06) 45%, transparent 70%);
+      mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+      -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ALTERNATIVA 2: DESENFOQUE GAUSSIANO (BLUR PROFUNDO) */
+    .glow-alt2 {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 480px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(37, 99, 235, 0.18) 60%, transparent 80%);
+      filter: blur(55px);
+      opacity: 0.65;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ALTERNATIVA 3: OBSIDIAN PURO (SIN ESFERA) */
+    .glow-alt3 {
+      display: none;
+    }
+
+    /* Cuadrícula táctica */
+    .mock-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Temas en el simulador */
+    .theme-tactical-mode .hero-stage { background-color: #080b08; }
+    .theme-tactical-mode .glow-alt1 {
+      background: radial-gradient(ellipse 70% 50% at 50% 25%, rgba(163, 230, 53, 0.18) 0%, rgba(101, 163, 13, 0.08) 45%, transparent 70%);
+    }
+    .theme-tactical-mode .glow-alt2 {
+      background: radial-gradient(circle, rgba(163, 230, 53, 0.4) 0%, rgba(101, 163, 13, 0.2) 60%, transparent 80%);
+    }
+
+    .theme-light-mode .hero-stage { background-color: #f8fafc; }
+    .theme-light-mode .glow-alt1 {
+      background: radial-gradient(ellipse 70% 50% at 50% 25%, rgba(59, 130, 246, 0.12) 0%, rgba(245, 158, 11, 0.05) 45%, transparent 70%);
+    }
+    .theme-light-mode .glow-alt2 {
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(245, 158, 11, 0.12) 60%, transparent 80%);
+    }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-3 sm:p-5">
+
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-xl max-w-5xl mx-auto">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-5 border-b border-[var(--border)]">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            TEST VISUAL EN VIVO
+          </span>
+          <span class="text-xs text-[var(--muted-foreground)]">Hero Spotlight Effect</span>
+        </div>
+        <h2 class="text-xl font-bold mt-1 text-[var(--foreground)]">Comparador de Soluciones para el Difuminado del Hero</h2>
+        <p class="text-xs sm:text-sm text-[var(--muted-foreground)] mt-0.5">
+          Prueba cada opción y observa cómo desaparece el corte horizontal señalado con la flecha verde.
+        </p>
+      </div>
+
+      <!-- SELECTOR DE PALETA DE TEMA -->
+      <div class="flex items-center gap-1.5 bg-black/30 p-1.5 rounded-xl border border-white/10 self-start sm:self-auto">
+        <span class="text-xs text-slate-400 px-2 font-medium">Tema:</span>
+        <button onclick="setThemeMode('obsidian')" id="btn-theme-obsidian" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-500 text-slate-950 transition-all">
+          Obsidian
+        </button>
+        <button onclick="setThemeMode('tactical')" id="btn-theme-tactical" class="px-2.5 py-1 text-xs rounded-lg font-bold text-slate-300 hover:text-white transition-all">
+          Tactical
+        </button>
+        <button onclick="setThemeMode('light')" id="btn-theme-light" class="px-2.5 py-1 text-xs rounded-lg font-bold text-slate-300 hover:text-white transition-all">
+          Light
+        </button>
+      </div>
+    </div>
+
+    <!-- PESTAÑAS SELECTORAS DE LAS 3 ALTERNATIVAS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 my-5">
+      
+      <!-- TAB 0: PROBLEMA ACTUAL -->
+      <button onclick="selectOption('actual')" id="tab-actual" class="flex flex-col text-left p-3 rounded-xl border border-red-500/50 bg-red-950/20 text-red-200 transition-all hover:bg-red-950/30">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-red-400">Estado Actual</span>
+          <span class="text-xs bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded">Con Falla</span>
+        </div>
+        <strong class="text-sm font-semibold mt-1">Línea Cortada (500px)</strong>
+        <span class="text-xs text-slate-400 mt-0.5">Muestra el corte físico señalado</span>
+      </button>
+
+      <!-- TAB 1: ALTERNATIVA 1 -->
+      <button onclick="selectOption('alt1')" id="tab-alt1" class="flex flex-col text-left p-3 rounded-xl border border-amber-500/30 bg-white/5 text-slate-300 transition-all hover:bg-white/10">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Alternativa 1</span>
+          <span class="text-xs bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold">Recomendada</span>
+        </div>
+        <strong class="text-sm font-semibold mt-1">Fade-to-Zero Natural</strong>
+        <span class="text-xs text-slate-400 mt-0.5">Elipse suave 100% sin costuras</span>
+      </button>
+
+      <!-- TAB 2: ALTERNATIVA 2 -->
+      <button onclick="selectOption('alt2')" id="tab-alt2" class="flex flex-col text-left p-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Alternativa 2</span>
+          <span class="text-xs bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded">Volumétrica</span>
+        </div>
+        <strong class="text-sm font-semibold mt-1">Gaussian Blur (90px)</strong>
+        <span class="text-xs text-slate-400 mt-0.5">Luz ambiental desenfocada</span>
+      </button>
+
+      <!-- TAB 3: ALTERNATIVA 3 -->
+      <button onclick="selectOption('alt3')" id="tab-alt3" class="flex flex-col text-left p-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Alternativa 3</span>
+          <span class="text-xs bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded">Minimalista</span>
+        </div>
+        <strong class="text-sm font-semibold mt-1">Obsidian Puro</strong>
+        <span class="text-xs text-slate-400 mt-0.5">Sin esfera (fondo plano)</span>
+      </button>
+
+    </div>
+
+    <!-- ESCENARIO HERO SIMULADO EN VIVO -->
+    <div id="hero-stage-container" class="hero-stage relative p-6 sm:p-10 border border-white/10 shadow-2xl">
+      
+      <!-- Elemento de Fondo Dinámico -->
+      <div id="glow-element" class="glow-actual"></div>
+      <div class="mock-grid"></div>
+      
+      <!-- Canvas de Malla de Partículas en Vivo -->
+      <canvas id="mockMeshCanvas" class="mock-canvas"></canvas>
+
+      <!-- Marcador de Falla (Solo visible en Estado Actual) -->
+      <div id="cutoff-indicator" class="cutoff-marker">
+        <span class="cutoff-label">⚠️ LÍNEA DE CORTE BRUSCO (FIN DEL DIV DE 500PX)</span>
+      </div>
+
+      <!-- CONTENIDO REAL DEL HERO SIMULADO -->
+      <div class="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center max-w-4xl mx-auto">
+        
+        <!-- Columna Izquierda: Textos y Botones -->
+        <div class="md:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
+            <span>PANAMÁ 2026</span>
+            <span class="text-slate-400">• Tu casillero en Miami & China</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+            Importa de <span class="text-amber-400">USA y China</span> a Panamá sin complicaciones
+          </h1>
+
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Casillero físico gratis, compras por internet asistidas y fletes marítimos o aéreos con entrega directa puerta a puerta.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-lg shadow-lg shadow-amber-500/20">
+              Solicitar Casillero Gratis
+            </button>
+            <button class="bg-slate-800/80 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-lg border border-white/10">
+              Calcular mi Tarifa
+            </button>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Tarjeta de Rastreo -->
+        <div class="md:col-span-5 bg-slate-900/90 border border-white/10 rounded-xl p-4 shadow-xl backdrop-blur-md">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <span class="text-xs font-bold text-white">Rastreo Inmediato</span>
+            <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono font-bold">EXLO ERP</span>
+          </div>
+          <div class="mt-3 space-y-2">
+            <div class="h-8 bg-black/40 border border-white/10 rounded-lg flex items-center px-3 text-xs text-slate-500 font-mono">
+              Ej: TBA304958392
+            </div>
+            <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2 rounded-lg">
+              Localizar Envío
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TARJETA EXPLICATIVA DE LA OPCIÓN SELECCIONADA -->
+    <div id="option-details-card" class="mt-5 p-4 rounded-xl border border-white/10 bg-black/30">
+      <!-- Se inyecta dinámicamente -->
+    </div>
+
+  </div>
+
+  <script>
+    let currentOption = 'actual';
+    let currentTheme = 'obsidian';
+
+    const DETAILS = {
+      actual: {
+        title: '❌ Estado Actual: Corte Rígido a 500px',
+        desc: 'El div de la esfera tiene una altura fija de 500px y empieza en top: -120px. Justo al alcanzar el pixel 380, la caja termina físicamente antes de que el degradado llegue al 0%, creando una línea horizontal dura visible.',
+        pros: ['Ninguno (es la falla actual).'],
+        cons: ['Se percibe una división artificial en el fondo.', 'En monitores grandes o pantallas altas el corte es muy evidente.'],
+        badgeColor: 'text-red-400',
+        badgeBg: 'bg-red-500/10'
+      },
+      alt1: {
+        title: '🟢 Alternativa 1: Fade-to-Zero Natural (Recomendada)',
+        desc: 'La esfera se transforma en una elipse proporcional (70% x 50%) que abarca toda la sección con una máscara de degradado vertical (mask-image). La luz se extingue al 100% transparente antes de llegar al tercio inferior, haciendo que el fondo se funda en perfecta continuidad sin ninguna línea recta.',
+        pros: ['Cero líneas o cortes perceptibles.', 'Conserva la iluminación dorada elegante y prémium.', 'Rendimiento nativo 60 FPS sin consumo extra de GPU.', 'Se adapta dinámicamente a celulares y monitores ultra-anchos.'],
+        cons: ['Ninguno.'],
+        badgeColor: 'text-emerald-400',
+        badgeBg: 'bg-emerald-500/10'
+      },
+      alt2: {
+        title: '🟡 Alternativa 2: Luz Volumétrica Ambiental (Gaussian Blur)',
+        desc: 'Se genera una esfera de luz y se le aplica un filtro CSS de desenfoque de 55px a 90px (filter: blur), convirtiéndola en una nebulosa difusa suave.',
+        pros: ['Aspecto de iluminación volumétrica moderna estilo Apple/Vercel.', 'Transición completamente vaporosa.'],
+        cons: ['En celulares antiguos puede consumir un 3-5% más de procesador por el cálculo continuo del filtro de desenfoque.', 'Los bordes de la nebulosa pueden lucir ligeramente menos contrastados.'],
+        badgeColor: 'text-cyan-400',
+        badgeBg: 'bg-cyan-500/10'
+      },
+      alt3: {
+        title: '⚪ Alternativa 3: Obsidian Puro (Fondo Plano Minimalista)',
+        desc: 'Se remueve la esfera de luz por completo. El fondo del Hero queda en el mismo color carbón oscuro (#090d14) que el resto de las secciones, dejando que resalten exclusivamente los iconos vectoriales y las líneas de conexión doradas.',
+        pros: ['Uniformidad 100% idéntica entre el Hero y los contenedores inferiores.', 'Rendimiento ultra ligero.'],
+        cons: ['El Hero pierde su punto focal de luz cenital.', 'El fondo se aprecia más plano y menos llamativo.'],
+        badgeColor: 'text-purple-400',
+        badgeBg: 'bg-purple-500/10'
+      }
+    };
+
+    function selectOption(opt) {
+      currentOption = opt;
+
+      // Actualizar pestañas activas
+      ['actual', 'alt1', 'alt2', 'alt3'].forEach(o => {
+        const btn = document.getElementById('tab-' + o);
+        if (o === opt) {
+          btn.className = 'flex flex-col text-left p-3 rounded-xl border border-amber-500 bg-amber-500/15 text-white shadow-lg transition-all';
+        } else {
+          btn.className = 'flex flex-col text-left p-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10';
+        }
+      });
+
+      // Actualizar el elemento de luz
+      const glow = document.getElementById('glow-element');
+      const indicator = document.getElementById('cutoff-indicator');
+
+      glow.className = 'glow-' + opt;
+
+      if (opt === 'actual') {
+        indicator.style.display = 'flex';
+      } else {
+        indicator.style.display = 'none';
+      }
+
+      // Renderizar ficha de detalles
+      renderDetails();
+    }
+
+    function setThemeMode(theme) {
+      currentTheme = theme;
+      const stage = document.getElementById('hero-stage-container');
+      stage.className = 'hero-stage relative p-6 sm:p-10 border border-white/10 shadow-2xl theme-' + theme + '-mode';
+
+      ['obsidian', 'tactical', 'light'].forEach(t => {
+        const btn = document.getElementById('btn-theme-' + t);
+        if (t === theme) {
+          btn.className = 'px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-500 text-slate-950 transition-all';
+        } else {
+          btn.className = 'px-2.5 py-1 text-xs rounded-lg font-bold text-slate-300 hover:text-white transition-all';
+        }
+      });
+    }
+
+    function renderDetails() {
+      const data = DETAILS[currentOption];
+      const container = document.getElementById('option-details-card');
+
+      container.innerHTML = `
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold px-2 py-0.5 rounded ${data.badgeBg} ${data.badgeColor}">${data.title}</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-300 mb-3 leading-relaxed">${data.desc}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-white/10">
+          <div>
+            <span class="font-bold text-emerald-400 block mb-1">✓ Ventajas:</span>
+            <ul class="list-disc list-inside text-slate-400 space-y-0.5">
+              ${data.pros.map(p => `<li>${p}</li>`).join('')}
+            </ul>
+          </div>
+          <div>
+            <span class="font-bold text-rose-400 block mb-1">⚠️ Consideraciones:</span>
+            <ul class="list-disc list-inside text-slate-400 space-y-0.5">
+              ${data.cons.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    // Canvas de partículas ligero para el mockup
+    function initMockCanvas() {
+      const canvas = document.getElementById('mockMeshCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const stage = document.getElementById('hero-stage-container');
+
+      let w = canvas.width = stage.offsetWidth;
+      let h = canvas.height = stage.offsetHeight;
+
+      const nodes = [];
+      for (let i = 0; i < 24; i++) {
+        nodes.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        const isTactical = currentTheme === 'tactical';
+        const isLight = currentTheme === 'light';
+        const lineRgb = isLight ? '59, 130, 246' : isTactical ? '163, 230, 53' : '245, 158, 11';
+
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 10 || n.x > w - 10) n.vx *= -1;
+          if (n.y < 10 || n.y > h - 10) n.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgb(${lineRgb})`;
+          ctx.fill();
+
+          for (let j = i + 1; j < nodes.length; j++) {
+            const n2 = nodes[j];
+            const dx = n.x - n2.x;
+            const dy = n.y - n2.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 120) {
+              ctx.beginPath();
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(n2.x, n2.y);
+              ctx.strokeStyle = `rgba(${lineRgb}, ${1 - d / 120})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectOption('actual');
+      setTimeout(initMockCanvas, 100);
+    });
+  </script>
+</body>
+</html>
