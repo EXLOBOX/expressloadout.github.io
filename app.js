@@ -28,6 +28,7 @@ const defaultEvents = [
     discount: 'Hasta 80% OFF • Millones de Ofertas',
     logisticsTip: 'Evento cumbre mundial. Para compras voluminosas o carga pesada, despacha por flete marítimo antes del 15 de Noviembre para recibir antes de Navidad en Panamá.',
     url: 'https://www.aliexpress.com',
+    socialUrl: 'https://www.instagram.com/expressloadout',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80',
     badge: '11.11 Día del Soltero',
     hidden: false
@@ -133,6 +134,8 @@ const defaultCases = [
     mode: 'China • Marítimo',
     stat: '1,850 lbs • $3,400 Ahorro',
     image: 'images/banner.jpg',
+    link: 'https://www.instagram.com/expressloadout',
+    hidden: false,
     desc: '“Con Express Loadout importé sin complicaciones 10 reformers para mi gimnasio de pilates. Fueron rápidos, transparentes y hasta me ayudaron a subir toda la carga a mi segundo piso. ¡Servicio impecable!”'
   },
   {
@@ -143,6 +146,8 @@ const defaultCases = [
     mode: 'Miami, USA • Aéreo',
     stat: '4 Días de Entrega • 0 Daños',
     image: 'images/login-icon.svg',
+    link: '',
+    hidden: false,
     desc: '“Necesitaba traer unos equipos delicados comprados en Amazon. Se encargaron de la recepción y embalaje en Miami. En 4 días los tenía en mis manos sin cargos ocultos.”'
   },
   {
@@ -153,6 +158,8 @@ const defaultCases = [
     mode: 'USA • Marítimo & Aéreo',
     stat: 'Entrega en Tierras Altas',
     image: 'images/banner.jpg',
+    link: '',
+    hidden: false,
     desc: '“Uso su casillero en Miami desde hace más de un año. Recibo mis compras no solo en la capital sino hasta Boquete Chiriquí con despacho directo y atención personalizada.”'
   }
 ];
@@ -203,10 +210,14 @@ function loadStoredData() {
 
     const storedCases = localStorage.getItem(STORAGE_KEYS.CASES);
     if (storedCases) {
-      currentCases = JSON.parse(storedCases).map(c => ({
-        ...c,
-        hidden: c.hidden === true
-      }));
+      currentCases = JSON.parse(storedCases).map(c => {
+        const def = defaultCases.find(d => d.id === c.id);
+        return {
+          ...c,
+          hidden: c.hidden === true,
+          link: c.link !== undefined ? c.link : (def ? def.link : '')
+        };
+      });
     } else {
       currentCases = [...defaultCases];
       localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
@@ -219,7 +230,8 @@ function loadStoredData() {
         return {
           ...e,
           hidden: e.hidden === true,
-          image: e.image || (def ? def.image : '')
+          image: e.image || (def ? def.image : ''),
+          socialUrl: e.socialUrl !== undefined ? e.socialUrl : (def ? def.socialUrl : '')
         };
       });
     } else {
@@ -2486,23 +2498,39 @@ function renderSuccessCases() {
     return;
   }
 
-  container.innerHTML = visibleCases.map(c => `
+  container.innerHTML = visibleCases.map(c => {
+    const hasLink = !!c.link;
+    const isInstagram = hasLink && c.link.includes('instagram.com');
+
+    return `
     <article class="case-card glass-panel" id="card-${c.id}">
       <div class="case-image-wrap">
-        <img src="${c.image || 'images/banner.jpg'}" alt="${c.title}" class="case-image" loading="lazy" />
+        ${hasLink ? `<a href="${c.link}" target="_blank" rel="noopener" class="case-image-link" title="Ver en ${isInstagram ? 'Instagram' : 'la web'}">` : ''}
+          <img src="${c.image || 'images/banner.jpg'}" alt="${c.title}" class="case-image" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />
+        ${hasLink ? `</a>` : ''}
         <span class="case-badge-overlay">${c.mode}</span>
         <span class="case-stat-badge">${c.stat}</span>
       </div>
       <div class="case-body">
-        <h3 class="case-title">${c.title}</h3>
+        <h3 class="case-title">
+          ${hasLink ? `<a href="${c.link}" target="_blank" rel="noopener" class="case-title-link">${c.title}</a>` : c.title}
+        </h3>
         <p class="case-desc">${c.desc}</p>
         <div class="case-footer">
           <span class="case-client-name">Cliente: ${c.client}</span>
           <span style="color:var(--brand-yellow); font-weight:700;">★★★★★</span>
         </div>
+        ${hasLink ? `
+          <div class="case-redirection-row">
+            <a href="${c.link}" target="_blank" rel="noopener" class="case-redirect-btn ${isInstagram ? 'btn-instagram-pill' : ''}">
+              <i class="ph ${isInstagram ? 'ph-instagram-logo' : 'ph-arrow-square-out'}"></i>
+              <span>${isInstagram ? 'Ver en Instagram' : 'Ver Perfil / Testimonio'}</span>
+            </a>
+          </div>
+        ` : ''}
       </div>
     </article>
-  `).join('');
+  `}).join('');
 
   // Actualizar también en el panel admin si está abierto
   renderAdminCasesList();
@@ -2868,6 +2896,13 @@ function previewCaseImage(event) {
 
 function previewCaseUrl(url) {
   if (!url) return;
+  url = url.trim();
+  if (url.includes('instagram.com/p/') || url.includes('instagram.com/reel/') || url.includes('instagram.com/tv/')) {
+    const linkInput = document.getElementById('case-link');
+    if (linkInput && !linkInput.value) {
+      linkInput.value = url;
+    }
+  }
   currentCasePhotoData = url;
   displayPhotoPreview(url);
 }
@@ -2903,6 +2938,7 @@ function editCase(caseId) {
   const statInput = document.getElementById('case-stat');
   const descInput = document.getElementById('case-desc');
   const urlInput = document.getElementById('case-img-url');
+  const linkInput = document.getElementById('case-link');
   const submitBtn = document.getElementById('case-submit-btn');
   const cancelBtn = document.getElementById('case-cancel-edit-btn');
 
@@ -2911,6 +2947,7 @@ function editCase(caseId) {
   if (modeSelect) modeSelect.value = c.mode || 'China • Marítimo';
   if (statInput) statInput.value = c.stat || '';
   if (descInput) descInput.value = c.desc || '';
+  if (linkInput) linkInput.value = c.link || '';
 
   if (c.image) {
     currentCasePhotoData = c.image;
@@ -2942,6 +2979,9 @@ function resetCaseForm() {
   document.getElementById('new-case-form')?.reset();
   clearCaseImage();
 
+  const linkInput = document.getElementById('case-link');
+  if (linkInput) linkInput.value = '';
+
   const submitBtn = document.getElementById('case-submit-btn');
   const cancelBtn = document.getElementById('case-cancel-edit-btn');
   if (submitBtn) {
@@ -2969,6 +3009,7 @@ function handleSaveCase(e) {
   const mode = document.getElementById('case-mode').value;
   const stat = document.getElementById('case-stat').value.trim();
   const desc = document.getElementById('case-desc').value.trim();
+  const link = document.getElementById('case-link')?.value.trim() || '';
 
   if (editingCaseId) {
     const idx = currentCases.findIndex(c => c.id === editingCaseId);
@@ -2980,13 +3021,14 @@ function handleSaveCase(e) {
         mode,
         stat,
         desc,
+        link: link || currentCases[idx].link || '',
         image: currentCasePhotoData || currentCases[idx].image || 'images/banner.jpg',
         updatedAt: new Date().toISOString()
       };
       localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
       renderSuccessCases();
       resetCaseForm();
-      alert('✅ ¡Caso de éxito y fotografía actualizados con éxito!');
+      alert('✅ ¡Caso de éxito, fotografía y link actualizados con éxito!');
       return;
     }
   }
@@ -2998,6 +3040,7 @@ function handleSaveCase(e) {
     mode,
     stat,
     desc,
+    link,
     image: currentCasePhotoData || 'images/banner.jpg',
     hidden: false,
     createdAt: new Date().toISOString()
@@ -3035,7 +3078,7 @@ function renderAdminCasesList() {
     return `
     <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
       <div class="admin-case-info">
-        <img src="${c.image || 'images/banner.jpg'}" class="admin-item-thumb" />
+        <img src="${c.image || 'images/banner.jpg'}" class="admin-item-thumb" onerror="this.onerror=null; this.src='images/banner.jpg';" />
         <div style="min-width:0;">
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">${c.title}</strong>
@@ -3043,8 +3086,9 @@ function renderAdminCasesList() {
               ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
               : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
-            ${c.client} • ${c.mode} • ${c.stat}
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>${c.client} • ${c.mode} • ${c.stat}</span>
+            ${c.link ? `<a href="${c.link}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${c.link}"><i class="ph ph-instagram-logo"></i> Link</a>` : ''}
           </div>
         </div>
       </div>
@@ -3281,15 +3325,27 @@ function renderEvents(platform = 'all') {
           </div>
     `;
 
+    const hasSocialLink = !!evt.socialUrl;
+    const isInstagramSocial = hasSocialLink && evt.socialUrl.includes('instagram.com');
+
+    const socialTagMarkup = hasSocialLink ? `
+      <a href="${evt.socialUrl}" target="_blank" rel="noopener" class="event-platform-tag tag-instagram-flyer" style="margin-bottom:0;" title="Ver en ${isInstagramSocial ? 'Instagram' : 'Red Social'}">
+        <i class="ph ${isInstagramSocial ? 'ph-instagram-logo' : 'ph-share-network'}"></i> ${isInstagramSocial ? 'Instagram' : 'Social'}
+      </a>
+    ` : '';
+
     return `
       <article class="event-card glass-panel" id="event-${evt.id}">
         <div class="event-flyer-header ${evt.image ? 'has-flyer-image' : ''}">
-          ${evt.image ? `<img src="${evt.image}" alt="${evt.title}" class="event-flyer-bg-img" loading="lazy" />` : ''}
+          ${evt.image ? `<img src="${evt.image}" alt="${evt.title}" class="event-flyer-bg-img" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />` : ''}
           <div class="event-flyer-overlay"></div>
           <div class="event-flyer-content">
-            <span class="event-platform-tag tag-${evt.platform}">
-              <i class="ph ph-calendar-blank"></i> ${platformLabel}
-            </span>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+              <span class="event-platform-tag tag-${evt.platform}" style="margin-bottom:0;">
+                <i class="ph ph-calendar-blank"></i> ${platformLabel}
+              </span>
+              ${socialTagMarkup}
+            </div>
             <h3 class="event-title">${evt.title}</h3>
             <span class="event-discount-badge">${evt.discount}</span>
           </div>
@@ -3307,6 +3363,11 @@ function renderEvents(platform = 'all') {
             <a href="${evt.url}" target="_blank" rel="noopener" class="btn btn-primary btn-block">
               <i class="ph ph-shopping-cart"></i> Ver Oferta Oficial
             </a>
+            ${hasSocialLink ? `
+              <a href="${evt.socialUrl}" target="_blank" rel="noopener" class="btn btn-outline ${isInstagramSocial ? 'btn-instagram' : ''}" title="Ver en ${isInstagramSocial ? 'Instagram' : 'Red Social'}">
+                <i class="ph ${isInstagramSocial ? 'ph-instagram-logo' : 'ph-share-network'}"></i> ${isInstagramSocial ? 'Instagram' : 'Social'}
+              </a>
+            ` : ''}
             <a href="https://wa.me/50765210278?text=Hola%20Express%20Loadout,%20deseo%20asesoría%20para%20el%20evento%20${encodeURIComponent(evt.title)}" target="_blank" rel="noopener" class="btn btn-outline" title="Pedir Asistencia de Compra">
               <i class="ph ph-whatsapp-logo"></i> Asesoría
             </a>
@@ -3470,6 +3531,13 @@ function previewEventImage(event) {
 
 function previewEventUrl(url) {
   if (!url) return;
+  url = url.trim();
+  if (url.includes('instagram.com/p/') || url.includes('instagram.com/reel/') || url.includes('instagram.com/tv/')) {
+    const socialInput = document.getElementById('event-social-url');
+    if (socialInput && !socialInput.value) {
+      socialInput.value = url;
+    }
+  }
   currentEventPhotoData = url;
   displayEventPhotoPreview(url);
 }
@@ -3505,6 +3573,7 @@ function editEvent(eventId) {
   const discountInput = document.getElementById('event-discount');
   const recInput = document.getElementById('event-recommendation');
   const urlInput = document.getElementById('event-url');
+  const socialUrlInput = document.getElementById('event-social-url');
   const imgUrlInput = document.getElementById('event-img-url');
   const submitBtn = document.getElementById('event-submit-btn');
   const cancelBtn = document.getElementById('event-cancel-edit-btn');
@@ -3515,6 +3584,7 @@ function editEvent(eventId) {
   if (discountInput) discountInput.value = evt.discount || '';
   if (recInput) recInput.value = evt.logisticsTip || '';
   if (urlInput) urlInput.value = evt.url || '';
+  if (socialUrlInput) socialUrlInput.value = evt.socialUrl || '';
 
   if (evt.image) {
     currentEventPhotoData = evt.image;
@@ -3546,6 +3616,9 @@ function resetEventForm() {
   document.getElementById('new-event-form')?.reset();
   clearEventImage();
 
+  const socialUrlInput = document.getElementById('event-social-url');
+  if (socialUrlInput) socialUrlInput.value = '';
+
   const submitBtn = document.getElementById('event-submit-btn');
   const cancelBtn = document.getElementById('event-cancel-edit-btn');
   if (submitBtn) {
@@ -3574,6 +3647,7 @@ function handleSaveEvent(e) {
   const discount = document.getElementById('event-discount').value.trim();
   const logisticsTip = document.getElementById('event-recommendation').value.trim();
   const url = document.getElementById('event-url').value.trim();
+  const socialUrl = document.getElementById('event-social-url')?.value.trim() || '';
 
   const formattedDate = dateInput ? (dateInput.includes('T') ? dateInput : `${dateInput}T00:00:00`) : '';
   const hasTimer = !!dateInput;
@@ -3590,6 +3664,7 @@ function handleSaveEvent(e) {
         discount,
         logisticsTip,
         url: url || 'https://www.expressloadout.com',
+        socialUrl: socialUrl || currentEvents[idx].socialUrl || '',
         image: currentEventPhotoData || currentEvents[idx].image || '',
         updatedAt: new Date().toISOString()
       };
@@ -3597,7 +3672,7 @@ function handleSaveEvent(e) {
       renderEvents(activeEventsFilter);
       renderAdminEventsList();
       resetEventForm();
-      alert('✅ ¡Evento y fotografía del encabezado actualizados con éxito!');
+      alert('✅ ¡Evento, fotografía del encabezado y links actualizados con éxito!');
       return;
     }
   }
@@ -3611,6 +3686,7 @@ function handleSaveEvent(e) {
     discount,
     logisticsTip,
     url: url || 'https://www.expressloadout.com',
+    socialUrl,
     image: currentEventPhotoData || '',
     badge: 'Evento Destacado',
     hidden: false,
@@ -3652,7 +3728,7 @@ function renderAdminEventsList() {
     <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
       <div class="admin-case-info">
         ${e.image 
-          ? `<img src="${e.image}" class="admin-item-thumb" />` 
+          ? `<img src="${e.image}" class="admin-item-thumb" onerror="this.onerror=null; this.src='images/banner.jpg';" />` 
           : `<div class="admin-item-icon-wrap"><i class="ph ph-calendar-star"></i></div>`}
         <div style="min-width:0;">
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -3661,8 +3737,9 @@ function renderAdminEventsList() {
               ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
               : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
-            ${(e.platform || 'general').toUpperCase()} • Fecha: ${dateFormatted} • ${e.discount || ''}
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>${(e.platform || 'general').toUpperCase()} • Fecha: ${dateFormatted} • ${e.discount || ''}</span>
+            ${e.socialUrl ? `<a href="${e.socialUrl}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${e.socialUrl}"><i class="ph ph-instagram-logo"></i> Social</a>` : ''}
           </div>
         </div>
       </div>
@@ -3670,7 +3747,7 @@ function renderAdminEventsList() {
         <button type="button" class="btn btn-outline btn-xs ${isHidden ? 'btn-action-show' : 'btn-action-hide'}" onclick="toggleHideEvent('${e.id}')" title="${isHidden ? 'Mostrar en el calendario' : 'Ocultar del calendario'}">
           <i class="ph ${isHidden ? 'ph-eye' : 'ph-eye-slash'}"></i> ${isHidden ? 'Mostrar' : 'Ocultar'}
         </button>
-        <button type="button" class="btn btn-outline btn-xs btn-action-edit" onclick="editEvent('${e.id}')" title="Editar texto, fecha y foto del flyer">
+        <button type="button" class="btn btn-outline btn-xs btn-action-edit" onclick="editEvent('${e.id}')" title="Editar texto, fecha, links y foto del flyer">
           <i class="ph ph-pencil-simple"></i> Editar
         </button>
         <button type="button" class="btn btn-outline btn-xs btn-action-delete" onclick="deleteEvent('${e.id}')" title="Eliminar definitivamente">
