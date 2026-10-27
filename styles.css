@@ -3824,3 +3824,82 @@ button, input, select, textarea {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+
+/* =============================================================================
+   MALLA DINÁMICA DE RED LOGÍSTICA (SECCIONES DESTACADAS CON CONTRASTE)
+   ============================================================================= */
+.section-container.has-animated-mesh {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-base) !important;
+}
+
+.section-container.has-animated-mesh .site-container {
+  position: relative;
+  z-index: 2;
+}
+
+.section-mesh-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.90;
+}
+
+.section-mesh-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 880px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(37, 99, 235, 0.06) 50%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+  transition: background 0.3s ease;
+}
+
+body.theme-tactical .section-mesh-glow {
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.14) 0%, rgba(101, 163, 13, 0.08) 50%, transparent 75%);
+}
+
+body.theme-light .section-mesh-glow {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 75%);
+}
+
+body.theme-tactical .hero-glow-bg {
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.16) 0%, rgba(101, 163, 13, 0.08) 50%, rgba(8, 11, 8, 0) 75%);
+}
+
+body.theme-light .hero-glow-bg {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.10) 0%, rgba(245, 158, 11, 0.05) 50%, rgba(248, 250, 252, 0) 75%);
+}
+
+body.theme-light .hero-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}
+
+.section-mesh-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 85%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.theme-light .section-mesh-grid {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}

@@ -2115,88 +2115,173 @@ const HERO_LOGISTICS_SVGS = [
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{COLOR}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'
 ];
 
-let heroMeshImages = [];
+// =============================================================================
+// MOTOR DE MALLA DE RED LOGÍSTICA DINÁMICA MULTI-TEMA (HERO + 5 CONTENEDORES)
+// Sincronizado dinámicamente con las paletas de Obsidian, Tactical y Light
+// =============================================================================
+const THEME_MESH_PALETTES = {
+  obsidian: {
+    iconColor: '#f59e0b',
+    lineRgb: '245, 158, 11',
+    packetColor: '#fbbf24',
+    glowRgb: '245, 158, 11'
+  },
+  tactical: {
+    iconColor: '#a3e635',
+    lineRgb: '163, 230, 53',
+    packetColor: '#bef264',
+    glowRgb: '163, 230, 53'
+  },
+  light: {
+    iconColor: '#2563eb',
+    lineRgb: '59, 130, 246',
+    packetColor: '#2563eb',
+    glowRgb: '59, 130, 246'
+  }
+};
 
-function buildHeroMeshIconCaches() {
-  heroMeshImages = HERO_LOGISTICS_SVGS.map(svg => {
-    const img = new Image();
-    // Color dorado ámbar táctico que combina con Express Loadout
-    img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg.replace(/{COLOR}/g, '#f59e0b'));
-    return img;
+let themeMeshIconCaches = {
+  obsidian: [],
+  tactical: [],
+  light: []
+};
+
+function buildLogisticsMeshIconCaches() {
+  const configs = [
+    { key: 'obsidian', color: '#f59e0b' },
+    { key: 'tactical', color: '#a3e635' },
+    { key: 'light', color: '#2563eb' }
+  ];
+
+  configs.forEach(cfg => {
+    themeMeshIconCaches[cfg.key] = HERO_LOGISTICS_SVGS.map(svg => {
+      const img = new Image();
+      img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg.replace(/{COLOR}/g, cfg.color));
+      return img;
+    });
   });
 }
 
-function initHeroIconMesh() {
-  const canvas = document.getElementById('heroMeshCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const heroSection = document.getElementById('hero');
-  if (!heroSection) return;
+function getActiveMeshTheme() {
+  if (document.body.classList.contains('theme-tactical')) return 'tactical';
+  if (document.body.classList.contains('theme-light')) return 'light';
+  return 'obsidian';
+}
 
-  buildHeroMeshIconCaches();
+// Gestor de animación para cada canvas de sección
+class SectionMesh {
+  constructor(sectionId, canvasId, isHero = false) {
+    this.section = document.getElementById(sectionId);
+    this.canvas = document.getElementById(canvasId);
+    if (!this.section || !this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.isHero = isHero;
+    this.nodes = [];
+    this.dataPackets = [];
+    this.mouse = { x: -1000, y: -1000 };
+    this.CONNECT_DIST = isHero ? 175 : 165;
+    this.isVisible = false;
+    this.animFrame = null;
+    this.width = 0;
+    this.height = 0;
+    this.frameCount = Math.floor(Math.random() * 100);
 
-  let width = canvas.width = heroSection.offsetWidth;
-  let height = canvas.height = heroSection.offsetHeight;
+    this.init();
+  }
 
-  let nodes = [];
-  let dataPackets = [];
-  const CONNECT_DIST = 175; // Distancia de interconexión logística
+  init() {
+    this.resize();
+    this.bindEvents();
+    if (this.isHero) {
+      this.isVisible = true;
+      this.loop();
+    } else {
+      this.observeVisibility();
+    }
+  }
 
-  function initMeshNodes() {
-    nodes = [];
-    dataPackets = [];
-    // Densidad armónica de nodos
-    const nodeCount = Math.floor((width * height) / 36000);
-    const total = Math.max(20, Math.min(nodeCount, 45));
+  resize() {
+    this.width = this.canvas.width = this.section.offsetWidth;
+    this.height = this.canvas.height = this.section.offsetHeight;
+    this.createNodes();
+  }
+
+  createNodes() {
+    this.nodes = [];
+    this.dataPackets = [];
+    const density = this.isHero ? 36000 : 38000;
+    const minCount = this.isHero ? 20 : 16;
+    const maxCount = this.isHero ? 45 : 36;
+    const count = Math.floor((this.width * this.height) / density);
+    const total = Math.max(minCount, Math.min(count, maxCount));
 
     for (let i = 0; i < total; i++) {
-      nodes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
+      this.nodes.push({
+        x: Math.random() * this.width,
+        y: Math.random() * this.height,
+        vx: (Math.random() - 0.5) * (this.isHero ? 0.45 : 0.40),
+        vy: (Math.random() - 0.5) * (this.isHero ? 0.45 : 0.40),
         iconIndex: i % HERO_LOGISTICS_SVGS.length,
-        size: 24,
+        size: this.isHero ? 24 : 22,
         pulseOffset: Math.random() * Math.PI * 2
       });
     }
   }
 
-  initMeshNodes();
+  bindEvents() {
+    window.addEventListener('resize', () => {
+      if (this.isVisible) this.resize();
+    });
 
-  window.addEventListener('resize', () => {
-    if (!heroSection) return;
-    width = canvas.width = heroSection.offsetWidth;
-    height = canvas.height = heroSection.offsetHeight;
-    initMeshNodes();
-  });
+    this.section.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mouse.x = e.clientX - rect.left;
+      this.mouse.y = e.clientY - rect.top;
+    });
 
-  // Interacción suave con el mouse sobre el Hero
-  let mouse = { x: -1000, y: -1000 };
-  heroSection.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-  });
+    this.section.addEventListener('mouseleave', () => {
+      this.mouse.x = -1000;
+      this.mouse.y = -1000;
+    });
+  }
 
-  heroSection.addEventListener('mouseleave', () => {
-    mouse.x = -1000;
-    mouse.y = -1000;
-  });
+  observeVisibility() {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        this.isVisible = e.isIntersecting;
+        if (this.isVisible) {
+          if (!this.animFrame) this.loop();
+        } else {
+          if (this.animFrame) {
+            cancelAnimationFrame(this.animFrame);
+            this.animFrame = null;
+          }
+        }
+      });
+    }, { threshold: 0.05 });
 
-  let frameCount = 0;
+    obs.observe(this.section);
+  }
 
-  function renderHeroMesh() {
-    frameCount++;
+  loop() {
+    if (!this.isVisible) return;
+    this.render();
+    this.animFrame = requestAnimationFrame(() => this.loop());
+  }
+
+  render() {
+    const { ctx, width, height, nodes, dataPackets, mouse, CONNECT_DIST } = this;
+    this.frameCount++;
     ctx.clearRect(0, 0, width, height);
 
-    // Color de líneas sutiles y pulso
-    const isTactical = document.body.classList.contains('theme-tactical');
-    const isLight = document.body.classList.contains('theme-light');
-    const lineRgb = isLight ? '59, 130, 246' : isTactical ? '163, 230, 53' : '245, 158, 11';
-    const packetGlow = isLight ? '#2563eb' : isTactical ? '#bef264' : '#fbbf24';
+    // Detección dinámica del tema activo en tiempo real
+    const theme = getActiveMeshTheme();
+    const palette = THEME_MESH_PALETTES[theme];
+    const images = themeMeshIconCaches[theme];
+    const lineRgb = palette.lineRgb;
+    const packetGlow = palette.packetColor;
 
-    // 1. Mover nodos con rebote suave
+    // 1. Mover nodos
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       n.x += n.vx;
@@ -2207,18 +2292,18 @@ function initHeroIconMesh() {
       if (n.y < 15) { n.y = 15; n.vy *= -1; }
       if (n.y > height - 15) { n.y = height - 15; n.vy *= -1; }
 
-      // Reacción al mouse (repulsión suave)
       const mdx = n.x - mouse.x;
       const mdy = n.y - mouse.y;
       const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-      if (mdist < 130 && mdist > 0) {
-        const force = (130 - mdist) / 130 * 0.9;
+      const reactRadius = this.isHero ? 130 : 115;
+      if (mdist < reactRadius && mdist > 0) {
+        const force = (reactRadius - mdist) / reactRadius * 0.88;
         n.x += (mdx / mdist) * force;
         n.y += (mdy / mdist) * force;
       }
     }
 
-    // 2. Trazar líneas de conexión de la red logística
+    // 2. Líneas de interconexión logística
     for (let i = 0; i < nodes.length; i++) {
       const n1 = nodes[i];
       for (let j = i + 1; j < nodes.length; j++) {
@@ -2228,7 +2313,7 @@ function initHeroIconMesh() {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < CONNECT_DIST) {
-          const alpha = (1 - dist / CONNECT_DIST) * 0.28;
+          const alpha = (1 - dist / CONNECT_DIST) * (this.isHero ? 0.28 : 0.22);
           ctx.beginPath();
           ctx.moveTo(n1.x, n1.y);
           ctx.lineTo(n2.x, n2.y);
@@ -2236,20 +2321,20 @@ function initHeroIconMesh() {
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          // Generar pulsos de paquetes logísticos ocasionales en tránsito
-          if (Math.random() < 0.0012 && dataPackets.length < 18) {
+          // Pulsos de paquetes de datos
+          if (Math.random() < 0.0012 && dataPackets.length < (this.isHero ? 18 : 12)) {
             dataPackets.push({
               fromX: n1.x, fromY: n1.y,
               toX: n2.x, toY: n2.y,
               progress: 0,
-              speed: 0.012 + Math.random() * 0.018
+              speed: 0.012 + Math.random() * 0.016
             });
           }
         }
       }
     }
 
-    // 3. Dibujar paquetes luminosos en tránsito entre nodos
+    // 3. Paquetes luminosos en tránsito
     for (let p = dataPackets.length - 1; p >= 0; p--) {
       const pkt = dataPackets[p];
       pkt.progress += pkt.speed;
@@ -2262,42 +2347,62 @@ function initHeroIconMesh() {
       const currX = pkt.fromX + (pkt.toX - pkt.fromX) * pkt.progress;
       const currY = pkt.fromY + (pkt.toY - pkt.fromY) * pkt.progress;
 
-      // Glow del paquete
       ctx.beginPath();
-      ctx.arc(currX, currY, 3, 0, Math.PI * 2);
+      ctx.arc(currX, currY, this.isHero ? 3 : 2.5, 0, Math.PI * 2);
       ctx.fillStyle = packetGlow;
       ctx.shadowColor = packetGlow;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 8;
       ctx.fill();
       ctx.shadowBlur = 0;
     }
 
-    // 4. Dibujar los iconos vectoriales monocromáticos
+    // 4. Dibujar iconos vectoriales monocromáticos adaptados al tema
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
-      const img = heroMeshImages[n.iconIndex];
-      const pulse = Math.sin(frameCount * 0.04 + n.pulseOffset) * 0.18 + 0.82;
+      const img = images ? images[n.iconIndex] : null;
+      const pulse = Math.sin(this.frameCount * 0.04 + n.pulseOffset) * 0.18 + 0.82;
 
-      // Halo sutil bajo cada icono
+      // Halo sutil bajo cada nodo
       ctx.beginPath();
-      ctx.arc(n.x, n.y, 14 * pulse, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${lineRgb}, 0.07)`;
+      ctx.arc(n.x, n.y, (this.isHero ? 14 : 12) * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${lineRgb}, 0.06)`;
       ctx.fill();
 
-      // Dibujar imagen SVG del icono
       if (img && img.complete) {
         ctx.save();
-        ctx.globalAlpha = 0.85 * pulse;
+        ctx.globalAlpha = (this.isHero ? 0.85 : 0.65) * pulse;
         const half = n.size / 2;
         ctx.drawImage(img, n.x - half, n.y - half, n.size, n.size);
         ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${lineRgb}, 0.5)`;
+        ctx.fill();
       }
     }
-
-    requestAnimationFrame(renderHeroMesh);
   }
+}
 
-  renderHeroMesh();
+// Inicializador principal del sistema de red logística
+function initHeroIconMesh() {
+  buildLogisticsMeshIconCaches();
+
+  // 1. Malla en Hero
+  new SectionMesh('hero', 'heroMeshCanvas', true);
+
+  // 2. Mallas en los 5 contenedores con contraste (Calculadora, Casos Éxito, Eventos, Tracking, FAQs)
+  const targetSections = [
+    { sec: 'calculadora', canvas: 'mesh-canvas-calculadora' },
+    { sec: 'casos-exito', canvas: 'mesh-canvas-casos-exito' },
+    { sec: 'eventos', canvas: 'mesh-canvas-eventos' },
+    { sec: 'tracking', canvas: 'mesh-canvas-tracking' },
+    { sec: 'faq', canvas: 'mesh-canvas-faq' }
+  ];
+
+  targetSections.forEach(item => {
+    new SectionMesh(item.sec, item.canvas, false);
+  });
 }
 
 // =============================================================================
