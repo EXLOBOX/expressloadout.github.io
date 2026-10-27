@@ -3761,3 +3761,66 @@ button, input, select, textarea {
   padding: 8px 12px;
   font-size: 0.78rem;
 }
+
+/* =============================================================================
+   TACTICAL STEPPER 5 & CUSTOMS NOTICE (TOCUMEN 24-48H + KAPPA WAREHOUSE RECEIPT)
+   ============================================================================= */
+.tactical-stepper-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.tactical-customs-notice {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.tactical-customs-notice i {
+  font-size: 1.4rem;
+  color: #fbbf24;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.tactical-customs-notice strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #fbbf24;
+  margin-bottom: 4px;
+}
+
+.tactical-customs-notice p {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tactical-receipt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 900px) {
+  .tactical-stepper-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

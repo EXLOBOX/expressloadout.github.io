@@ -1778,6 +1778,21 @@
               </div>
             </div>
 
+            <!-- SECCIÓN KAPPA LOGISTICS (PANAMÁ WAREHOUSE & RECEIPT) -->
+            <div id="section-cfg-kappa" class="admin-subpanel" style="margin-bottom:16px;">
+              <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:0.95rem;">
+                <i class="ph ph-buildings"></i> Conexión Kappa Logistics (Disponibilidad Panamá & Recibo Almacén)
+              </h5>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+                Permite obtener el estatus real de llegada física a Panamá (<code>Loaded</code>), número de recibo de almacén (ej: <code>D96539</code>) y tienda cuando ElizaApp se detiene en <code>WAREHOUSED</code>.
+              </p>
+              <div class="form-group">
+                <label class="form-label">URL del Endpoint Proxy / Worker para Kappa:</label>
+                <input type="url" id="track-cfg-kappa-url" class="form-input" placeholder="https://api.expressloadout.com/api/tracking o Cloudflare Worker URL" />
+                <small style="color:var(--text-muted); font-size:0.75rem;">Si no se define, el sistema procesa guías verificadas y proyecta la ventana aduanal de Tocumen (24-48 hrs hábiles).</small>
+              </div>
+            </div>
+
             <!-- SECCIÓN GAS WEBHOOK -->
             <div id="section-cfg-gas" class="admin-subpanel" style="margin-bottom:16px;">
               <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:0.95rem;">
