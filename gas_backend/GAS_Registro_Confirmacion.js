@@ -15,6 +15,7 @@
 
 var SPREADSHEET_DB_CLIENTES_ID = '10yX1OvFETdOBId25Ft4GsgumyPAqd4DywhN7-Ydq14Y';
 var SECRET_HASH_SALT = 'EXLO_AUTH_SECRET_KEY_2026_PANAMA_TRACK';
+var WEBAPP_EXEC_URL = 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec';
 
 // =============================================================================
 // MANEJADORES HTTP: doGet y doPost
@@ -127,9 +128,10 @@ function solicitarVerificacionCasillero(payload) {
       '' // Código asignado (vacío hasta que confirme)
     ]);
 
-    // Construir URL dinámica de confirmación
-    var webAppUrl = ScriptApp.getService().getUrl();
-    var confirmUrl = webAppUrl + '?action=confirm&token=' + encodeURIComponent(token);
+    // Construir URL pública de confirmación oficial (/macros/s/)
+    // NOTA: ScriptApp.getService().getUrl() en proyectos vinculados a Sheets genera /macros/d/
+    // que es interceptado erróneamente por el visor de Google Drive.
+    var confirmUrl = WEBAPP_EXEC_URL + '?action=confirm&token=' + encodeURIComponent(token);
 
     // Enviar correo de verificación (Paso 1)
     _enviarCorreoConfirmacion24H(email, name, confirmUrl, expiraLegible);
