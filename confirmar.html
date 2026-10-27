@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Confirmación y Activación de Casillero | Express Loadout Panamá</title>
+  <meta name="description" content="Activa y confirma tu casillero internacional en USA y China con Express Loadout Panamá." />
+  <link rel="icon" type="image/png" href="images/LOGO_Favicon.png" />
+  <link rel="canonical" href="https://www.expressloadout.com/confirmar.html" />
+
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" />
+
+  <!-- Estilos base del sitio -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    :root {
+      --bg-dark: #080b0e;
+      --card-bg: rgba(15, 23, 42, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --brand-yellow: #f59e0b;
+      --brand-emerald: #10b981;
+      --brand-cyan: #06b6d4;
+      --brand-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08), transparent 45%),
+        radial-gradient(circle at 10% 30%, rgba(16, 185, 129, 0.05), transparent 40%),
+        linear-gradient(180deg, #080b0e 0%, #0c1117 100%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .confirm-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(8, 11, 14, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .confirm-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .confirm-logo img {
+      height: 38px;
+      width: auto;
+    }
+
+    .confirm-logo span {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .confirm-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px 60px;
+    }
+
+    .card-wrap {
+      max-width: 640px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 36px 30px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--brand-yellow), var(--brand-emerald));
+    }
+
+    .state-panel {
+      text-align: center;
+    }
+
+    /* Spinner Loading */
+    .spinner-wrap {
+      margin: 20px auto 24px;
+      width: 64px;
+      height: 64px;
+      position: relative;
+    }
+
+    .spinner {
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(245, 158, 11, 0.2);
+      border-top-color: var(--brand-yellow);
+      border-radius: 50%;
+      animation: spin 0.9s cubic-bezier(0.55, 0.25, 0.25, 0.7) infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .code-badge-container {
+      background: rgba(245, 158, 11, 0.1);
+      border: 2px dashed rgba(245, 158, 11, 0.6);
+      border-radius: 14px;
+      padding: 20px 16px;
+      margin: 24px 0 28px;
+    }
+
+    .code-badge-label {
+      display: block;
+      color: var(--brand-yellow);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .code-badge-number {
+      font-family: 'Space Grotesk', Consolas, monospace;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    /* Address Cards */
+    .addr-box {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px 18px;
+      text-align: left;
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease;
+    }
+
+    .addr-box:hover {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .addr-box.aereo {
+      border-left: 4px solid var(--brand-yellow);
+    }
+
+    .addr-box.maritimo {
+      border-left: 4px solid var(--brand-emerald);
+    }
+
+    .addr-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .addr-box-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .addr-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .addr-val {
+      color: #fff;
+      font-weight: 600;
+      font-family: 'Space Grotesk', monospace;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--brand-yellow);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--brand-yellow);
+      color: #0f172a;
+    }
+
+    .china-callout {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 24px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .btn-action-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+
+    .btn-action-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(34, 197, 94, 0.45);
+    }
+
+    .btn-action-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="confirm-header">
+    <a href="https://www.expressloadout.com/" class="confirm-logo">
+      <img src="images/LOGO_Amarillo_2x2_-_Alteracion.png" alt="Express Loadout Panamá" />
+      <span>EXPRESS LOADOUT</span>
+    </a>
+    <a href="https://www.expressloadout.com/" class="btn-action-secondary" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+      <i class="ph ph-house"></i> Ir al Sitio Web
+    </a>
+  </header>
+
+  <!-- CONTENEDOR CENTRAL -->
+  <main class="confirm-main">
+    <div class="card-wrap">
+      
+      <!-- ESTADO 1: VERIFICANDO TOKEN (LOADING) -->
+      <div id="state-loading" class="state-panel">
+        <div class="spinner-wrap">
+          <div class="spinner"></div>
+        </div>
+        <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:8px;">Validando enlace de seguridad...</h2>
+        <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.5;">
+          Estamos confirmando tu solicitud y asignando de forma automática tu número único de casillero en el sistema.
+        </p>
+      </div>
+
+      <!-- ESTADO 2: ÉXITO (ACTIVADO) -->
+      <div id="state-success" class="state-panel hidden">
+        <div style="font-size:3rem; color:var(--brand-emerald); margin-bottom:10px;">
+          <i class="ph-fill ph-check-circle"></i>
+        </div>
+        <h1 style="font-size:1.6rem; font-weight:800; margin:0 0 6px 0;">¡Casillero Activado con Éxito!</h1>
+        <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:20px;">
+          Bienvenido(a) <strong id="user-display-name" style="color:#fff;">Cliente</strong>. Tu cuenta oficial ha sido dada de alta en nuestra base de datos.
+        </p>
+
+        <!-- BADGE CON EL CODIGO -->
+        <div class="code-badge-container">
+          <span class="code-badge-label">Tu Número de Casillero Oficial:</span>
+          <span class="code-badge-number" id="user-display-code">EXLO - 000</span>
+        </div>
+
+        <!-- TARJETA MIAMI AEREO -->
+        <div class="addr-box aereo">
+          <div class="addr-box-header">
+            <span class="addr-box-title" style="color:var(--brand-yellow);">
+              <i class="ph ph-airplane-takeoff"></i> Dirección USA — Aéreo Express (3 a 5 días)
+            </span>
+            <button class="copy-btn" onclick="copyEntireAddress('aereo')">
+              <i class="ph ph-copy"></i> Copiar Todo
+            </button>
+          </div>
+          <div class="addr-row">
+            <span>Nombre completo:</span>
+            <span class="addr-val" id="addr-aereo-name">[EXLO] Nombre</span>
+          </div>
+          <div class="addr-row">
+            <span>Dirección (Address):</span>
+            <span class="addr-val">1970 NW 82nd Ave</span>
+          </div>
+          <div class="addr-row">
+            <span>Suite / Línea 2:</span>
+            <span class="addr-val" id="addr-aereo-suite" style="color:var(--brand-yellow);">EXLO - 000</span>
+          </div>
+          <div class="addr-row">
+            <span>Ciudad / Estado / Zip:</span>
+            <span class="addr-val">Doral, FL 33191</span>
+          </div>
+          <div class="addr-row">
+            <span>Teléfono USA:</span>
+            <span class="addr-val">+1 (786) 615-5555</span>
+          </div>
+        </div>
+
+        <!-- TARJETA MIAMI MARITIMO -->
+        <div class="addr-box maritimo">
+          <div class="addr-box-header">
+            <span class="addr-box-title" style="color:var(--brand-emerald);">
+              <i class="ph ph-boat"></i> Dirección USA — Marítimo (+25 lbs / Comercial)
+            </span>
+            <button class="copy-btn" onclick="copyEntireAddress('maritimo')">
+              <i class="ph ph-copy"></i> Copiar Todo
+            </button>
+          </div>
+          <div class="addr-row">
+            <span>Nombre completo:</span>
+            <span class="addr-val" id="addr-maritimo-name">[EXLO OCEAN] Nombre</span>
+          </div>
+          <div class="addr-row">
+            <span>Dirección (Address):</span>
+            <span class="addr-val">1970 NW 82nd Ave</span>
+          </div>
+          <div class="addr-row">
+            <span>Suite / Línea 2:</span>
+            <span class="addr-val" id="addr-maritimo-suite" style="color:var(--brand-emerald);">EXLO OCEAN - 000</span>
+          </div>
+          <div class="addr-row">
+            <span>Ciudad / Estado / Zip:</span>
+            <span class="addr-val">Doral, FL 33191</span>
+          </div>
+        </div>
+
+        <!-- CHINA CALLOUT -->
+        <div class="china-callout">
+          <strong style="color:var(--brand-cyan); display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <i class="ph ph-globe"></i> ¿Deseas importar desde China (Alibaba, Fábricas)?
+          </strong>
+          Las importaciones marítimas y aéreas desde Guangzhou se coordinan directamente con un asesor para inspección, cubicaje y aranceles. Toca el botón a continuación para habilitar tu dirección en China.
+        </div>
+
+        <!-- ACCIONES -->
+        <a id="btn-wa-support" href="https://wa.me/50765210278" target="_blank" class="btn-action-primary">
+          <i class="ph-fill ph-whatsapp-logo" style="font-size:1.2rem;"></i> Contactar a mi Asesor por WhatsApp
+        </a>
+
+        <a href="https://www.expressloadout.com/#tracking" class="btn-action-secondary">
+          <i class="ph ph-magnifying-glass"></i> Ir al Rastrear Guías / Inicio
+        </a>
+      </div>
+
+      <!-- ESTADO 3: ERROR / EXPIRADO -->
+      <div id="state-error" class="state-panel hidden">
+        <div style="font-size:3rem; color:var(--brand-rose); margin-bottom:12px;">
+          <i class="ph-fill ph-warning-circle"></i>
+        </div>
+        <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:8px;">No se pudo activar el casillero</h2>
+        <p id="error-message-text" style="color:var(--text-muted); font-size:0.95rem; line-height:1.5; margin-bottom:24px;">
+          El enlace de verificación no es válido, ya fue utilizado o han transcurrido más de 24 horas desde la solicitud.
+        </p>
+
+        <a href="https://www.expressloadout.com/#registro" class="btn-action-primary" style="background:var(--brand-yellow); color:#0f172a;">
+          <i class="ph ph-arrows-clockwise"></i> Solicitar Nuevo Casillero
+        </a>
+        <a href="https://www.expressloadout.com/" class="btn-action-secondary" style="margin-top:10px;">
+          <i class="ph ph-house"></i> Volver a la Página Principal
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec';
+
+    // Obtener parámetros de la URL
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      let val = urlParams.get(name);
+      if (!val && window.location.hash) {
+        // En caso de que venga con hash format #confirm?token=...
+        const hashQuery = window.location.hash.split('?')[1];
+        if (hashQuery) {
+          const hashParams = new URLSearchParams(hashQuery);
+          val = hashParams.get(name);
+        }
+      }
+      return val;
+    }
+
+    let globalClientData = null;
+
+    async function processConfirmation() {
+      const token = getQueryParam('token');
+      
+      if (!token) {
+        showError('No se encontró ningún token de seguridad en la dirección web.');
+        return;
+      }
+
+      try {
+        // 1. Intentar confirmación via POST
+        let response = null;
+        try {
+          const postRes = await fetch(GAS_BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'confirmLocker', token: token })
+          });
+          if (postRes.ok) {
+            response = await postRes.json();
+          }
+        } catch(postErr) {
+          console.warn('Fallback a GET debido a restricción de red/CORS:', postErr);
+        }
+
+        // 2. Fallback a GET si POST falló o no respondió JSON
+        if (!response || !response.success) {
+          const getRes = await fetch(`${GAS_BACKEND_URL}?action=confirmLocker&token=${encodeURIComponent(token)}&format=json`);
+          if (getRes.ok) {
+            response = await getRes.json();
+          }
+        }
+
+        if (response && response.success) {
+          showSuccess(response);
+        } else {
+          showError(response ? response.message : 'Error desconocido al validar el casillero.');
+        }
+      } catch (err) {
+        console.error('Error procesando confirmación:', err);
+        showError('Hubo un problema de conexión con el servidor. Por favor verifica tu conexión a internet o reintenta.');
+      }
+    }
+
+    function showSuccess(data) {
+      globalClientData = data;
+      document.getElementById('state-loading').classList.add('hidden');
+      document.getElementById('state-error').classList.add('hidden');
+      document.getElementById('state-success').classList.remove('hidden');
+
+      const code = data.code || '---';
+      const name = data.name || 'Cliente';
+
+      document.getElementById('user-display-name').textContent = name;
+      document.getElementById('user-display-code').textContent = 'EXLO - ' + code;
+
+      document.getElementById('addr-aereo-name').textContent = '[EXLO] ' + name;
+      document.getElementById('addr-aereo-suite').textContent = 'EXLO - ' + code;
+
+      document.getElementById('addr-maritimo-name').textContent = '[EXLO OCEAN] ' + name;
+      document.getElementById('addr-maritimo-suite').textContent = 'EXLO OCEAN - ' + code;
+
+      // Actualizar enlace de WhatsApp con mensaje personalizado
+      const waMsg = encodeURIComponent(`Hola Express Loadout, acabo de activar mi casillero EXLO-${code} (${name}) y me gustaría recibir información para mis envíos.`);
+      document.getElementById('btn-wa-support').href = `https://wa.me/50765210278?text=${waMsg}`;
+    }
+
+    function showError(message) {
+      document.getElementById('state-loading').classList.add('hidden');
+      document.getElementById('state-success').classList.add('hidden');
+      document.getElementById('state-error').classList.remove('hidden');
+      if (message) {
+        document.getElementById('error-message-text').textContent = message;
+      }
+    }
+
+    function copyEntireAddress(type) {
+      if (!globalClientData) return;
+      const code = globalClientData.code;
+      const name = globalClientData.name;
+
+      let text = '';
+      if (type === 'aereo') {
+        text = `Nombre completo: [EXLO] ${name}\nDirección: 1970 NW 82nd Ave\nSuite / Línea 2: EXLO - ${code}\nCiudad: Doral\nEstado: FL (Florida)\nZip Code: 33191\nTeléfono: +1 (786) 615-5555`;
+      } else {
+        text = `Nombre completo: [EXLO OCEAN] ${name}\nDirección: 1970 NW 82nd Ave\nSuite / Línea 2: EXLO OCEAN - ${code}\nCiudad: Doral\nEstado: FL (Florida)\nZip Code: 33191`;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert('📋 ¡Dirección completa copiada al portapapeles!');
+      }).catch(() => {
+        prompt('Copia tu dirección:', text);
+      });
+    }
+
+    // Iniciar al cargar el documento
+    window.addEventListener('DOMContentLoaded', processConfirmation);
+  </script>
+</body>
+</html>

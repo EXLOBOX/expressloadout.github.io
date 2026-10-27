@@ -24,9 +24,18 @@ var WEBAPP_EXEC_URL = 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_
 function doGet(e) {
   var p = (e && e.parameter) ? e.parameter : {};
   
-  // Acción de confirmación desde el clic en el correo
+  // Consulta API de confirmación (desde confirmar.html en expressloadout.com)
+  if (p.action === 'confirmLocker' || p.format === 'json') {
+    var resConfirm = confirmarCasilleroPorToken(p.token);
+    return ContentService.createTextOutput(JSON.stringify(resConfirm))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Acción de confirmación desde el navegador (redirigir al sitio web oficial)
   if (p.action === 'confirm' || p.token) {
-    return handleConfirmarRegistroWeb(p.token);
+    var redirectUrl = 'https://www.expressloadout.com/confirmar.html?token=' + encodeURIComponent(p.token || '');
+    var htmlRedirect = '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + redirectUrl + '"></head><body>Redirigiendo a Express Loadout... <a href="' + redirectUrl + '">Haz clic aquí</a></body></html>';
+    return HtmlService.createHtmlOutput(htmlRedirect);
   }
   
   // Consulta de próximo código disponible (opcional para el sitio web)
@@ -128,10 +137,10 @@ function solicitarVerificacionCasillero(payload) {
       '' // Código asignado (vacío hasta que confirme)
     ]);
 
-    // Construir URL pública de confirmación oficial (/macros/s/)
-    // NOTA: ScriptApp.getService().getUrl() en proyectos vinculados a Sheets genera /macros/d/
-    // que es interceptado erróneamente por el visor de Google Drive.
-    var confirmUrl = WEBAPP_EXEC_URL + '?action=confirm&token=' + encodeURIComponent(token);
+    // Construir URL oficial de confirmación en el sitio web de Express Loadout
+    // NOTA: Se enruta directamente al dominio expressloadout.com/confirmar.html para evitar
+    // la intercepción de Google Drive y resolver incompatibilidades de cookies multi-cuenta en script.google.com
+    var confirmUrl = 'https://www.expressloadout.com/confirmar.html?token=' + encodeURIComponent(token);
 
     // Enviar correo de verificación (Paso 1)
     _enviarCorreoConfirmacion24H(email, name, confirmUrl, expiraLegible);
