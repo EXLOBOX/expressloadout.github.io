@@ -354,13 +354,13 @@
 
               <div id="hero-addr-usa-content">
                 <div class="address-header">
-                  <span class="address-tag">Dirección Miami (Doral Warehouse):</span>
+                  <span class="address-tag">Dirección Miami (USA):</span>
                   <button class="copy-btn" onclick="copyAddressSnippet('usa')" title="Copiar dirección">
                     <i class="ph ph-copy"></i> Copiar
                   </button>
                 </div>
                 <code class="address-snippet">
-                  1970 NW 82nd Ave, [Tu Nombre + EXLO-PA], Doral, FL 33191
+                  Address: 1970 NW 82nd Ave • Nombre completo: [EXLO] Tu Nombre, Doral, FL 33191
                 </code>
               </div>
 
@@ -1072,19 +1072,19 @@
                     <input type="email" id="reg-email" name="email" class="form-input" placeholder="ejemplo@correo.com" autocomplete="email" required />
                   </div>
                   <div class="form-group">
-                    <label for="reg-phone" class="form-label">WhatsApp / Celular (Panamá +507) *</label>
-                    <input type="tel" id="reg-phone" name="phone" class="form-input" placeholder="+507 6000-0000" autocomplete="tel" inputmode="tel" required />
-                    <span class="phone-helper-note"><i class="ph ph-map-pin"></i> Requiere número válido de Panamá (+507)</span>
+                    <label for="reg-phone" class="form-label">WhatsApp / Celular (con código de país) *</label>
+                    <input type="tel" id="reg-phone" name="phone" class="form-input" placeholder="Ej: +507 6521-0278 o +1 (305) 555-0123" autocomplete="tel" inputmode="tel" required />
+                    <span class="phone-helper-note"><i class="ph ph-globe"></i> Acepta cualquier número internacional con código de país (+507, +1, +57, +34, etc.)</span>
                   </div>
                 </div>
 
                 <div class="form-group-grid">
                   <div class="form-group">
                     <label for="reg-id" class="form-label">Cédula, Pasaporte o RUC *</label>
-                    <input type="text" id="reg-id" name="national_id" class="form-input" placeholder="Ej: 8-888-8888" autocomplete="off" required />
+                    <input type="text" id="reg-id" name="national_id" class="form-input" placeholder="Ej: 8-888-8888 o Pasaporte" autocomplete="off" required />
                   </div>
                   <div class="form-group">
-                    <label for="reg-province" class="form-label">Provincia de Entrega *</label>
+                    <label for="reg-province" class="form-label">Provincia o Destino de Entrega *</label>
                     <select id="reg-province" name="address_province" class="form-input" autocomplete="address-level1" required>
                       <option value="Panamá">Panamá Centro / San Miguelito</option>
                       <option value="Panamá Oeste">Panamá Oeste (Arraiján / La Chorrera)</option>
@@ -1095,6 +1095,7 @@
                       <option value="Los Santos">Los Santos (Las Tablas)</option>
                       <option value="Veraguas">Veraguas (Santiago)</option>
                       <option value="Bocas del Toro">Bocas del Toro</option>
+                      <option value="Internacional">Envío / Cliente Internacional</option>
                     </select>
                   </div>
                 </div>
@@ -1105,7 +1106,7 @@
                     <label class="check-container">
                       <input type="checkbox" name="interest" value="USA" checked />
                       <span class="checkmark"></span>
-                      <span>Compras en USA (Amazon, eBay, etc.)</span>
+                      <span>Compras en USA Aéreo (Amazon, eBay, etc.)</span>
                     </label>
                     <label class="check-container">
                       <input type="checkbox" name="interest" value="China" checked />
@@ -1126,12 +1127,12 @@
                     <label class="captcha-checkbox-wrap" id="captcha-interactive-wrap">
                       <input type="checkbox" id="captcha-check" onchange="handleCaptchaVerification(this)" />
                       <span class="captcha-checkbox-custom"></span>
-                      <span class="captcha-label-text">Verificación de Seguridad Panamá (No soy un robot)</span>
+                      <span class="captcha-label-text">Verificación de Seguridad Anti-Spam (No soy un robot)</span>
                     </label>
                     <div id="captcha-spinner" class="captcha-spinner hidden"></div>
                     <div id="captcha-badge" class="captcha-badge-ok hidden">
                       <i class="ph-fill ph-shield-check"></i>
-                      <span id="captcha-badge-text">Verificado • IP y Prefijo Panamá +507 Seguro</span>
+                      <span id="captcha-badge-text">Verificado • Conexión Segura y Anti-Bots Validada</span>
                     </div>
                   </div>
                   <div class="captcha-right">
@@ -1146,36 +1147,47 @@
                 </button>
 
                 <p class="form-disclaimer">
-                  🔒 Tus datos están protegidos. Al registrarte recibirás tu casillero y las instrucciones por WhatsApp y correo electrónico.
+                  🔒 Tus datos están protegidos. Recibirás un enlace de confirmación por correo (válido por 24 horas) para activar tu casillero en la base de datos oficial.
                 </p>
               </form>
 
               <!-- Modal o Resultado de Registro Exitoso -->
               <div id="reg-success-box" class="reg-success-card hidden">
-                <div class="success-icon-wrap">
-                  <i class="ph-fill ph-check-circle"></i>
+                <div class="success-icon-wrap" style="background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fbbf24;">
+                  <i class="ph-fill ph-envelope-simple-check" style="color:#fbbf24; font-size:2.4rem;"></i>
                 </div>
-                <h4 class="success-title">¡Casillero Generado con Éxito!</h4>
-                <p class="success-subtitle">Tu cuenta Express Loadout está lista para recibir compras:</p>
+                <h4 class="success-title" style="color:#fbbf24;">¡Paso 1 Completado: Revisa tu Correo!</h4>
+                <p class="success-subtitle" id="reg-success-msg">
+                  Hemos enviado un <strong>enlace de confirmación seguro</strong> a tu correo electrónico. Tienes <strong>24 horas</strong> para hacer clic y activar tu número oficial en el sistema.
+                </p>
                 
                 <div class="casillero-badge-box">
-                  <span class="badge-label">Tu Código de Casillero:</span>
-                  <div class="badge-code" id="generated-casillero-code">EXLO-PA-8492</div>
+                  <span class="badge-label">Estado de Activación:</span>
+                  <div class="badge-code" id="generated-casillero-code" style="font-size:1.4rem;">Pendiente de Confirmación (24h)</div>
                 </div>
 
                 <div class="casillero-address-card">
+                  <!-- USA AEREO -->
                   <div class="address-box-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                      <strong style="color:var(--brand-yellow);"><i class="ph ph-map-pin"></i> 1. Tu Dirección en Miami (USA):</strong>
-                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('usa')"><i class="ph ph-copy"></i> Copiar USA</button>
+                      <strong style="color:var(--brand-yellow);"><i class="ph ph-airplane-tilt"></i> 1. Tu Dirección USA — Aéreo Express (3-5 días):</strong>
+                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('usa')"><i class="ph ph-copy"></i> Copiar USA Aéreo</button>
                     </div>
                     <div class="address-row">
-                      <span>Nombre en Paquete:</span>
-                      <strong id="gen-client-name">Carlos Mendoza EXLO-PA-8492</strong>
+                      <span>Nombre completo:</span>
+                      <strong id="gen-client-name">[EXLO] Tu Nombre</strong>
                     </div>
                     <div class="address-row">
-                      <span>Dirección Bodega:</span>
-                      <span>1970 NW 82nd Ave, Doral, FL 33191</span>
+                      <span>Address:</span>
+                      <strong>1970 NW 82nd Ave</strong>
+                    </div>
+                    <div class="address-row">
+                      <span>Suite / Línea 2:</span>
+                      <span id="gen-client-suite" style="color:var(--brand-yellow);">EXLO - [Código asignado al confirmar]</span>
+                    </div>
+                    <div class="address-row">
+                      <span>Ciudad / Estado / Zip:</span>
+                      <span>Doral, FL 33191</span>
                     </div>
                     <div class="address-row">
                       <span>Teléfono Warehouse:</span>
@@ -1185,29 +1197,44 @@
 
                   <hr style="border:none; border-top:1px dashed var(--border-subtle); margin:12px 0;" />
 
+                  <!-- USA MARITIMO -->
                   <div class="address-box-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                      <strong style="color:#60a5fa;"><i class="ph ph-warehouse"></i> 2. Tu Dirección en Guangzhou (China):</strong>
-                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('china')"><i class="ph ph-copy"></i> Copiar China</button>
+                      <strong style="color:#34d399;"><i class="ph ph-boat"></i> 2. Tu Dirección USA — Marítimo (+25 lbs):</strong>
+                      <button type="button" class="btn btn-outline btn-xs" onclick="copyFullWarehouseAddress('maritimo')"><i class="ph ph-copy"></i> Copiar Marítimo</button>
                     </div>
                     <div class="address-row">
-                      <span>Ubicación Bodega:</span>
-                      <span>Guangzhou, Distrito Baiyun, Guangdong, China</span>
+                      <span>Nombre completo:</span>
+                      <strong id="gen-client-ocean">[EXLO OCEAN] Tu Nombre</strong>
                     </div>
                     <div class="address-row">
-                      <span>Código Postal (Zip):</span>
-                      <span>510440</span>
+                      <span>Address:</span>
+                      <strong>1970 NW 82nd Ave</strong>
                     </div>
                     <div class="address-row">
-                      <span>Código de Casillero:</span>
-                      <strong id="gen-client-china">NOVA PTY - EXLO-PA-8492</strong>
+                      <span>Suite / Línea 2:</span>
+                      <span style="color:#34d399;">EXLO OCEAN - [Código asignado al confirmar]</span>
                     </div>
+                    <div class="address-row">
+                      <span>Ciudad / Estado / Zip:</span>
+                      <span>Doral, FL 33191</span>
+                    </div>
+                  </div>
+
+                  <hr style="border:none; border-top:1px dashed var(--border-subtle); margin:12px 0;" />
+
+                  <!-- IMPORTACIONES CHINA -->
+                  <div class="address-box-section" style="background:rgba(245,158,11,0.05); padding:10px 12px; border-radius:8px;">
+                    <strong style="color:#60a5fa; display:block; margin-bottom:4px;"><i class="ph ph-warehouse"></i> 3. Importaciones desde China (Alibaba / Fábricas):</strong>
+                    <p style="font-size:0.8rem; color:#cbd5e1; margin:0; line-height:1.45;">
+                      Debido a la complejidad logística de clasificación arancelaria, cálculo CBM e inspección de aduanas, las importaciones desde China se coordinan de forma personalizada con un asesor de operaciones vía WhatsApp.
+                    </p>
                   </div>
                 </div>
 
                 <div class="success-actions">
                   <a href="" id="whatsapp-welcome-link" target="_blank" class="btn btn-whatsapp btn-block" style="margin-top:10px;">
-                    <i class="ph ph-whatsapp-logo"></i> Confirmar con un Asesor por WhatsApp
+                    <i class="ph ph-whatsapp-logo"></i> Consultar o Confirmar por WhatsApp
                   </a>
                 </div>
               </div>

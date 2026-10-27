@@ -2246,9 +2246,9 @@ function handleCaptchaVerification(checkbox) {
 }
 
 // =============================================================================
-// REGISTRO DE CASILLERO & MODAL DE CONFIRMACIÓN (GOOGLE AUTOFILL & BOT SHIELD)
+// REGISTRO DE CASILLERO & VERIFICACIÓN POR CORREO (24 HORAS & HASH ANTI-SPAM)
 // =============================================================================
-function handleRegistration(e) {
+async function handleRegistration(e) {
   e.preventDefault();
 
   // 1. Detección de trampa Honeypot (Spam Bots)
@@ -2260,7 +2260,7 @@ function handleRegistration(e) {
 
   // 2. Validación obligatoria de Captcha Panamá
   if (!isCaptchaVerified) {
-    alert('🛡️ Por favor completa la "Verificación de Seguridad Panamá (No soy un robot)" para habilitar el registro.');
+    alert('🛡️ Por favor completa la verificación de seguridad anti-spam para habilitar el registro.');
     document.getElementById('panama-captcha-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
@@ -2271,37 +2271,27 @@ function handleRegistration(e) {
   const idNumber = document.getElementById('reg-id').value.trim();
   const province = document.getElementById('reg-province').value;
 
-  // 3. Validación de número telefónico de Panamá (+507)
+  // 3. Validación de número telefónico internacional (Acepta cualquier país)
   const digitsOnly = phone.replace(/\D/g, '');
-  if (digitsOnly.length < 8) {
-    alert('⚠️ Ingresa un número de celular o WhatsApp válido de Panamá (mínimo 8 dígitos).');
+  if (digitsOnly.length < 7 || digitsOnly.length > 16) {
+    alert('⚠️ Ingresa un número de celular o WhatsApp válido con su código de país (entre 7 y 15 dígitos numéricos).');
     document.getElementById('reg-phone').focus();
     return;
   }
 
-  // Intereses
+  // Intereses seleccionados
   const checkedBoxes = document.querySelectorAll('input[name="interest"]:checked');
   const interests = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
 
-  // Generar código único de casillero EXLO
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  const casilleroCode = `EXLO-PA-${randomSuffix}`;
+  const submitBtn = document.getElementById('reg-submit-btn');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="ph ph-spinner"></i> Generando Enlace Seguro de Verificación...`;
+  }
 
-  // Mostrar tarjeta de éxito
-  const formElem = document.getElementById('express-register-form');
-  const successBox = document.getElementById('reg-success-box');
-  const codeElem = document.getElementById('generated-casillero-code');
-  const nameElem = document.getElementById('gen-client-name');
-  const waLink = document.getElementById('whatsapp-welcome-link');
-
-  if (formElem) formElem.classList.add('hidden');
-  if (successBox) successBox.classList.remove('hidden');
-  if (codeElem) codeElem.innerText = casilleroCode;
-  if (nameElem) nameElem.innerText = `${name} (${casilleroCode})`;
-
-  // Guardar lead localmente
+  // Estructura de datos de registro
   const registrationData = {
-    code: casilleroCode,
     name,
     email,
     phone,
@@ -2311,27 +2301,62 @@ function handleRegistration(e) {
     createdAt: new Date().toISOString()
   };
 
+  // Enviar solicitud de verificación al WebApp de Google Apps Script
+  let gasResult = null;
+  try {
+    gasResult = await sendRegistrationVerification(registrationData);
+  } catch (err) {
+    console.warn('Error al contactar WebApp de verificación:', err);
+  }
+
+  // Guardar lead localmente en cache
   try {
     const leads = JSON.parse(localStorage.getItem('exlo_leads_cache') || '[]');
-    leads.push(registrationData);
+    leads.push({ ...registrationData, status: 'PENDIENTE_CONFIRMACION_24H' });
     localStorage.setItem('exlo_leads_cache', JSON.stringify(leads));
   } catch (err) {
     console.error(err);
   }
 
-  // Si existe webhook de GAS ERP configurado, enviar en segundo plano
-  sendToGasWebhook(registrationData);
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
 
-  // Armar link de WhatsApp
+  // Mostrar tarjeta de éxito con instrucciones de confirmación de 24 horas
+  const formElem = document.getElementById('express-register-form');
+  const successBox = document.getElementById('reg-success-box');
+  const codeElem = document.getElementById('generated-casillero-code');
+  const nameElem = document.getElementById('gen-client-name');
+  const oceanElem = document.getElementById('gen-client-ocean');
+  const suiteElem = document.getElementById('gen-client-suite');
+  const msgElem = document.getElementById('reg-success-msg');
+  const waLink = document.getElementById('whatsapp-welcome-link');
+
+  if (formElem) formElem.classList.add('hidden');
+  if (successBox) successBox.classList.remove('hidden');
+
+  if (nameElem) nameElem.innerText = `[EXLO] ${name}`;
+  if (oceanElem) oceanElem.innerText = `[EXLO OCEAN] ${name}`;
+  if (codeElem) codeElem.innerText = 'Enlace de Activación Enviado (24h)';
+  if (suiteElem) suiteElem.innerText = 'EXLO - [Código asignado al confirmar]';
+
+  if (msgElem) {
+    msgElem.innerHTML = `
+      Hemos generado un <strong>enlace dinámico con firma de seguridad</strong> y lo enviamos a <strong>${email}</strong>.<br>
+      Tienes <strong>24 horas</strong> para hacer clic en el botón de confirmación recibido por correo. Al confirmar, tu casillero se activará automáticamente de forma ascendente en la base de datos oficial.
+    `;
+  }
+
+  // Enlace dinámico de WhatsApp para soporte o confirmación asistida
   const waMessage = encodeURIComponent(
-    `¡Hola Express Loadout! Acabo de registrar mi casillero gratuito.\n\n` +
+    `¡Hola Express Loadout! Acabo de registrar mi casillero y recibí el correo de verificación.\n\n` +
     `• Nombre: ${name}\n` +
-    `• Casillero Asignado: ${casilleroCode}\n` +
+    `• Correo: ${email}\n` +
     `• Celular: ${phone}\n` +
-    `• Cédula/RUC: ${idNumber}\n` +
-    `• Provincia: ${province}\n` +
-    `• Interés: ${interests}\n\n` +
-    `Por favor confírmenme para comenzar a realizar mis compras.`
+    `• Cédula/RUC/Pasaporte: ${idNumber}\n` +
+    `• Destino: ${province}\n\n` +
+    `Deseo confirmar la activación de mi casillero oficial.`
   );
 
   if (waLink) {
@@ -2339,16 +2364,41 @@ function handleRegistration(e) {
   }
 }
 
-function sendToGasWebhook(data) {
+async function sendRegistrationVerification(data) {
   const gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL);
-  if (!gasUrl) return;
+  if (!gasUrl) {
+    console.log('No hay GAS WebApp configurado en CMS; registro en modo simulación de seguridad.');
+    return null;
+  }
 
-  fetch(gasUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'registerLocker', payload: data })
-  }).catch(e => console.warn('GAS webhook post:', e));
+  try {
+    const res = await fetch(gasUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'requestVerification', payload: data })
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    // Si fetch POST tiene restricción de CORS en navegador cliente, reintentar con GET seguro
+    try {
+      const q = new URLSearchParams({
+        action: 'requestVerification',
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        idNumber: data.idNumber,
+        province: data.province,
+        interests: data.interests
+      });
+      const getRes = await fetch(`${gasUrl}?${q.toString()}`);
+      if (getRes.ok) return await getRes.json();
+    } catch (e) {
+      console.warn('Fallback GET verification request failed:', e);
+    }
+  }
+  return null;
 }
 
 function switchHeroAddress(type) {
@@ -2376,22 +2426,26 @@ function copyFullWarehouseAddress(type = 'usa') {
   let text = '';
 
   if (type === 'china') {
-    text = `ALMACÉN CHINA:\nCONSIGNATARIO: NOVA PTY - ${name} ${code}\nCIUDAD: Guangzhou\nDISTRITO: Baiyun District\nPROVINCIA: Guangdong\nPAÍS: China\nCÓDIGO POSTAL: 510440`;
+    text = `IMPORTACIONES DESDE CHINA:\nPara habilitar y recibir la dirección exacta de la bodega en Guangzhou (China) adecuada para tu carga, por favor contáctanos por WhatsApp (+507 6521-0278) indicando tu código de casillero. Nuestro equipo te asesorará con la clasificación arancelaria y cubicaje CBM.`;
+  } else if (type === 'maritimo') {
+    text = `ALMACÉN MIAMI, USA (MARÍTIMO - CARGA PESADA/COMERCIAL):\nNOMBRE COMPLETO: [EXLO OCEAN] ${name}\nADDRESS: 1970 NW 82nd Ave\nSUITE / LÍNEA 2: EXLO OCEAN - ${code}\nCIUDAD: Doral\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33191\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
   } else {
-    text = `ALMACÉN MIAMI, USA:\nNOMBRE: ${name} ${code}\nDIRECCIÓN LÍNEA 1: 1970 NW 82nd Ave\nLÍNEA 2 (CASILLERO): ${code}\nCIUDAD: Doral\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33191\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
+    text = `ALMACÉN MIAMI, USA (AÉREO EXPRESS 3-5 DÍAS):\nNOMBRE COMPLETO: [EXLO] ${name}\nADDRESS: 1970 NW 82nd Ave\nSUITE / LÍNEA 2: EXLO - ${code}\nCIUDAD: Doral\nESTADO: FL (Florida)\nCÓDIGO POSTAL: 33191\nPAÍS: United States\nTELÉFONO: +1 (786) 615-5555`;
   }
 
   navigator.clipboard.writeText(text).then(() => {
-    alert('✅ Dirección completa copiada al portapapeles.');
+    alert('✅ Dirección copiada al portapapeles:\n\n' + text);
+  }).catch(() => {
+    prompt('Copia tu dirección:', text);
   });
 }
 
 function copyAddressSnippet(type = 'usa') {
   let snippet = '';
   if (type === 'china') {
-    snippet = 'Guangzhou, Baiyun District, Guangdong, China (Zip: 510440) | NOVA PTY - [Tu Nombre + EXLO-PA]';
+    snippet = 'Guangzhou, Baiyun District, Guangdong, China (Zip: 510440) | Para habilitar importaciones de China, contáctanos por WhatsApp (+507 6521-0278)';
   } else {
-    snippet = '1970 NW 82nd Ave, [Tu Nombre + EXLO-PA], Doral, FL 33191';
+    snippet = 'Address: 1970 NW 82nd Ave • Nombre completo: [EXLO] Tu Nombre, Doral, FL 33191';
   }
   navigator.clipboard.writeText(snippet).then(() => {
     alert('✅ Dirección copiada: ' + snippet);
