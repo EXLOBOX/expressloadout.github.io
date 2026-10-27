@@ -3154,3 +3154,509 @@ button, input, select, textarea {
     flex-direction: column;
   }
 }
+
+/* =============================================================================
+   TACTICAL LOGISTICS VISUALIZER & TRACKING CMS (EXECUTIVE OBSIDIAN GRADE)
+   ============================================================================= */
+.tactical-track-card {
+  background: linear-gradient(145deg, #0b111e 0%, #070a12 100%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 24px rgba(245, 158, 11, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-top: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--trans-medium);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tactical-track-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f59e0b, #fbbf24, transparent);
+}
+
+.tactical-hud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 18px;
+}
+
+.tactical-track-id-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tactical-carrier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tactical-number-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  font-family: Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.tactical-number-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.tactical-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tactical-status-pill.status-warehouse {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.tactical-status-pill.status-transit {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.tactical-status-pill.status-customs {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.tactical-status-pill.status-ready {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.tactical-status-pill.status-delivered {
+  background: rgba(34, 197, 94, 0.18);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+}
+
+.tactical-radar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  position: relative;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.tactical-radar-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  animation: radarPulse 1.8s infinite ease-out;
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ROUTE BANNER */
+.tactical-route-banner {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tactical-hub-point {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tactical-hub-flag {
+  font-size: 1.4rem;
+}
+
+.tactical-hub-info h6 {
+  font-size: 0.85rem;
+  color: #f1f5f9;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tactical-hub-info span {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.tactical-route-line-box {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.tactical-route-line {
+  width: 100%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(245, 158, 11, 0.3) 0, rgba(245, 158, 11, 0.3) 6px, transparent 6px, transparent 12px);
+}
+
+.tactical-route-vehicle {
+  position: absolute;
+  background: #0f172a;
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  animation: vehicleFloat 2.5s infinite ease-in-out;
+}
+
+@keyframes vehicleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 4-STAGE MILESTONE STEPPER */
+.tactical-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.tactical-step-node {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+  position: relative;
+  transition: all var(--trans-fast);
+}
+
+.tactical-step-node.completed {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.tactical-step-node.active {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.15);
+}
+
+.tactical-step-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.tactical-step-node.completed .tactical-step-icon {
+  background: #10b981;
+  color: #052e16;
+  font-weight: 700;
+}
+
+.tactical-step-node.active .tactical-step-icon {
+  background: #f59e0b;
+  color: #451a03;
+  font-weight: 700;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.tactical-step-title {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1.25;
+}
+
+.tactical-step-sub {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* DOSSIER DATA GRID */
+.tactical-dossier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.tactical-dossier-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tactical-dossier-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tactical-dossier-val {
+  font-size: 0.84rem;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+/* CHECKPOINTS TIMELINE */
+.tactical-history-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 16px;
+  margin-bottom: 18px;
+}
+
+.tactical-history-title {
+  font-size: 0.84rem;
+  color: #cbd5e1;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tactical-checkpoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.tactical-checkpoints-list::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tactical-checkpoint-entry {
+  position: relative;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.tactical-checkpoint-dot {
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #475569;
+  border: 2px solid #0b111e;
+}
+
+.tactical-checkpoint-entry:first-child .tactical-checkpoint-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.tactical-checkpoint-time {
+  font-size: 0.72rem;
+  color: #fbbf24;
+  font-weight: 600;
+  font-family: Consolas, monospace;
+}
+
+.tactical-checkpoint-loc {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.tactical-checkpoint-desc {
+  color: #e2e8f0;
+  margin-top: 2px;
+}
+
+/* ACTION BUTTONS */
+.tactical-actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tactical-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--trans-fast);
+}
+
+.tactical-action-btn.whatsapp {
+  background: rgba(37, 211, 102, 0.15);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #25d366;
+}
+.tactical-action-btn.whatsapp:hover {
+  background: #25d366;
+  color: #052e16;
+}
+
+.tactical-action-btn.carrier {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+.tactical-action-btn.carrier:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+.tactical-action-btn.share {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+.tactical-action-btn.share:hover {
+  background: #f59e0b;
+  color: #451a03;
+}
+
+/* SCANNER LOADING INDICATOR */
+.tactical-scanner-loading {
+  background: rgba(11, 17, 30, 0.85);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tactical-radar-spinner {
+  width: 38px;
+  height: 38px;
+  border: 2px solid rgba(245, 158, 11, 0.2);
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: radarSpin 0.9s linear infinite;
+}
+
+@keyframes radarSpin {
+  to { transform: rotate(360deg); }
+}
+
+.admin-subpanel {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+@media (max-width: 768px) {
+  .tactical-stepper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tactical-hud-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tactical-route-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tactical-route-line-box {
+    width: 100%;
+    margin: 8px 0;
+  }
+}

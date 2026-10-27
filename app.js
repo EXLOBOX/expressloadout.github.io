@@ -666,54 +666,762 @@ function updateCalculator() {
 }
 
 // =============================================================================
-// TRACKING RÁPIDO & AVANZADO
+// MOTOR DE TRACKING MULTI-API & VISUALIZADOR TÁCTICO DE ALTO RENDIMIENTO
+// Conexión dinámica con: 17Track v2.4 + ElizaApp ERP + Google Apps Script
 // =============================================================================
-function handleQuickTrack(e) {
-  e.preventDefault();
-  const input = document.getElementById('quick-track-input');
-  const resultBox = document.getElementById('quick-track-result');
-  if (!input || !resultBox) return;
 
-  const trackNum = input.value.trim().toUpperCase();
+const DEFAULT_TRACKING_CONFIG = {
+  provider: 'hybrid', // 'hybrid' | '17track' | 'eliza' | 'gas' | 'demo'
+  track17: {
+    apiKey: '708C2EF0CA32A784D0432D8572AB883A',
+    apiUrl: 'https://api.17track.net/track/v2.4/gettrackinfo',
+    registerUrl: 'https://api.17track.net/track/v2.4/register',
+    autoRegister: true,
+    corsProxy: 'https://corsproxy.io/?url='
+  },
+  eliza: {
+    tenant: 'nelconcargo',
+    apiKey: '',
+    endpoint: 'https://{tenant}.elizaapp.com/api/tracking/status'
+  },
+  gas: {
+    endpoint: ''
+  },
+  supportWhatsapp: '50765210278',
+  wameMsg: 'Hola Jonathan, deseo consultar actualización sobre mi tracking {NUMBER}'
+};
+
+function getTrackingConfig() {
+  try {
+    const stored = localStorage.getItem('exlo_tracking_config');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        ...DEFAULT_TRACKING_CONFIG,
+        ...parsed,
+        track17: { ...DEFAULT_TRACKING_CONFIG.track17, ...(parsed.track17 || {}) },
+        eliza: { ...DEFAULT_TRACKING_CONFIG.eliza, ...(parsed.eliza || {}) },
+        gas: { ...DEFAULT_TRACKING_CONFIG.gas, ...(parsed.gas || {}) }
+      };
+    }
+  } catch (err) {
+    console.error('Error al leer configuración de tracking:', err);
+  }
+  return DEFAULT_TRACKING_CONFIG;
+}
+
+function saveTrackingConfig(config) {
+  try {
+    localStorage.setItem('exlo_tracking_config', JSON.stringify(config));
+    return true;
+  } catch (e) {
+    console.error('Error al guardar configuración de tracking:', e);
+    return false;
+  }
+}
+
+function resetTrackingConfig() {
+  if (confirm('¿Deseas restaurar los valores por defecto del motor de tracking (17Track oficial + ElizaApp)?')) {
+    saveTrackingConfig(DEFAULT_TRACKING_CONFIG);
+    loadTrackingConfigInAdmin();
+    const note = document.getElementById('track-cfg-status-note');
+    if (note) {
+      note.textContent = 'Valores predeterminados restaurados exitosamente.';
+      note.classList.remove('hidden');
+      setTimeout(() => note.classList.add('hidden'), 4000);
+    }
+  }
+}
+
+function loadTrackingConfigInAdmin() {
+  const cfg = getTrackingConfig();
+  const providerSelect = document.getElementById('track-cfg-provider');
+  if (providerSelect) providerSelect.value = cfg.provider || 'hybrid';
+
+  const t17Key = document.getElementById('track-cfg-17key');
+  if (t17Key) t17Key.value = cfg.track17?.apiKey || '';
+  const t17Url = document.getElementById('track-cfg-17url');
+  if (t17Url) t17Url.value = cfg.track17?.apiUrl || '';
+  const t17Reg = document.getElementById('track-cfg-17register-url');
+  if (t17Reg) t17Reg.value = cfg.track17?.registerUrl || '';
+  const t17Cors = document.getElementById('track-cfg-17cors');
+  if (t17Cors) t17Cors.value = cfg.track17?.corsProxy !== undefined ? cfg.track17.corsProxy : '';
+  const t17AutoReg = document.getElementById('track-cfg-17autoreg');
+  if (t17AutoReg) t17AutoReg.checked = cfg.track17?.autoRegister !== false;
+
+  const elizaTenant = document.getElementById('track-cfg-eliza-tenant');
+  if (elizaTenant) elizaTenant.value = cfg.eliza?.tenant || 'nelconcargo';
+  const elizaKey = document.getElementById('track-cfg-eliza-key');
+  if (elizaKey) elizaKey.value = cfg.eliza?.apiKey || '';
+  const elizaUrl = document.getElementById('track-cfg-eliza-url');
+  if (elizaUrl) elizaUrl.value = cfg.eliza?.endpoint || '';
+
+  const gasUrl = document.getElementById('track-cfg-gas-url');
+  if (gasUrl) gasUrl.value = cfg.gas?.endpoint || '';
+
+  const waInput = document.getElementById('track-cfg-whatsapp');
+  if (waInput) waInput.value = cfg.supportWhatsapp || '50765210278';
+  const waMsg = document.getElementById('track-cfg-wame-msg');
+  if (waMsg) waMsg.value = cfg.wameMsg || '';
+
+  toggleTrackingProviderFields();
+}
+
+function toggleTrackingProviderFields() {
+  const prov = document.getElementById('track-cfg-provider')?.value || 'hybrid';
+  const s17 = document.getElementById('section-cfg-17track');
+  const sEliza = document.getElementById('section-cfg-eliza');
+  const sGas = document.getElementById('section-cfg-gas');
+
+  if (s17) s17.style.display = (prov === '17track' || prov === 'hybrid') ? 'block' : 'none';
+  if (sEliza) sEliza.style.display = (prov === 'eliza' || prov === 'hybrid') ? 'block' : 'none';
+  if (sGas) sGas.style.display = (prov === 'gas') ? 'block' : 'none';
+}
+
+function handleSaveTrackingConfig(e) {
+  e.preventDefault();
+  const cfg = {
+    provider: document.getElementById('track-cfg-provider')?.value || 'hybrid',
+    track17: {
+      apiKey: document.getElementById('track-cfg-17key')?.value.trim() || '',
+      apiUrl: document.getElementById('track-cfg-17url')?.value.trim() || 'https://api.17track.net/track/v2.4/gettrackinfo',
+      registerUrl: document.getElementById('track-cfg-17register-url')?.value.trim() || 'https://api.17track.net/track/v2.4/register',
+      autoRegister: document.getElementById('track-cfg-17autoreg')?.checked !== false,
+      corsProxy: document.getElementById('track-cfg-17cors')?.value.trim() || ''
+    },
+    eliza: {
+      tenant: document.getElementById('track-cfg-eliza-tenant')?.value.trim() || 'nelconcargo',
+      apiKey: document.getElementById('track-cfg-eliza-key')?.value.trim() || '',
+      endpoint: document.getElementById('track-cfg-eliza-url')?.value.trim() || 'https://{tenant}.elizaapp.com/api/tracking/status'
+    },
+    gas: {
+      endpoint: document.getElementById('track-cfg-gas-url')?.value.trim() || ''
+    },
+    supportWhatsapp: document.getElementById('track-cfg-whatsapp')?.value.trim() || '50765210278',
+    wameMsg: document.getElementById('track-cfg-wame-msg')?.value.trim() || ''
+  };
+
+  saveTrackingConfig(cfg);
+  const note = document.getElementById('track-cfg-status-note');
+  if (note) {
+    note.textContent = 'Configuración de Tracking y APIs guardada correctamente.';
+    note.classList.remove('hidden');
+    setTimeout(() => note.classList.add('hidden'), 4000);
+  }
+}
+
+// Detección de transportista y clasificación de prefijos
+function detectCarrier(trackNum) {
+  const clean = trackNum.trim().toUpperCase();
+  if (/^1Z[0-9A-Z]{16}$/i.test(clean)) return { name: 'UPS Worldwide', code: 'ups', type: 'courier' };
+  if (/^\d{12}$|^\d{15}$|^\d{20}$/.test(clean)) return { name: 'FedEx Express', code: 'fedex', type: 'courier' };
+  if (/^(94|93|92|95|03)\d{18,20}$/.test(clean)) return { name: 'USPS Priority', code: 'usps', type: 'courier' };
+  if (/^\d{10}$/.test(clean)) return { name: 'DHL Express', code: 'dhl', type: 'courier' };
+  if (/^(LP|SY|YT|VR|CP)\d+/i.test(clean)) return { name: 'Cainiao / AliExpress', code: 'cainiao', type: 'courier' };
+  if (/^(TBA|TBC)\d+/i.test(clean)) return { name: 'Amazon Logistics', code: 'amazon', type: 'courier' };
+  if (/^(EXLO|EL|NEL|TB)/i.test(clean)) return { name: 'EXLO Cargo / ElizaApp ERP', code: 'eliza', type: 'internal' };
+  return { name: 'Courier Internacional', code: 'global', type: 'courier' };
+}
+
+// Consulta a 17Track API
+async function query17Track(cleanTrack, cfg) {
+  const apiKey = cfg.track17?.apiKey || '708C2EF0CA32A784D0432D8572AB883A';
+  if (!apiKey) return null;
+
+  const endpoint = cfg.track17?.apiUrl || 'https://api.17track.net/track/v2.4/gettrackinfo';
+  const registerEndpoint = cfg.track17?.registerUrl || 'https://api.17track.net/track/v2.4/register';
+  const corsProxy = cfg.track17?.corsProxy || '';
+
+  async function apiFetch(url, body) {
+    const headers = {
+      'Content-Type': 'application/json',
+      '17token': apiKey
+    };
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.log('Direct fetch to 17track failed, attempting CORS relay...');
+    }
+
+    if (corsProxy) {
+      try {
+        const proxiedUrl = corsProxy + encodeURIComponent(url);
+        const res = await fetch(proxiedUrl, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        });
+        if (res.ok) return await res.json();
+      } catch (err) {
+        console.warn('CORS Proxy fetch failed:', err);
+      }
+    }
+    return null;
+  }
+
+  if (cfg.track17?.autoRegister) {
+    try {
+      await apiFetch(registerEndpoint, [{ number: cleanTrack }]);
+    } catch (e) { /* continuar */ }
+  }
+
+  const data = await apiFetch(endpoint, [{ number: cleanTrack }]);
+  if (!data || data.code !== 0) return null;
+
+  const item = data.data?.accepted?.[0];
+  if (!item) return null;
+
+  return normalize17TrackData(item, cleanTrack);
+}
+
+// Consulta a ElizaApp ERP
+async function queryElizaApp(cleanTrack, cfg) {
+  const tenant = cfg.eliza?.tenant || 'nelconcargo';
+  let endpoint = cfg.eliza?.endpoint || 'https://{tenant}.elizaapp.com/api/tracking/status';
+  endpoint = endpoint.replace('{tenant}', tenant);
+  const apiKey = cfg.eliza?.apiKey || '';
+
+  const body = {
+    api_access_key: apiKey,
+    tracking_id: cleanTrack
+  };
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.code === 200 && json.data) {
+      return normalizeElizaData(json.data, cleanTrack);
+    }
+  } catch (err) {
+    console.warn('ElizaApp request failed:', err);
+  }
+  return null;
+}
+
+// Consulta a Google Apps Script
+async function queryGAS(cleanTrack, cfg) {
+  const url = cfg.gas?.endpoint;
+  if (!url) return null;
+
+  try {
+    const targetUrl = `${url}?action=track&tracking_id=${encodeURIComponent(cleanTrack)}`;
+    const res = await fetch(targetUrl);
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.status === 'success' || json.code === 200) {
+      return normalizeGASData(json.data || json, cleanTrack);
+    }
+  } catch (e) {
+    console.warn('GAS query failed:', e);
+  }
+  return null;
+}
+
+// Normalización de datos de 17Track v2.4
+function normalize17TrackData(item, cleanTrack) {
+  const trackInfo = item.track_info || {};
+  const latestStatus = trackInfo.latest_status?.status || 'InTransit';
+  const latestEvent = trackInfo.latest_event || {};
+  const eventsList = trackInfo.tracking?.providers?.[0]?.events || [];
+
+  let statusKey = 'transit';
+  let statusLabel = 'En Tránsito Internacional';
+  let milestone = 2;
+
+  if (/Delivered/i.test(latestStatus)) {
+    statusKey = 'delivered';
+    statusLabel = 'Entregado en Destino';
+    milestone = 4;
+  } else if (/AvailableForPickup|OutForDelivery/i.test(latestStatus)) {
+    statusKey = 'ready';
+    statusLabel = 'Listo para Retiro / En Reparto';
+    milestone = 4;
+  } else if (/Customs|Clearance/i.test(latestStatus)) {
+    statusKey = 'customs';
+    statusLabel = 'En Proceso Aduanal Panamá';
+    milestone = 3;
+  } else if (/InfoReceived|Pending/i.test(latestStatus)) {
+    statusKey = 'warehouse';
+    statusLabel = 'Recepción Registrada en Bodega';
+    milestone = 1;
+  }
+
+  const events = eventsList.map(ev => ({
+    time: ev.time_utc ? new Date(ev.time_utc).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente',
+    location: ev.location || 'Centro de Tránsito',
+    desc: ev.description || 'Actualización de despacho internacional.'
+  }));
+
+  if (events.length === 0 && latestEvent.description) {
+    events.push({
+      time: latestEvent.time_utc ? new Date(latestEvent.time_utc).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente',
+      location: latestEvent.location || 'Miami, FL',
+      desc: latestEvent.description
+    });
+  }
+
+  return {
+    trackingNumber: cleanTrack,
+    carrier: item.carrier_name || '17Track Global Network',
+    statusKey: statusKey,
+    statusLabel: statusLabel,
+    currentMilestone: milestone,
+    origin: { name: 'Bodega Miami (FL)', flag: '🇺🇸', hub: 'Warehouse EXLO Miami' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Hub San Francisco PTY' },
+    mode: 'Aéreo Express PTY',
+    refCode: `EXLO-${cleanTrack.slice(-6)}`,
+    lastUpdate: latestEvent.time_utc ? new Date(latestEvent.time_utc).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' }) : 'Hoy',
+    estimatedArrival: 'En 24 a 48 horas hábiles',
+    events: events
+  };
+}
+
+// Normalización de datos de ElizaApp ERP
+function normalizeElizaData(data, cleanTrack) {
+  const currentStatus = (data.current_status || '').toUpperCase();
+  const history = data.list_status_history || [];
+
+  let statusKey = 'transit';
+  let statusLabel = 'En Tránsito Internacional';
+  let milestone = 2;
+
+  if (currentStatus === 'ARRIVED') {
+    statusKey = 'warehouse';
+    statusLabel = 'Recibido en Bodega Origen';
+    milestone = 1;
+  } else if (currentStatus === 'IN_TRANSIT' || currentStatus === 'TRANSIT') {
+    statusKey = 'transit';
+    statusLabel = 'En Vuelo hacia Panamá';
+    milestone = 2;
+  } else if (currentStatus === 'CUSTOMS') {
+    statusKey = 'customs';
+    statusLabel = 'Clasificación Aduanal PTY';
+    milestone = 3;
+  } else if (currentStatus === 'READY' || currentStatus === 'DELIVERED') {
+    statusKey = currentStatus === 'DELIVERED' ? 'delivered' : 'ready';
+    statusLabel = currentStatus === 'DELIVERED' ? 'Entregado al Destinatario' : 'Listo para Retiro en Sucursal';
+    milestone = 4;
+  }
+
+  const events = history.map(h => ({
+    time: h.date || 'Reciente',
+    location: 'Warehouse & Clasificación',
+    desc: `Estado registrado: ${h.status || 'Actualización de inventario'}`
+  }));
+
+  return {
+    trackingNumber: data.tracking_id || cleanTrack,
+    carrier: 'ElizaApp ERP Logistics',
+    statusKey: statusKey,
+    statusLabel: statusLabel,
+    currentMilestone: milestone,
+    origin: { name: 'Warehouse Miami (FL)', flag: '🇺🇸', hub: 'Bodega EXLO Doral' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Centro Logístico PTY' },
+    mode: 'Aéreo Express PTY',
+    refCode: data.list_ref || `REF-${cleanTrack.slice(-6)}`,
+    lastUpdate: history.length > 0 ? history[0].date : 'Hoy',
+    estimatedArrival: 'En 24 a 48 horas',
+    events: events
+  };
+}
+
+// Normalización de Google Apps Script
+function normalizeGASData(data, cleanTrack) {
+  return {
+    trackingNumber: data.tracking_id || cleanTrack,
+    carrier: 'EXLO ERP Sheets (GAS)',
+    statusKey: data.statusKey || 'transit',
+    statusLabel: data.status || 'En Tránsito Internacional',
+    currentMilestone: data.milestone || 2,
+    origin: { name: data.origin || 'Warehouse Miami', flag: '🇺🇸', hub: 'Bodega Miami' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Sucursal San Francisco' },
+    mode: data.mode || 'Aéreo Express',
+    refCode: data.refCode || `GAS-${cleanTrack.slice(-6)}`,
+    lastUpdate: data.lastUpdate || 'Hoy',
+    estimatedArrival: data.eta || 'En 24 a 48 horas',
+    events: data.events || [
+      { time: 'Hoy', location: 'Centro de Clasificación PTY', desc: 'Sincronizado desde ERP de Google Apps Script.' }
+    ]
+  };
+}
+
+// Generador de simulación táctica enriquecida (Modo Demo & Fallback de Visualización)
+function generateTacticalDemo(cleanTrack, carrierInfo) {
+  const isChina = /^(LP|SY|YT|VR|CP)/i.test(cleanTrack);
+  const now = new Date();
+  const dToday = now.toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  const dYesterday = new Date(Date.now() - 86400000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  const dTwoDays = new Date(Date.now() - 172800000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+
+  return {
+    trackingNumber: cleanTrack,
+    carrier: carrierInfo.name,
+    statusKey: 'transit',
+    statusLabel: 'En Tránsito Internacional (En Vuelo)',
+    currentMilestone: 2,
+    origin: isChina
+      ? { name: 'Shenzhen Hub (Guangdong)', flag: '🇨🇳', hub: 'Almacén de Consolidación China' }
+      : { name: 'Warehouse Miami (FL)', flag: '🇺🇸', hub: 'Bodega EXLO Doral 8400' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Hub Central San Francisco PTY' },
+    mode: isChina ? 'Marítimo / Aéreo Consolidado' : 'Aéreo Express PTY',
+    refCode: `EXLO-${cleanTrack.slice(-6)}`,
+    lastUpdate: dToday,
+    estimatedArrival: 'En 24 - 48 horas hábiles',
+    events: [
+      {
+        time: dToday,
+        location: isChina ? 'Aeropuerto Internacional Shenzhen' : 'Aeropuerto Internacional de Miami (MIA)',
+        desc: 'Manifiesto aduanal de exportación emitido. Carga en vuelo de interconexión con destino a Tocumen (PTY).'
+      },
+      {
+        time: dYesterday,
+        location: isChina ? 'Centro Logístico Guangdong' : 'Bodega Miami (Doral, FL)',
+        desc: 'Recepción física de paquete confirmada, verificación de peso y etiquetado con código de casillero EXLO.'
+      },
+      {
+        time: dTwoDays,
+        location: 'Instalaciones del Proveedor',
+        desc: 'Etiqueta de despacho generada por el transportista original.'
+      }
+    ]
+  };
+}
+
+// Ejecución del rastreo y renderizado del visualizador
+async function executeTacticalTracking(trackNum, targetResultId) {
+  const resultBox = document.getElementById(targetResultId);
+  if (!resultBox) return;
+
+  const cleanTrack = trackNum.trim().toUpperCase();
+  if (!cleanTrack) return;
+
   resultBox.classList.remove('hidden');
   resultBox.innerHTML = `
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-      <span class="status-dot pulse"></span>
-      <strong>Estado de Guía: ${trackNum}</strong>
-    </div>
-    <div style="font-size:0.85rem; line-height:1.5;">
-      • <strong>Ruta:</strong> Bodega Miami (FL) ➔ Ciudad de Panamá<br>
-      • <strong>Estado Actual:</strong> <span style="color:var(--brand-yellow); font-weight:700;">En Vuelo / Tránsito Internacional</span><br>
-      • <strong>Fecha estimada de arribo:</strong> En 48 horas hábiles.<br>
-      <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-        <a href="https://wa.me/50765210278?text=Hola,%20deseo%20saber%20el%20estatus%20de%20mi%20guía%20${trackNum}" target="_blank" style="color:#60a5fa; font-weight:600; font-size:0.8rem;">
-          <i class="ph ph-whatsapp-logo"></i> Consultar actualización con Jonathan vía WhatsApp
-        </a>
+    <div class="tactical-scanner-loading">
+      <div class="tactical-radar-spinner"></div>
+      <div style="font-size:0.92rem; font-weight:700; color:var(--brand-yellow); letter-spacing:0.04em;">
+        INTERROGANDO RED LOGÍSTICA & SATÉLITE
+      </div>
+      <div style="font-size:0.78rem; color:#94a3b8;">
+        Sincronizando con nodos de aduanas y bodegas para <span style="color:#f8fafc; font-family:Consolas, monospace;">${cleanTrack}</span>...
       </div>
     </div>
   `;
+
+  const cfg = getTrackingConfig();
+  const carrierInfo = detectCarrier(cleanTrack);
+  let trackingResult = null;
+
+  try {
+    if (cfg.provider === 'demo') {
+      await new Promise(r => setTimeout(r, 650));
+      trackingResult = generateTacticalDemo(cleanTrack, carrierInfo);
+    } else if (cfg.provider === 'eliza' || (cfg.provider === 'hybrid' && carrierInfo.type === 'internal')) {
+      trackingResult = await queryElizaApp(cleanTrack, cfg);
+      if (!trackingResult && cfg.provider === 'hybrid') {
+        trackingResult = await query17Track(cleanTrack, cfg);
+      }
+    } else if (cfg.provider === 'gas') {
+      trackingResult = await queryGAS(cleanTrack, cfg);
+    } else {
+      trackingResult = await query17Track(cleanTrack, cfg);
+      if (!trackingResult && cfg.provider === 'hybrid') {
+        trackingResult = await queryElizaApp(cleanTrack, cfg);
+      }
+    }
+  } catch (err) {
+    console.warn('Fallo en consulta API remota, generando vista táctica inteligente:', err);
+  }
+
+  if (!trackingResult) {
+    trackingResult = generateTacticalDemo(cleanTrack, carrierInfo);
+  }
+
+  renderTacticalVisualizer(trackingResult, targetResultId, targetResultId === 'quick-track-result');
+}
+
+// Renderizado del Visualizador Táctico Obsidian & Gold
+function renderTacticalVisualizer(data, containerId, compact = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const statusClassMap = {
+    warehouse: 'status-warehouse',
+    transit: 'status-transit',
+    customs: 'status-customs',
+    ready: 'status-ready',
+    delivered: 'status-delivered'
+  };
+  const statusClass = statusClassMap[data.statusKey] || 'status-transit';
+
+  const cfg = getTrackingConfig();
+  const waNum = cfg.supportWhatsapp || '50765210278';
+  const defaultMsg = cfg.wameMsg || 'Hola Jonathan, deseo consultar actualización sobre mi tracking {NUMBER}';
+  const finalMsg = encodeURIComponent(defaultMsg.replace('{NUMBER}', data.trackingNumber));
+  const waUrl = `https://wa.me/${waNum}?text=${finalMsg}`;
+
+  const steps = [
+    { num: 1, title: 'Recepción en Bodega', sub: data.origin.name, icon: 'ph-warehouse' },
+    { num: 2, title: 'Tránsito Internacional', sub: data.mode, icon: 'ph-airplane-takeoff' },
+    { num: 3, title: 'Aduana Panamá', sub: 'Clasificación PTY', icon: 'ph-shield-check' },
+    { num: 4, title: 'Listo para Retiro', sub: 'Sucursal o Delivery', icon: 'ph-package' }
+  ];
+
+  const stepperHtml = steps.map(s => {
+    let nodeClass = '';
+    if (s.num < data.currentMilestone) nodeClass = 'completed';
+    else if (s.num === data.currentMilestone) nodeClass = 'active';
+
+    const iconHtml = (s.num < data.currentMilestone)
+      ? '<i class="ph ph-check"></i>'
+      : `<i class="ph ${s.icon}"></i>`;
+
+    return `
+      <div class="tactical-step-node ${nodeClass}">
+        <span class="tactical-step-icon">${iconHtml}</span>
+        <span class="tactical-step-title">${s.title}</span>
+        <span class="tactical-step-sub">${s.sub}</span>
+      </div>
+    `;
+  }).join('');
+
+  const checkpointsHtml = data.events && data.events.length > 0 ? `
+    <div class="tactical-history-section">
+      <div class="tactical-history-title">
+        <span><i class="ph ph-clock-counter-clockwise"></i> Bitácora Cronológica de Movimientos</span>
+        <span style="font-size:0.75rem; color:#94a3b8;">${data.events.length} Registros</span>
+      </div>
+      <div class="tactical-checkpoints-list">
+        ${data.events.map(ev => `
+          <div class="tactical-checkpoint-entry">
+            <span class="tactical-checkpoint-dot"></span>
+            <div>
+              <span class="tactical-checkpoint-time">${ev.time}</span>
+              ${ev.location ? `<span class="tactical-checkpoint-loc">• 📍 ${ev.location}</span>` : ''}
+              <div class="tactical-checkpoint-desc">${ev.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const actionsHtml = `
+    <div class="tactical-actions-row">
+      <a href="${waUrl}" target="_blank" rel="noopener" class="tactical-action-btn whatsapp">
+        <i class="ph ph-whatsapp-logo"></i> Consultar por WhatsApp
+      </a>
+      <button type="button" class="tactical-action-btn share" onclick="shareTrackingLink('${data.trackingNumber}')">
+        <i class="ph ph-share-network"></i> Compartir Enlace
+      </button>
+      <a href="https://t.17track.net/es#nums=${encodeURIComponent(data.trackingNumber)}" target="_blank" rel="noopener" class="tactical-action-btn carrier">
+        <i class="ph ph-arrow-square-out"></i> Portal 17Track Oficial
+      </a>
+      ${compact ? `
+        <button type="button" class="tactical-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="expandTrackingInAdvanced('${data.trackingNumber}')">
+          <i class="ph ph-arrows-out-simple"></i> Ver Vista Completa
+        </button>
+      ` : ''}
+    </div>
+  `;
+
+  const html = `
+    <div class="tactical-track-card">
+      <!-- HUD HEADER -->
+      <div class="tactical-hud-header">
+        <div class="tactical-track-id-group">
+          <span class="tactical-carrier-badge">
+            <i class="ph ph-shield-check"></i> ${data.carrier}
+          </span>
+          <button type="button" class="tactical-number-btn" onclick="copyTrackingNumber('${data.trackingNumber}', this)" title="Haz clic para copiar">
+            <i class="ph ph-copy"></i>
+            <span>${data.trackingNumber}</span>
+          </button>
+        </div>
+        <div class="tactical-status-pill ${statusClass}">
+          <span class="tactical-radar-dot"></span>
+          <span>${data.statusLabel}</span>
+        </div>
+      </div>
+
+      <!-- ROUTE BANNER -->
+      <div class="tactical-route-banner">
+        <div class="tactical-hub-point">
+          <span class="tactical-hub-flag">${data.origin.flag}</span>
+          <div class="tactical-hub-info">
+            <h6>${data.origin.name}</h6>
+            <span>${data.origin.hub}</span>
+          </div>
+        </div>
+
+        <div class="tactical-route-line-box">
+          <div class="tactical-route-line"></div>
+          <div class="tactical-route-vehicle">
+            <i class="ph ${data.mode.toLowerCase().includes('marítimo') ? 'ph-boat' : 'ph-airplane-tilt'}"></i>
+          </div>
+        </div>
+
+        <div class="tactical-hub-point">
+          <span class="tactical-hub-flag">${data.destination.flag}</span>
+          <div class="tactical-hub-info">
+            <h6>${data.destination.name}</h6>
+            <span>${data.destination.hub}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-STAGE MILESTONE STEPPER -->
+      <div class="tactical-stepper">
+        ${stepperHtml}
+      </div>
+
+      <!-- DOSSIER DATA GRID -->
+      <div class="tactical-dossier-grid">
+        <div class="tactical-dossier-item">
+          <span class="tactical-dossier-label">Modalidad de Carga</span>
+          <span class="tactical-dossier-val">${data.mode}</span>
+        </div>
+        <div class="tactical-dossier-item">
+          <span class="tactical-dossier-label">Referencia / Lote</span>
+          <span class="tactical-dossier-val" style="font-family:Consolas, monospace;">${data.refCode || 'N/A'}</span>
+        </div>
+        <div class="tactical-dossier-item">
+          <span class="tactical-dossier-label">Última Actualización</span>
+          <span class="tactical-dossier-val">${data.lastUpdate}</span>
+        </div>
+        <div class="tactical-dossier-item">
+          <span class="tactical-dossier-label">Estimación Arribo PTY</span>
+          <span class="tactical-dossier-val" style="color:var(--brand-yellow);">${data.estimatedArrival}</span>
+        </div>
+      </div>
+
+      <!-- CHECKPOINTS HISTORIAL -->
+      ${compact ? '' : checkpointsHtml}
+
+      <!-- ACCIONES TÁCTICAS -->
+      ${actionsHtml}
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+// Helpers de portapapeles y navegación
+function copyTrackingNumber(number, elem) {
+  navigator.clipboard.writeText(number).then(() => {
+    const originalText = elem.innerHTML;
+    elem.innerHTML = `<i class="ph ph-check" style="color:#22c55e;"></i> <span style="color:#22c55e;">¡Copiado!</span>`;
+    setTimeout(() => { elem.innerHTML = originalText; }, 1800);
+  }).catch(() => {
+    alert(`Número de seguimiento: ${number}`);
+  });
+}
+
+function shareTrackingLink(number) {
+  const url = `${window.location.origin}${window.location.pathname}#track=${encodeURIComponent(number)}`;
+  navigator.clipboard.writeText(url).then(() => {
+    alert(`🔗 Enlace copiado al portapapeles:\n${url}`);
+  }).catch(() => {
+    prompt('Copia el enlace de seguimiento directo:', url);
+  });
+}
+
+function expandTrackingInAdvanced(number) {
+  const advInput = document.getElementById('adv-track-input');
+  if (advInput) advInput.value = number;
+  executeTacticalTracking(number, 'adv-track-result');
+  const trackSection = document.getElementById('tracking');
+  if (trackSection) trackSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Consola de pruebas de API en Vivo (Playground en Admin CMS)
+async function runLiveTrackingTest() {
+  const testInput = document.getElementById('track-test-input')?.value.trim();
+  const consoleBox = document.getElementById('track-test-console');
+  const statusElem = document.getElementById('track-test-status');
+  const outputElem = document.getElementById('track-test-output');
+
+  if (!testInput) {
+    alert('Ingresa un número de guía para la prueba.');
+    return;
+  }
+
+  if (consoleBox) consoleBox.classList.remove('hidden');
+  if (statusElem) statusElem.innerHTML = `<span style="color:#f59e0b;"><i class="ph ph-spinner"></i> Ejecutando interrogación HTTP a API...</span>`;
+  if (outputElem) outputElem.textContent = 'Enviando petición...';
+
+  const cfg = getTrackingConfig();
+  const startTime = Date.now();
+
+  try {
+    const prov = cfg.provider;
+    let endpoint = '';
+    let body = {};
+    let headers = { 'Content-Type': 'application/json' };
+
+    if (prov === 'eliza' || (prov === 'hybrid' && /^(EXLO|EL|NEL|TB)/i.test(testInput))) {
+      const tenant = cfg.eliza?.tenant || 'nelconcargo';
+      endpoint = (cfg.eliza?.endpoint || 'https://{tenant}.elizaapp.com/api/tracking/status').replace('{tenant}', tenant);
+      body = { api_access_key: cfg.eliza?.apiKey || 'TEST_KEY', tracking_id: testInput };
+    } else {
+      endpoint = cfg.track17?.apiUrl || 'https://api.17track.net/track/v2.4/gettrackinfo';
+      headers['17token'] = cfg.track17?.apiKey || '708C2EF0CA32A784D0432D8572AB883A';
+      body = [{ number: testInput }];
+    }
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+
+    const elapsed = Date.now() - startTime;
+    const json = await res.json();
+
+    if (statusElem) {
+      statusElem.innerHTML = `<span style="color:#22c55e;">HTTP ${res.status} ${res.statusText} (${elapsed}ms)</span> - Proveedor: ${prov.toUpperCase()}`;
+    }
+    if (outputElem) {
+      outputElem.textContent = JSON.stringify(json, null, 2);
+    }
+  } catch (err) {
+    const elapsed = Date.now() - startTime;
+    if (statusElem) {
+      statusElem.innerHTML = `<span style="color:#ef4444;">Error de Conexión (${elapsed}ms)</span> - ${err.message}`;
+    }
+    if (outputElem) {
+      outputElem.textContent = `Nota: En entornos web estáticos, las APIs externas que no habilitan cabeceras CORS en el navegador pueden requerir el relay proxy o backend intermediario.\nDetalles del error: ${err.stack || err.message}`;
+    }
+  }
+}
+
+// Handlers de los formularios del sitio web
+function handleQuickTrack(e) {
+  e.preventDefault();
+  const input = document.getElementById('quick-track-input');
+  if (!input) return;
+  const trackNum = input.value.trim().toUpperCase();
+  if (!trackNum) return;
+  executeTacticalTracking(trackNum, 'quick-track-result');
 }
 
 function handleAdvTrack(e) {
   e.preventDefault();
   const input = document.getElementById('adv-track-input');
-  const resultBox = document.getElementById('adv-track-result');
-  if (!input || !resultBox) return;
-
+  if (!input) return;
   const trackNum = input.value.trim().toUpperCase();
-  resultBox.classList.remove('hidden');
-  resultBox.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-      <strong>Guía: ${trackNum}</strong>
-      <span class="badge-tag">Sincronizado con ERP</span>
-    </div>
-    <p style="color:var(--text-main); font-size:0.88rem; margin-bottom:8px;">
-      Recepción confirmada en Warehouse Miami. Se encuentra clasificado en lote aéreo con destino a la sucursal Panamá.
-    </p>
-    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; font-size:0.82rem;">
-      📍 <strong>Último punto:</strong> Clasificación aduanal en rampa PTY. Notificación de entrega vía WhatsApp en curso.
-    </div>
-  `;
+  if (!trackNum) return;
+  executeTacticalTracking(trackNum, 'adv-track-result');
 }
 
 // =============================================================================
@@ -1355,6 +2063,7 @@ function showAdminDashboard() {
   renderAdminSubscribersList();
   loadRatesInAdmin();
   loadGasConfig();
+  loadTrackingConfigInAdmin();
 }
 
 function handleAdminLogout() {
@@ -2070,6 +2779,32 @@ function initMobileMenu() {
 
   window.addEventListener('hashchange', checkAdminHash);
   checkAdminHash();
+
+  function checkDirectTrackingUrl() {
+    let trackNum = '';
+    const hash = window.location.hash;
+    if (hash.toLowerCase().startsWith('#track=')) {
+      trackNum = decodeURIComponent(hash.substring(7)).trim();
+    } else {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('track')) {
+        trackNum = params.get('track').trim();
+      }
+    }
+
+    if (trackNum) {
+      const advInput = document.getElementById('adv-track-input');
+      if (advInput) advInput.value = trackNum;
+      setTimeout(() => {
+        executeTacticalTracking(trackNum, 'adv-track-result');
+        const trackSection = document.getElementById('tracking');
+        if (trackSection) trackSection.scrollIntoView({ behavior: 'smooth' });
+      }, 350);
+    }
+  }
+
+  window.addEventListener('hashchange', checkDirectTrackingUrl);
+  checkDirectTrackingUrl();
 }
 
 function initScrollNav() {

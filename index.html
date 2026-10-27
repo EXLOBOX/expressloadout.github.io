@@ -945,8 +945,6 @@
                 </button>
               </div>
             </form>
-
-            <div id="adv-track-result" class="adv-result-box hidden"></div>
           </div>
 
           <div class="tracking-banner-right">
@@ -984,6 +982,9 @@
               </div>
             </div>
           </div>
+
+          <!-- CONTENEDOR EXPANSIVO PARA VISUALIZADOR TÁCTICO -->
+          <div id="adv-track-result" class="adv-result-box hidden" style="grid-column: 1 / -1; width: 100%;"></div>
         </div>
       </div>
     </section>
@@ -1454,6 +1455,9 @@
           <button class="admin-tab-btn" data-tab="rates" onclick="switchAdminTab('rates')">
             <i class="ph ph-currency-dollar"></i> Ajustar Tarifas
           </button>
+          <button class="admin-tab-btn" data-tab="tracking-api" onclick="switchAdminTab('tracking-api')">
+            <i class="ph ph-barcode"></i> APIs Tracking & Visualizador
+          </button>
           <button class="admin-tab-btn" data-tab="gas" onclick="switchAdminTab('gas')">
             <i class="ph ph-cloud-arrow-up"></i> Conexión GAS ERP
           </button>
@@ -1690,6 +1694,146 @@
               </button>
             </div>
             <div id="gas-test-result" class="gas-status-note hidden"></div>
+          </div>
+        </div>
+
+        <!-- TAB: CONFIGURACIÓN DE APIS TRACKING & VISUALIZADOR -->
+        <div class="admin-tab-pane" id="tab-pane-tracking-api">
+          <div class="admin-pane-header">
+            <div>
+              <h4>Configuración del Motor de Tracking & Visualizador</h4>
+              <span class="badge-tag">17Track API v2.4 + ElizaApp ERP + GAS Hybrid</span>
+            </div>
+          </div>
+          
+          <p class="gas-desc">
+            Personaliza los proveedores de seguimiento en tiempo real. El motor de búsqueda puede detectar de forma inteligente si la guía pertenece a couriers internacionales (UPS, FedEx, DHL, USPS, Cainiao) o a recepción interna en bodega (ElizaApp / GAS).
+          </p>
+
+          <form id="tracking-api-form" onsubmit="handleSaveTrackingConfig(event)">
+            <div class="form-group">
+              <label class="form-label">Modo Operativo del Validador:</label>
+              <select id="track-cfg-provider" class="form-input" onchange="toggleTrackingProviderFields()">
+                <option value="hybrid">⚡ Híbrido Inteligente (17Track + ElizaApp ERP Auto-detect) [Recomendado]</option>
+                <option value="17track">🌐 17Track API v2.4 (Couriers Globales: UPS, FedEx, DHL, Cainiao...)</option>
+                <option value="eliza">📦 ElizaApp ERP (Recepción en Warehouse Miami / Panamá)</option>
+                <option value="gas">📊 Google Apps Script (ERP Sheets Webhook)</option>
+                <option value="demo">🧪 Modo Demostración Táctica (Simulación de Paquetes)</option>
+              </select>
+            </div>
+
+            <!-- SECCIÓN 17TRACK -->
+            <div id="section-cfg-17track" class="admin-subpanel" style="margin-bottom:16px;">
+              <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:0.95rem;">
+                <i class="ph ph-globe"></i> Configuración 17Track API
+              </h5>
+              <div class="form-group-grid">
+                <div class="form-group">
+                  <label class="form-label">17Track API Key (17token):</label>
+                  <input type="text" id="track-cfg-17key" class="form-input" value="708C2EF0CA32A784D0432D8572AB883A" placeholder="Token 17track" />
+                  <small style="color:var(--text-muted); font-size:0.75rem;">Token de tu cuenta 17Track registrado en el sistema.</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Endpoint de Consulta (gettrackinfo):</label>
+                  <input type="url" id="track-cfg-17url" class="form-input" value="https://api.17track.net/track/v2.4/gettrackinfo" />
+                </div>
+              </div>
+              <div class="form-group-grid">
+                <div class="form-group">
+                  <label class="form-label">Endpoint de Auto-Registro (register):</label>
+                  <input type="url" id="track-cfg-17register-url" class="form-input" value="https://api.17track.net/track/v2.4/register" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Relay CORS Proxy (para llamadas directas desde navegador):</label>
+                  <input type="text" id="track-cfg-17cors" class="form-input" value="https://corsproxy.io/?url=" placeholder="Opcional: https://corsproxy.io/?url=" />
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:8px;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; color:var(--text-main);">
+                  <input type="checkbox" id="track-cfg-17autoreg" checked />
+                  Auto-registrar guías en 17Track si aún no existen en su base de datos
+                </label>
+              </div>
+            </div>
+
+            <!-- SECCIÓN ELIZAAPP ERP -->
+            <div id="section-cfg-eliza" class="admin-subpanel" style="margin-bottom:16px;">
+              <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:0.95rem;">
+                <i class="ph ph-package"></i> Configuración ElizaApp ERP (Warehouse Tracking)
+              </h5>
+              <div class="form-group-grid">
+                <div class="form-group">
+                  <label class="form-label">Subdominio / Tenant:</label>
+                  <input type="text" id="track-cfg-eliza-tenant" class="form-input" value="nelconcargo" placeholder="ej: nelconcargo o expressloadout" />
+                  <small style="color:var(--text-muted); font-size:0.75rem;">Genera: https://[tenant].elizaapp.com/api/tracking/status</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">API Access Key (api_access_key):</label>
+                  <input type="text" id="track-cfg-eliza-key" class="form-input" placeholder="Ingresa tu clave de acceso de ElizaApp" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Endpoint Personalizado (opcional):</label>
+                <input type="text" id="track-cfg-eliza-url" class="form-input" placeholder="https://{{tenant}}.elizaapp.com/api/tracking/status" />
+              </div>
+            </div>
+
+            <!-- SECCIÓN GAS WEBHOOK -->
+            <div id="section-cfg-gas" class="admin-subpanel" style="margin-bottom:16px;">
+              <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:0.95rem;">
+                <i class="ph ph-file-cloud"></i> Google Apps Script (ERP Webhook)
+              </h5>
+              <div class="form-group">
+                <label class="form-label">URL WebApp Exec para Tracking:</label>
+                <input type="url" id="track-cfg-gas-url" class="form-input" placeholder="https://script.google.com/macros/s/.../exec" />
+              </div>
+            </div>
+
+            <!-- SECCIÓN GENERAL & WHATSAPP SOPORTE -->
+            <div class="form-group-grid">
+              <div class="form-group">
+                <label class="form-label">WhatsApp de Soporte para Tracking:</label>
+                <input type="text" id="track-cfg-whatsapp" class="form-input" value="50765210278" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mensaje Predeterminado WhatsApp:</label>
+                <input type="text" id="track-cfg-wame-msg" class="form-input" value="Hola Jonathan, deseo consultar actualización sobre mi tracking {NUMBER}" />
+              </div>
+            </div>
+
+            <!-- BOTONES DE GUARDADO -->
+            <div class="sync-actions-row" style="margin-top:16px;">
+              <button type="submit" class="btn btn-primary">
+                <i class="ph ph-floppy-disk"></i> Guardar Configuración de Tracking
+              </button>
+              <button type="button" class="btn btn-outline" onclick="resetTrackingConfig()">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar Valores Predeterminados
+              </button>
+            </div>
+            <div id="track-cfg-status-note" class="gas-status-note hidden" style="margin-top:10px;"></div>
+          </form>
+
+          <!-- BANCO DE PRUEBAS / LIVE PLAYGROUND -->
+          <div class="admin-subpanel" style="margin-top:24px; border-top:1px solid var(--border-subtle); padding-top:20px;">
+            <div class="admin-pane-header" style="margin-bottom:12px;">
+              <h5 style="color:var(--brand-yellow); display:flex; align-items:center; gap:8px; font-size:1rem;">
+                <i class="ph ph-flask"></i> Consola de Prueba de API en Vivo (Live Tester)
+              </h5>
+              <span class="badge-tag">Interroga la API seleccionada</span>
+            </div>
+            <p style="font-size:0.83rem; color:var(--text-muted); margin-bottom:14px;">
+              Prueba cualquier número de guía real o de prueba para verificar la respuesta HTTP y el payload JSON antes de consultar en la web:
+            </p>
+            <div class="input-with-button" style="margin-bottom:12px;">
+              <input type="text" id="track-test-input" class="form-input" value="TB08200923400918239838748726374678623874" placeholder="Ej: 1Z9999999999999999 o TB0820..." />
+              <button type="button" class="btn btn-accent" onclick="runLiveTrackingTest()">
+                <i class="ph ph-play"></i> Probar API en Vivo
+              </button>
+            </div>
+            <div id="track-test-console" class="hidden" style="background:#050811; border:1px solid #1e293b; border-radius:8px; padding:14px; font-family:Consolas, monospace; font-size:0.8rem; color:#94a3b8; max-height:280px; overflow-y:auto; position:relative;">
+              <div id="track-test-status" style="margin-bottom:8px; font-weight:700;"></div>
+              <pre id="track-test-output" style="margin:0; white-space:pre-wrap; word-break:break-all;"></pre>
+            </div>
           </div>
         </div>
 
