@@ -2184,6 +2184,7 @@ class SectionMesh {
     this.animFrame = null;
     this.width = 0;
     this.height = 0;
+    this.dpr = 1;
     this.frameCount = Math.floor(Math.random() * 100);
 
     this.init();
@@ -2192,6 +2193,7 @@ class SectionMesh {
   init() {
     this.resize();
     this.bindEvents();
+    this.setupResizeObserver();
     if (this.isHero) {
       this.isVisible = true;
       this.loop();
@@ -2200,18 +2202,35 @@ class SectionMesh {
     }
   }
 
-  resize() {
-    this.width = this.canvas.width = this.section.offsetWidth;
-    this.height = this.canvas.height = this.section.offsetHeight;
+  resize(newWidth, newHeight) {
+    const w = newWidth || this.section.offsetWidth;
+    const h = newHeight || this.section.offsetHeight;
+    if (w <= 0 || h <= 0) return;
+
+    this.width = w;
+    this.height = h;
+
+    // Soporte HiDPI / Retina para máxima nitidez sin despixelado
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.dpr = dpr;
+
+    this.canvas.width = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
+
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     this.createNodes();
   }
 
   createNodes() {
     this.nodes = [];
     this.dataPackets = [];
-    const density = this.isHero ? 36000 : 38000;
+    // Densidad armónica de nodos ajustada a las proporciones reales
+    const density = this.isHero ? 36000 : 40000;
     const minCount = this.isHero ? 20 : 16;
-    const maxCount = this.isHero ? 45 : 36;
+    const maxCount = this.isHero ? 45 : 38;
     const count = Math.floor((this.width * this.height) / density);
     const total = Math.max(minCount, Math.min(count, maxCount));
 
@@ -2230,7 +2249,11 @@ class SectionMesh {
 
   bindEvents() {
     window.addEventListener('resize', () => {
-      if (this.isVisible) this.resize();
+      this.resize();
+    });
+
+    window.addEventListener('load', () => {
+      this.resize();
     });
 
     this.section.addEventListener('mousemove', (e) => {
@@ -2245,11 +2268,31 @@ class SectionMesh {
     });
   }
 
+  setupResizeObserver() {
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const cr = entry.contentRect;
+          const newW = Math.round(cr.width || this.section.offsetWidth);
+          const newH = Math.round(cr.height || this.section.offsetHeight);
+          if (newW > 0 && newH > 0 && (newW !== this.width || Math.abs(newH - this.height) > 6)) {
+            this.resize(newW, newH);
+          }
+        }
+      });
+      this.resizeObserver.observe(this.section);
+    }
+  }
+
   observeVisibility() {
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         this.isVisible = e.isIntersecting;
         if (this.isVisible) {
+          // Re-sincronizar altura si el contenido creció dinámicamente
+          if (this.section.offsetHeight !== this.height || this.section.offsetWidth !== this.width) {
+            this.resize();
+          }
           if (!this.animFrame) this.loop();
         } else {
           if (this.animFrame) {
@@ -2281,7 +2324,7 @@ class SectionMesh {
     const lineRgb = palette.lineRgb;
     const packetGlow = palette.packetColor;
 
-    // 1. Mover nodos
+    // 1. Mover nodos con rebote suave y repulsión al cursor
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       n.x += n.vx;
@@ -2383,7 +2426,6 @@ class SectionMesh {
     }
   }
 }
-
 // Inicializador principal del sistema de red logística
 function initHeroIconMesh() {
   buildLogisticsMeshIconCaches();
