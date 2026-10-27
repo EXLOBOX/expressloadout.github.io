@@ -15,6 +15,8 @@ const STORAGE_KEYS = {
   SUBSCRIBERS: 'exlo_event_subscribers_v4'
 };
 
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec';
+
 // Eventos y Fechas Clave Mundiales (Amazon, AliExpress, Shein, Walmart, Temu, Alibaba)
 const defaultEvents = [
   {
@@ -689,7 +691,7 @@ const DEFAULT_TRACKING_CONFIG = {
     directUrl: 'http://192.99.227.184:8096/TrackingPage.aspx'
   },
   gas: {
-    endpoint: ''
+    endpoint: 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec'
   },
   supportWhatsapp: '50765210278',
   wameMsg: 'Hola Jonathan, deseo consultar actualización sobre mi tracking {NUMBER}'
@@ -2365,7 +2367,7 @@ async function handleRegistration(e) {
 }
 
 async function sendRegistrationVerification(data) {
-  const gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL);
+  const gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
   if (!gasUrl) {
     console.log('No hay GAS WebApp configurado en CMS; registro en modo simulación de seguridad.');
     return null;
@@ -2689,7 +2691,7 @@ function handleSaveRates(e) {
 function loadGasConfig() {
   const input = document.getElementById('gas-webhook-url');
   if (input) {
-    input.value = localStorage.getItem(STORAGE_KEYS.GAS_URL) || '';
+    input.value = localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
   }
 }
 
