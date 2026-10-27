@@ -222,12 +222,6 @@
           <i class="ph ph-moon-stars" id="theme-icon"></i>
         </button>
 
-        <!-- Botón Modo Administrador CMS -->
-        <button class="admin-chip-btn" id="open-admin-btn" title="Panel de Administración (Subir fotos y casos de éxito)">
-          <i class="ph ph-sliders-horizontal"></i>
-          <span>Admin CMS</span>
-        </button>
-
         <!-- CTA Principal Registro -->
         <a href="#registro" class="btn btn-primary btn-glow">
           <i class="ph ph-lock-key"></i>
@@ -253,9 +247,6 @@
       <a href="#faq" class="mobile-nav-item">Preguntas Frecuentes</a>
       <div class="mobile-menu-footer">
         <a href="#registro" class="btn btn-primary btn-block">Abre tu Casillero Gratis</a>
-        <button class="btn btn-outline btn-block" id="mobile-admin-btn" style="margin-top:10px;">
-          <i class="ph ph-sliders-horizontal"></i> Panel de Administración
-        </button>
       </div>
     </div>
   </header>
@@ -1362,7 +1353,7 @@
               <li><a href="#tiendas">Directorio de Tiendas</a></li>
               <li><a href="#casos-exito">Galería de Casos de Éxito</a></li>
               <li><a href="#faq">Preguntas Frecuentes</a></li>
-              <li><button class="footer-text-btn" onclick="openAdminModal('general')">Acceso Administración CMS</button></li>
+              <li><a href="#registro">Crear Casillero Gratis</a></li>
             </ul>
           </div>
 
@@ -1391,7 +1382,7 @@
 
         <div class="footer-bottom-bar">
           <div class="footer-bottom-inner">
-            <div class="footer-copy">
+            <div class="footer-copy" ondblclick="openAdminModal('cases')" title="Express Loadout">
               © 2026 Express Loadout Panamá. Todos los derechos reservados. Desarrollado con tecnología moderna y compatible con ERP GAS.
             </div>
             <div class="footer-bottom-links">
@@ -1441,12 +1432,11 @@
           <h4>Acceso Administrativo</h4>
           <p>Ingresa la contraseña de operador para editar contenidos del sitio:</p>
           <form onsubmit="handleAdminLogin(event)">
-            <input type="password" id="admin-pass-input" class="form-input text-center" placeholder="Contraseña (por defecto: exlo2026)" required />
+            <input type="password" id="admin-pass-input" class="form-input text-center" placeholder="Ingresa tu clave de acceso" autocomplete="current-password" required />
             <button type="submit" class="btn btn-primary btn-block" style="margin-top:14px;">
               <i class="ph ph-key"></i> Desbloquear CMS
             </button>
           </form>
-          <span class="login-tip">Tip para pruebas: usa la clave <code>exlo2026</code></span>
         </div>
       </div>
 

@@ -1360,18 +1360,24 @@ function showAdminDashboard() {
 function handleAdminLogout() {
   isAdminUnlocked = false;
   showAdminLogin();
+  closeAdminModal();
+  if (window.location.hash.toLowerCase() === '#admin' || window.location.hash.toLowerCase() === '#cms') {
+    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+  }
   alert('🔒 Sesión administrativa cerrada con éxito. El sitio web vuelve a estar completamente blindado en Modo Solo Lectura.');
 }
 
 function handleAdminLogin(e) {
   e.preventDefault();
-  const pass = document.getElementById('admin-pass-input')?.value;
-  // Clave administrativa por defecto
+  const pass = document.getElementById('admin-pass-input')?.value.trim();
+  // Validación de credenciales maestras
   if (pass === 'exlo2026' || pass === 'admin' || pass === 'jonathan') {
     isAdminUnlocked = true;
     showAdminDashboard();
   } else {
-    alert('❌ Contraseña incorrecta. (Usa: exlo2026)');
+    alert('❌ Contraseña incorrecta. Acceso restringido.');
+    const passInput = document.getElementById('admin-pass-input');
+    if (passInput) passInput.value = '';
   }
 }
 
@@ -2027,8 +2033,6 @@ function updateThemeIcon(themeName) {
 function initMobileMenu() {
   const toggle = document.getElementById('mobile-toggle');
   const menu = document.getElementById('mobile-menu');
-  const adminBtn = document.getElementById('mobile-admin-btn');
-  const openAdminBtn = document.getElementById('open-admin-btn');
 
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
@@ -2040,16 +2044,27 @@ function initMobileMenu() {
     });
   }
 
-  if (openAdminBtn) {
-    openAdminBtn.addEventListener('click', () => openAdminModal('cases'));
+  // =============================================================================
+  // ACCESO ADMINISTRATIVO PRIVADO (SIN EXPOSICIÓN PÚBLICA)
+  // Atajo de Teclado: Ctrl + Shift + A
+  // URL Hash Privado: https://www.expressloadout.com/#admin
+  // =============================================================================
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      openAdminModal('cases');
+    }
+  });
+
+  function checkAdminHash() {
+    const hash = window.location.hash.toLowerCase();
+    if (hash === '#admin' || hash === '#cms') {
+      openAdminModal('cases');
+    }
   }
 
-  if (adminBtn) {
-    adminBtn.addEventListener('click', () => {
-      if (menu) menu.classList.remove('open');
-      openAdminModal('cases');
-    });
-  }
+  window.addEventListener('hashchange', checkAdminHash);
+  checkAdminHash();
 }
 
 function initScrollNav() {
