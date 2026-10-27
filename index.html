@@ -1432,7 +1432,8 @@
           <h4>Acceso Administrativo</h4>
           <p>Ingresa la contraseña de operador para editar contenidos del sitio:</p>
           <form onsubmit="handleAdminLogin(event)">
-            <input type="password" id="admin-pass-input" class="form-input text-center" placeholder="Ingresa tu clave de acceso" autocomplete="current-password" required />
+            <input type="text" id="admin-user-input" class="form-input text-center" placeholder="Usuario" autocomplete="username" style="margin-bottom:10px;" required />
+            <input type="password" id="admin-pass-input" class="form-input text-center" placeholder="Contraseña maestra" autocomplete="current-password" required />
             <button type="submit" class="btn btn-primary btn-block" style="margin-top:14px;">
               <i class="ph ph-key"></i> Desbloquear CMS
             </button>

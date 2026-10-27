@@ -1369,13 +1369,18 @@ function handleAdminLogout() {
 
 function handleAdminLogin(e) {
   e.preventDefault();
+  const user = document.getElementById('admin-user-input')?.value.trim();
   const pass = document.getElementById('admin-pass-input')?.value.trim();
-  // Validación de credenciales maestras
-  if (pass === 'exlo2026' || pass === 'admin' || pass === 'jonathan') {
+
+  // Validación de credenciales maestras (Usuario: JondZ33 | Clave: aN3ss1n350Z33!!!_2004!!!)
+  const isUserValid = (!user || user.toLowerCase() === 'jondz33');
+  const isPassValid = (pass === 'aN3ss1n350Z33!!!_2004!!!');
+
+  if (isUserValid && isPassValid) {
     isAdminUnlocked = true;
     showAdminDashboard();
   } else {
-    alert('❌ Contraseña incorrecta. Acceso restringido.');
+    alert('❌ Credenciales incorrectas. Acceso restringido.');
     const passInput = document.getElementById('admin-pass-input');
     if (passInput) passInput.value = '';
   }
