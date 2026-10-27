@@ -215,6 +215,7 @@ function loadStoredData() {
         return {
           ...c,
           hidden: c.hidden === true,
+          hideUrlButton: c.hideUrlButton === true,
           link: c.link !== undefined ? c.link : (def ? def.link : '')
         };
       });
@@ -230,8 +231,9 @@ function loadStoredData() {
         return {
           ...e,
           hidden: e.hidden === true,
+          hideUrlButton: e.hideUrlButton === true,
           image: e.image || (def ? def.image : ''),
-          socialUrl: e.socialUrl !== undefined ? e.socialUrl : (def ? def.socialUrl : '')
+          url: e.url || (def ? def.url : '')
         };
       });
     } else {
@@ -2501,15 +2503,47 @@ function renderSuccessCases() {
   container.innerHTML = visibleCases.map(c => {
     const hasLink = !!c.link;
     const isInstagram = hasLink && c.link.includes('instagram.com');
+    const isFacebook = hasLink && c.link.includes('facebook.com');
+    const hideBtn = c.hideUrlButton === true;
+
+    const photoContent = `
+      <img src="${c.image || 'images/banner.jpg'}" alt="${c.title}" class="case-image" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />
+      <span class="case-badge-overlay">${c.mode}</span>
+      <span class="case-stat-badge">${c.stat}</span>
+      ${hasLink ? `<span class="case-touch-indicator" title="Toca la foto para ir al enlace"><i class="ph ph-arrow-square-out"></i></span>` : ''}
+    `;
+
+    let buttonMarkup = '';
+    if (hasLink && !hideBtn) {
+      let btnLabel = 'Ver Enlace / Testimonio';
+      let iconClass = 'ph-arrow-square-out';
+      let btnClass = 'case-redirect-btn';
+      if (isInstagram) {
+        btnLabel = 'Ver en Instagram';
+        iconClass = 'ph-instagram-logo';
+        btnClass += ' btn-instagram-pill';
+      } else if (isFacebook) {
+        btnLabel = 'Ver en Facebook';
+        iconClass = 'ph-facebook-logo';
+        btnClass += ' btn-facebook-pill';
+      }
+
+      buttonMarkup = `
+        <div class="case-redirection-row">
+          <a href="${c.link}" target="_blank" rel="noopener" class="${btnClass}">
+            <i class="ph ${iconClass}"></i>
+            <span>${btnLabel}</span>
+          </a>
+        </div>
+      `;
+    }
 
     return `
     <article class="case-card glass-panel" id="card-${c.id}">
       <div class="case-image-wrap">
-        ${hasLink ? `<a href="${c.link}" target="_blank" rel="noopener" class="case-image-link" title="Ver en ${isInstagram ? 'Instagram' : 'la web'}">` : ''}
-          <img src="${c.image || 'images/banner.jpg'}" alt="${c.title}" class="case-image" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />
-        ${hasLink ? `</a>` : ''}
-        <span class="case-badge-overlay">${c.mode}</span>
-        <span class="case-stat-badge">${c.stat}</span>
+        ${hasLink 
+          ? `<a href="${c.link}" target="_blank" rel="noopener" class="case-image-link" title="Toca la foto para ir a: ${c.link}">${photoContent}</a>` 
+          : photoContent}
       </div>
       <div class="case-body">
         <h3 class="case-title">
@@ -2520,14 +2554,7 @@ function renderSuccessCases() {
           <span class="case-client-name">Cliente: ${c.client}</span>
           <span style="color:var(--brand-yellow); font-weight:700;">★★★★★</span>
         </div>
-        ${hasLink ? `
-          <div class="case-redirection-row">
-            <a href="${c.link}" target="_blank" rel="noopener" class="case-redirect-btn ${isInstagram ? 'btn-instagram-pill' : ''}">
-              <i class="ph ${isInstagram ? 'ph-instagram-logo' : 'ph-arrow-square-out'}"></i>
-              <span>${isInstagram ? 'Ver en Instagram' : 'Ver Perfil / Testimonio'}</span>
-            </a>
-          </div>
-        ` : ''}
+        ${buttonMarkup}
       </div>
     </article>
   `}).join('');
@@ -2878,6 +2905,47 @@ function switchAdminTab(tabName) {
   });
 }
 
+// =============================================================================
+// UTILIDADES MULTIMEDIA & LIMPIEZA DE ENLACES PÚBLICOS
+// =============================================================================
+function cleanImageUrl(rawUrl) {
+  if (!rawUrl) return '';
+  rawUrl = rawUrl.trim();
+  try {
+    // Si el usuario copia un enlace de resultado de Google Imágenes con parámetro imgurl
+    if (rawUrl.includes('google.') && rawUrl.includes('imgurl=')) {
+      const parsed = new URL(rawUrl);
+      const extracted = parsed.searchParams.get('imgurl');
+      if (extracted) return decodeURIComponent(extracted);
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+  return rawUrl;
+}
+
+function updateCaseUrlBtnHint() {
+  const checkbox = document.getElementById('case-hide-url-btn');
+  const hint = document.getElementById('case-hide-url-btn-hint');
+  if (!hint) return;
+  if (checkbox && checkbox.checked) {
+    hint.innerHTML = '<span style="color:#fbbf24;"><i class="ph ph-hand-tap"></i> <strong>Modo Activo:</strong> El botón de URL abajo estará <strong>OCULTO</strong>. Al tocar la foto en la tarjeta, el usuario irá automáticamente al hipervínculo.</span>';
+  } else {
+    hint.innerHTML = '<span><i class="ph ph-cursor-click"></i> <strong>Modo Normal:</strong> Se mostrará un botón interactivo abajo (y al tocar la foto también abrirá el enlace).</span>';
+  }
+}
+
+function updateEventUrlBtnHint() {
+  const checkbox = document.getElementById('event-hide-url-btn');
+  const hint = document.getElementById('event-hide-url-btn-hint');
+  if (!hint) return;
+  if (checkbox && checkbox.checked) {
+    hint.innerHTML = '<span style="color:#fbbf24;"><i class="ph ph-hand-tap"></i> <strong>Modo Activo:</strong> El botón "Ver Oferta" abajo estará <strong>OCULTO</strong>. Al tocar la foto/flyer, el usuario irá automáticamente al hipervínculo.</span>';
+  } else {
+    hint.innerHTML = '<span><i class="ph ph-cursor-click"></i> <strong>Modo Normal:</strong> Se mostrará el botón "Ver Oferta Oficial" abajo (y al tocar la foto también abrirá el enlace).</span>';
+  }
+}
+
 // Manejo de imagen para casos de éxito (Base64 o URL)
 let currentCasePhotoData = '';
 let editingCaseId = null;
@@ -2896,7 +2964,10 @@ function previewCaseImage(event) {
 
 function previewCaseUrl(url) {
   if (!url) return;
-  url = url.trim();
+  url = cleanImageUrl(url);
+  const inputElem = document.getElementById('case-img-url');
+  if (inputElem && inputElem.value !== url) inputElem.value = url;
+
   if (url.includes('instagram.com/p/') || url.includes('instagram.com/reel/') || url.includes('instagram.com/tv/')) {
     const linkInput = document.getElementById('case-link');
     if (linkInput && !linkInput.value) {
@@ -2939,6 +3010,7 @@ function editCase(caseId) {
   const descInput = document.getElementById('case-desc');
   const urlInput = document.getElementById('case-img-url');
   const linkInput = document.getElementById('case-link');
+  const hideBtnCheckbox = document.getElementById('case-hide-url-btn');
   const submitBtn = document.getElementById('case-submit-btn');
   const cancelBtn = document.getElementById('case-cancel-edit-btn');
 
@@ -2948,6 +3020,8 @@ function editCase(caseId) {
   if (statInput) statInput.value = c.stat || '';
   if (descInput) descInput.value = c.desc || '';
   if (linkInput) linkInput.value = c.link || '';
+  if (hideBtnCheckbox) hideBtnCheckbox.checked = c.hideUrlButton === true;
+  updateCaseUrlBtnHint();
 
   if (c.image) {
     currentCasePhotoData = c.image;
@@ -2982,6 +3056,10 @@ function resetCaseForm() {
   const linkInput = document.getElementById('case-link');
   if (linkInput) linkInput.value = '';
 
+  const hideBtnCheckbox = document.getElementById('case-hide-url-btn');
+  if (hideBtnCheckbox) hideBtnCheckbox.checked = false;
+  updateCaseUrlBtnHint();
+
   const submitBtn = document.getElementById('case-submit-btn');
   const cancelBtn = document.getElementById('case-cancel-edit-btn');
   if (submitBtn) {
@@ -3010,6 +3088,7 @@ function handleSaveCase(e) {
   const stat = document.getElementById('case-stat').value.trim();
   const desc = document.getElementById('case-desc').value.trim();
   const link = document.getElementById('case-link')?.value.trim() || '';
+  const hideUrlButton = document.getElementById('case-hide-url-btn')?.checked === true;
 
   if (editingCaseId) {
     const idx = currentCases.findIndex(c => c.id === editingCaseId);
@@ -3022,13 +3101,14 @@ function handleSaveCase(e) {
         stat,
         desc,
         link: link || currentCases[idx].link || '',
+        hideUrlButton,
         image: currentCasePhotoData || currentCases[idx].image || 'images/banner.jpg',
         updatedAt: new Date().toISOString()
       };
       localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
       renderSuccessCases();
       resetCaseForm();
-      alert('✅ ¡Caso de éxito, fotografía y link actualizados con éxito!');
+      alert('✅ ¡Caso de éxito, fotografía y configuración de hipervínculo actualizados con éxito!');
       return;
     }
   }
@@ -3041,6 +3121,7 @@ function handleSaveCase(e) {
     stat,
     desc,
     link,
+    hideUrlButton,
     image: currentCasePhotoData || 'images/banner.jpg',
     hidden: false,
     createdAt: new Date().toISOString()
@@ -3075,6 +3156,7 @@ function renderAdminCasesList() {
 
   container.innerHTML = currentCases.map(c => {
     const isHidden = c.hidden === true;
+    const hideBtn = c.hideUrlButton === true;
     return `
     <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
       <div class="admin-case-info">
@@ -3085,10 +3167,13 @@ function renderAdminCasesList() {
             ${isHidden 
               ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
               : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
+            ${c.link ? (hideBtn 
+              ? '<span class="badge-tag" style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-size:0.68rem; padding:1px 6px;" title="Al tocar la foto redirige directamente al enlace"><i class="ph ph-hand-tap"></i> Foto Directa (Botón Oculto)</span>' 
+              : '<span class="badge-tag" style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); font-size:0.68rem; padding:1px 6px;" title="Muestra botón abajo"><i class="ph ph-cursor-click"></i> Botón Abajo</span>') : ''}
           </div>
           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span>${c.client} • ${c.mode} • ${c.stat}</span>
-            ${c.link ? `<a href="${c.link}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${c.link}"><i class="ph ph-instagram-logo"></i> Link</a>` : ''}
+            ${c.link ? `<a href="${c.link}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${c.link}"><i class="ph ph-link"></i> Link</a>` : ''}
           </div>
         </div>
       </div>
@@ -3325,31 +3410,57 @@ function renderEvents(platform = 'all') {
           </div>
     `;
 
-    const hasSocialLink = !!evt.socialUrl;
-    const isInstagramSocial = hasSocialLink && evt.socialUrl.includes('instagram.com');
+    const hasLink = !!evt.url;
+    const isInstagram = hasLink && evt.url.includes('instagram.com');
+    const isFacebook = hasLink && evt.url.includes('facebook.com');
+    const hideBtn = evt.hideUrlButton === true;
 
-    const socialTagMarkup = hasSocialLink ? `
-      <a href="${evt.socialUrl}" target="_blank" rel="noopener" class="event-platform-tag tag-instagram-flyer" style="margin-bottom:0;" title="Ver en ${isInstagramSocial ? 'Instagram' : 'Red Social'}">
-        <i class="ph ${isInstagramSocial ? 'ph-instagram-logo' : 'ph-share-network'}"></i> ${isInstagramSocial ? 'Instagram' : 'Social'}
-      </a>
-    ` : '';
+    const flyerContent = `
+      ${evt.image ? `<img src="${evt.image}" alt="${evt.title}" class="event-flyer-bg-img" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />` : ''}
+      <div class="event-flyer-overlay"></div>
+      <div class="event-flyer-content">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+          <span class="event-platform-tag tag-${evt.platform}" style="margin-bottom:0;">
+            <i class="ph ph-calendar-blank"></i> ${platformLabel}
+          </span>
+          ${isInstagram ? `<span class="event-platform-tag tag-instagram-flyer" style="margin-bottom:0;"><i class="ph ph-instagram-logo"></i> Instagram</span>` : ''}
+          ${isFacebook ? `<span class="event-platform-tag btn-facebook-pill" style="margin-bottom:0;"><i class="ph ph-facebook-logo"></i> Facebook</span>` : ''}
+        </div>
+        <h3 class="event-title">${evt.title}</h3>
+        <span class="event-discount-badge">${evt.discount}</span>
+      </div>
+      ${hasLink ? `<span class="event-touch-indicator" title="Toca la foto para ir al hipervínculo"><i class="ph ph-arrow-square-out"></i></span>` : ''}
+    `;
+
+    // Botón de URL inferior (sólo si no está marcado "Ocultar Botón de URL"):
+    let actionBtnMarkup = '';
+    if (hasLink && !hideBtn) {
+      let btnLabel = 'Ver Oferta Oficial';
+      let iconClass = 'ph-shopping-cart';
+      let btnExtraClass = 'btn-primary';
+      if (isInstagram) {
+        btnLabel = 'Ver en Instagram';
+        iconClass = 'ph-instagram-logo';
+        btnExtraClass = 'btn-instagram';
+      } else if (isFacebook) {
+        btnLabel = 'Ver en Facebook';
+        iconClass = 'ph-facebook-logo';
+        btnExtraClass = 'btn-facebook';
+      }
+
+      actionBtnMarkup = `
+        <a href="${evt.url}" target="_blank" rel="noopener" class="btn btn-block ${btnExtraClass}">
+          <i class="ph ${iconClass}"></i> ${btnLabel}
+        </a>
+      `;
+    }
 
     return `
       <article class="event-card glass-panel" id="event-${evt.id}">
-        <div class="event-flyer-header ${evt.image ? 'has-flyer-image' : ''}">
-          ${evt.image ? `<img src="${evt.image}" alt="${evt.title}" class="event-flyer-bg-img" loading="lazy" onerror="this.onerror=null; this.src='images/banner.jpg';" />` : ''}
-          <div class="event-flyer-overlay"></div>
-          <div class="event-flyer-content">
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-              <span class="event-platform-tag tag-${evt.platform}" style="margin-bottom:0;">
-                <i class="ph ph-calendar-blank"></i> ${platformLabel}
-              </span>
-              ${socialTagMarkup}
-            </div>
-            <h3 class="event-title">${evt.title}</h3>
-            <span class="event-discount-badge">${evt.discount}</span>
-          </div>
-        </div>
+        ${hasLink 
+          ? `<a href="${evt.url}" target="_blank" rel="noopener" class="event-flyer-header ${evt.image ? 'has-flyer-image' : ''} event-flyer-clickable" title="Toca la foto para ir a: ${evt.url}">${flyerContent}</a>`
+          : `<div class="event-flyer-header ${evt.image ? 'has-flyer-image' : ''}">${flyerContent}</div>`
+        }
 
         <div class="event-body">
           ${timerMarkup}
@@ -3360,14 +3471,7 @@ function renderEvents(platform = 'all') {
           </div>
 
           <div class="event-actions-row">
-            <a href="${evt.url}" target="_blank" rel="noopener" class="btn btn-primary btn-block">
-              <i class="ph ph-shopping-cart"></i> Ver Oferta Oficial
-            </a>
-            ${hasSocialLink ? `
-              <a href="${evt.socialUrl}" target="_blank" rel="noopener" class="btn btn-outline ${isInstagramSocial ? 'btn-instagram' : ''}" title="Ver en ${isInstagramSocial ? 'Instagram' : 'Red Social'}">
-                <i class="ph ${isInstagramSocial ? 'ph-instagram-logo' : 'ph-share-network'}"></i> ${isInstagramSocial ? 'Instagram' : 'Social'}
-              </a>
-            ` : ''}
+            ${actionBtnMarkup}
             <a href="https://wa.me/50765210278?text=Hola%20Express%20Loadout,%20deseo%20asesoría%20para%20el%20evento%20${encodeURIComponent(evt.title)}" target="_blank" rel="noopener" class="btn btn-outline" title="Pedir Asistencia de Compra">
               <i class="ph ph-whatsapp-logo"></i> Asesoría
             </a>
@@ -3531,11 +3635,14 @@ function previewEventImage(event) {
 
 function previewEventUrl(url) {
   if (!url) return;
-  url = url.trim();
+  url = cleanImageUrl(url);
+  const inputElem = document.getElementById('event-img-url');
+  if (inputElem && inputElem.value !== url) inputElem.value = url;
+
   if (url.includes('instagram.com/p/') || url.includes('instagram.com/reel/') || url.includes('instagram.com/tv/')) {
-    const socialInput = document.getElementById('event-social-url');
-    if (socialInput && !socialInput.value) {
-      socialInput.value = url;
+    const eventUrlInput = document.getElementById('event-url');
+    if (eventUrlInput && !eventUrlInput.value) {
+      eventUrlInput.value = url;
     }
   }
   currentEventPhotoData = url;
@@ -3573,7 +3680,7 @@ function editEvent(eventId) {
   const discountInput = document.getElementById('event-discount');
   const recInput = document.getElementById('event-recommendation');
   const urlInput = document.getElementById('event-url');
-  const socialUrlInput = document.getElementById('event-social-url');
+  const hideBtnCheckbox = document.getElementById('event-hide-url-btn');
   const imgUrlInput = document.getElementById('event-img-url');
   const submitBtn = document.getElementById('event-submit-btn');
   const cancelBtn = document.getElementById('event-cancel-edit-btn');
@@ -3584,7 +3691,8 @@ function editEvent(eventId) {
   if (discountInput) discountInput.value = evt.discount || '';
   if (recInput) recInput.value = evt.logisticsTip || '';
   if (urlInput) urlInput.value = evt.url || '';
-  if (socialUrlInput) socialUrlInput.value = evt.socialUrl || '';
+  if (hideBtnCheckbox) hideBtnCheckbox.checked = evt.hideUrlButton === true;
+  updateEventUrlBtnHint();
 
   if (evt.image) {
     currentEventPhotoData = evt.image;
@@ -3616,8 +3724,9 @@ function resetEventForm() {
   document.getElementById('new-event-form')?.reset();
   clearEventImage();
 
-  const socialUrlInput = document.getElementById('event-social-url');
-  if (socialUrlInput) socialUrlInput.value = '';
+  const hideBtnCheckbox = document.getElementById('event-hide-url-btn');
+  if (hideBtnCheckbox) hideBtnCheckbox.checked = false;
+  updateEventUrlBtnHint();
 
   const submitBtn = document.getElementById('event-submit-btn');
   const cancelBtn = document.getElementById('event-cancel-edit-btn');
@@ -3647,7 +3756,7 @@ function handleSaveEvent(e) {
   const discount = document.getElementById('event-discount').value.trim();
   const logisticsTip = document.getElementById('event-recommendation').value.trim();
   const url = document.getElementById('event-url').value.trim();
-  const socialUrl = document.getElementById('event-social-url')?.value.trim() || '';
+  const hideUrlButton = document.getElementById('event-hide-url-btn')?.checked === true;
 
   const formattedDate = dateInput ? (dateInput.includes('T') ? dateInput : `${dateInput}T00:00:00`) : '';
   const hasTimer = !!dateInput;
@@ -3664,7 +3773,7 @@ function handleSaveEvent(e) {
         discount,
         logisticsTip,
         url: url || 'https://www.expressloadout.com',
-        socialUrl: socialUrl || currentEvents[idx].socialUrl || '',
+        hideUrlButton,
         image: currentEventPhotoData || currentEvents[idx].image || '',
         updatedAt: new Date().toISOString()
       };
@@ -3672,7 +3781,7 @@ function handleSaveEvent(e) {
       renderEvents(activeEventsFilter);
       renderAdminEventsList();
       resetEventForm();
-      alert('✅ ¡Evento, fotografía del encabezado y links actualizados con éxito!');
+      alert('✅ ¡Evento, fotografía del encabezado y configuración de hipervínculo actualizados con éxito!');
       return;
     }
   }
@@ -3686,7 +3795,7 @@ function handleSaveEvent(e) {
     discount,
     logisticsTip,
     url: url || 'https://www.expressloadout.com',
-    socialUrl,
+    hideUrlButton,
     image: currentEventPhotoData || '',
     badge: 'Evento Destacado',
     hidden: false,
@@ -3723,6 +3832,7 @@ function renderAdminEventsList() {
 
   container.innerHTML = currentEvents.map(e => {
     const isHidden = e.hidden === true;
+    const hideBtn = e.hideUrlButton === true;
     const dateFormatted = e.date ? e.date.split('T')[0] : 'Por confirmar';
     return `
     <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
@@ -3736,10 +3846,13 @@ function renderAdminEventsList() {
             ${isHidden 
               ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
               : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
+            ${e.url ? (hideBtn 
+              ? '<span class="badge-tag" style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-size:0.68rem; padding:1px 6px;" title="Al tocar la foto redirige directamente al enlace"><i class="ph ph-hand-tap"></i> Foto Directa (Botón Oculto)</span>' 
+              : '<span class="badge-tag" style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); font-size:0.68rem; padding:1px 6px;" title="Muestra botón abajo"><i class="ph ph-cursor-click"></i> Botón Abajo</span>') : ''}
           </div>
           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span>${(e.platform || 'general').toUpperCase()} • Fecha: ${dateFormatted} • ${e.discount || ''}</span>
-            ${e.socialUrl ? `<a href="${e.socialUrl}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${e.socialUrl}"><i class="ph ph-instagram-logo"></i> Social</a>` : ''}
+            ${e.url ? `<a href="${e.url}" target="_blank" rel="noopener" style="color:#f43f5e; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="${e.url}"><i class="ph ph-link"></i> Link</a>` : ''}
           </div>
         </div>
       </div>

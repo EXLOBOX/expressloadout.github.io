@@ -1538,16 +1538,16 @@
               <textarea id="case-desc" class="form-input" rows="3" placeholder="Comentario sobre la experiencia, honestidad del servicio, rapidez y ayuda en la entrega..." required></textarea>
             </div>
 
-            <!-- Subida de Foto (Archivo o URL) -->
+            <!-- Opción 1: Foto del Caso (Archivo local o Link público) -->
             <div class="photo-upload-section">
-              <label class="form-label"><i class="ph ph-camera"></i> Foto de la Entrega o Carga:</label>
+              <label class="form-label"><i class="ph ph-camera"></i> Foto del Caso (Opción 1: Archivo local ó Link público de imagen):</label>
               <div class="photo-inputs-row">
                 <input type="file" id="case-file-input" accept="image/*" class="file-input-custom" onchange="previewCaseImage(event)" />
                 <span class="or-separator">ó URL:</span>
-                <input type="url" id="case-img-url" class="form-input" placeholder="https://ejemplo.com/foto.jpg" onchange="previewCaseUrl(this.value)" />
+                <input type="url" id="case-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewCaseUrl(this.value)" onchange="previewCaseUrl(this.value)" />
               </div>
               <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
-                💡 Sube un archivo local o pega un link público directo de imagen (CDN de Instagram, Imgur, Cloudinary, etc.).
+                💡 Puedes subir una foto desde tu equipo o pegar el link directo de una imagen de Google, Instagram, Facebook o web.
               </span>
               <div id="case-img-preview-wrap" class="img-preview-box hidden" style="margin-top:8px;">
                 <img id="case-img-preview" src="" alt="Vista previa de foto" />
@@ -1555,14 +1555,21 @@
               </div>
             </div>
 
-            <!-- Link de Redirección (Instagram / Perfil / Testimonio) -->
+            <!-- Opción 2: Hipervínculo / URL de Redirección + Control Ocultar Botón -->
             <div class="form-group" style="margin-top:14px;">
               <label class="form-label">
-                <i class="ph ph-instagram-logo"></i> Enlace de Redirección (Instagram, Perfil o Testimonio - Opcional):
+                <i class="ph ph-link"></i> Opción 2: Hipervínculo / URL de Redirección (Opcional):
               </label>
-              <input type="url" id="case-link" class="form-input" placeholder="https://www.instagram.com/p/ejemplo ó https://instagram.com/usuario" />
-              <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
-                🔗 Los visitantes podrán hacer clic en la tarjeta para ser redireccionados al perfil o publicación de Instagram.
+              <input type="url" id="case-link" class="form-input" placeholder="https://instagram.com/..., https://facebook.com/..., https://ejemplo.com" />
+              
+              <div class="url-btn-toggle-row" style="margin-top:10px; display:flex; align-items:center; gap:8px;">
+                <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-main);">
+                  <input type="checkbox" id="case-hide-url-btn" onchange="updateCaseUrlBtnHint()" style="width:16px; height:16px; accent-color:var(--brand-yellow); cursor:pointer;" />
+                  <span>Ocultar Botón de URL</span>
+                </label>
+              </div>
+              <span id="case-hide-url-btn-hint" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
+                ℹ️ Si activas "Ocultar Botón de URL", la persona al tocar la foto irá automáticamente al sitio del hipervínculo sin mostrar botón abajo. Si está desmarcado, se mostrará el botón abajo.
               </span>
             </div>
 
@@ -1631,32 +1638,39 @@
               <input type="text" id="event-recommendation" class="form-input" placeholder="Ej: Pedir con Aéreo Express Miami (3-5 días) para recibir antes de agotar inventario." required />
             </div>
 
-            <div class="form-group-grid">
-              <div class="form-group">
-                <label class="form-label">Enlace Oficial de la Oferta / Tienda:</label>
-                <input type="url" id="event-url" class="form-input" placeholder="https://www.amazon.com/primeday" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label"><i class="ph ph-instagram-logo"></i> Enlace Red Social / Instagram (Opcional):</label>
-                <input type="url" id="event-social-url" class="form-input" placeholder="https://www.instagram.com/p/ejemplo" />
-              </div>
-            </div>
-
-            <!-- Subida de Foto/Flyer del Evento (Archivo o URL) -->
+            <!-- Opción 1: Foto / Flyer del Evento (Archivo o URL pública) -->
             <div class="photo-upload-section">
-              <label class="form-label"><i class="ph ph-camera"></i> Foto de Encabezado / Flyer del Evento (Se ajusta al título):</label>
+              <label class="form-label"><i class="ph ph-camera"></i> Foto de Encabezado / Flyer (Opción 1: Archivo local ó Link público):</label>
               <div class="photo-inputs-row">
                 <input type="file" id="event-file-input" accept="image/*" class="file-input-custom" onchange="previewEventImage(event)" />
                 <span class="or-separator">ó URL:</span>
-                <input type="url" id="event-img-url" class="form-input" placeholder="https://ejemplo.com/flyer-banner.jpg" onchange="previewEventUrl(this.value)" />
+                <input type="url" id="event-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewEventUrl(this.value)" onchange="previewEventUrl(this.value)" />
               </div>
               <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
-                💡 Sube un archivo local o pega un link público directo de imagen. Si incluye link de Instagram, se mostrará el tag en el flyer.
+                💡 Sube una imagen desde tu equipo o pega el link directo de alguna publicidad de Google, Instagram o Facebook.
               </span>
               <div id="event-img-preview-wrap" class="img-preview-box hidden" style="margin-top:8px;">
                 <img id="event-img-preview" src="" alt="Vista previa de flyer del evento" />
                 <button type="button" class="btn btn-outline btn-xs" onclick="clearEventImage()">Eliminar foto</button>
               </div>
+            </div>
+
+            <!-- Opción 2: Hipervínculo / Enlace de la Oferta + Control Ocultar Botón -->
+            <div class="form-group" style="margin-top:14px;">
+              <label class="form-label">
+                <i class="ph ph-link"></i> Opción 2: Hipervínculo / Enlace de la Oferta o Publicidad:
+              </label>
+              <input type="url" id="event-url" class="form-input" placeholder="https://www.amazon.com/..., https://instagram.com/..., etc." required />
+              
+              <div class="url-btn-toggle-row" style="margin-top:10px; display:flex; align-items:center; gap:8px;">
+                <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-main);">
+                  <input type="checkbox" id="event-hide-url-btn" onchange="updateEventUrlBtnHint()" style="width:16px; height:16px; accent-color:var(--brand-yellow); cursor:pointer;" />
+                  <span>Ocultar Botón de URL</span>
+                </label>
+              </div>
+              <span id="event-hide-url-btn-hint" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
+                ℹ️ Si activas "Ocultar Botón de URL", la persona al tocar la foto irá automáticamente al sitio del hipervínculo sin mostrar botón abajo. Si está desmarcado, se mostrará el botón abajo.
+              </span>
             </div>
 
             <div class="form-actions-row">
