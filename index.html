@@ -1553,10 +1553,13 @@
             </div>
 
             <div class="form-actions-row">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" id="case-submit-btn">
                 <i class="ph ph-floppy-disk"></i> Publicar Caso de Éxito
               </button>
-              <button type="button" class="btn btn-outline" onclick="resetCaseForm()">Limpiar</button>
+              <button type="button" class="btn btn-outline" id="case-reset-btn" onclick="resetCaseForm()">Limpiar</button>
+              <button type="button" class="btn btn-outline hidden" id="case-cancel-edit-btn" onclick="cancelEditCase()" style="color:#ef4444; border-color:#ef4444;">
+                <i class="ph ph-x"></i> Cancelar Edición
+              </button>
             </div>
           </form>
 
@@ -1564,7 +1567,7 @@
 
           <!-- Lista de casos existentes para eliminar o editar -->
           <div class="existing-cases-wrap">
-            <h5 class="existing-title">Casos Activos en la Página (<span id="cases-count-badge">0</span>):</h5>
+            <h5 class="existing-title">Gestión de Casos de Éxito (<span id="cases-count-badge">0</span>):</h5>
             <div id="admin-cases-list" class="admin-cases-table-wrap">
               <!-- Hidratado dinámicamente -->
             </div>
@@ -1575,7 +1578,7 @@
         <div class="admin-tab-pane" id="tab-pane-events">
           <div class="admin-pane-header">
             <h4>Gestor de Eventos, Ofertas & Suscriptores</h4>
-            <span class="badge-tag">Anuncia Prime Day, 11.11 y Mega Descuentos</span>
+            <span class="badge-tag">Anuncia Prime Day, 11.11 y Mega Descuentos con Flyer</span>
           </div>
 
           <form id="new-event-form" onsubmit="handleSaveEvent(event)">
@@ -1588,6 +1591,8 @@
                   <option value="temu">TEMU (Mega Ofertas & Cupones)</option>
                   <option value="alibaba">Alibaba (March Expo, Super Septiembre B2B)</option>
                   <option value="madeinchina">Made-in-China (Sourcing Fair Industrial)</option>
+                  <option value="shein">SHEIN (Moda & Flash Deals)</option>
+                  <option value="walmart">Walmart USA (Retail & Liquidaciones)</option>
                 </select>
               </div>
               <div class="form-group">
@@ -1598,8 +1603,8 @@
 
             <div class="form-group-grid">
               <div class="form-group">
-                <label class="form-label">Fecha del Evento (para cuenta regresiva):</label>
-                <input type="date" id="event-date" class="form-input" required />
+                <label class="form-label">Fecha del Evento (para cuenta regresiva, opcional):</label>
+                <input type="date" id="event-date" class="form-input" />
               </div>
               <div class="form-group">
                 <label class="form-label">Descuento o Beneficio Destacado:</label>
@@ -1617,11 +1622,28 @@
               <input type="url" id="event-url" class="form-input" placeholder="https://www.amazon.com/primeday" required />
             </div>
 
+            <!-- Subida de Foto/Flyer del Evento (Archivo o URL) -->
+            <div class="photo-upload-section">
+              <label class="form-label"><i class="ph ph-camera"></i> Foto de Encabezado / Flyer del Evento (Se ajusta al título):</label>
+              <div class="photo-inputs-row">
+                <input type="file" id="event-file-input" accept="image/*" class="file-input-custom" onchange="previewEventImage(event)" />
+                <span class="or-separator">ó URL:</span>
+                <input type="url" id="event-img-url" class="form-input" placeholder="https://ejemplo.com/flyer-banner.jpg" onchange="previewEventUrl(this.value)" />
+              </div>
+              <div id="event-img-preview-wrap" class="img-preview-box hidden">
+                <img id="event-img-preview" src="" alt="Vista previa de flyer del evento" />
+                <button type="button" class="btn btn-outline btn-xs" onclick="clearEventImage()">Eliminar foto</button>
+              </div>
+            </div>
+
             <div class="form-actions-row">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" id="event-submit-btn">
                 <i class="ph ph-plus-circle"></i> Publicar Evento en la Web
               </button>
-              <button type="button" class="btn btn-outline" onclick="document.getElementById('new-event-form').reset()">Limpiar</button>
+              <button type="button" class="btn btn-outline" id="event-reset-btn" onclick="resetEventForm()">Limpiar</button>
+              <button type="button" class="btn btn-outline hidden" id="event-cancel-edit-btn" onclick="cancelEditEvent()" style="color:#ef4444; border-color:#ef4444;">
+                <i class="ph ph-x"></i> Cancelar Edición
+              </button>
             </div>
           </form>
 
@@ -1629,7 +1651,7 @@
 
           <!-- Lista de eventos activos -->
           <div class="existing-cases-wrap">
-            <h5 class="existing-title">Eventos Activos en el Calendario:</h5>
+            <h5 class="existing-title">Gestión de Eventos y Ofertas (<span id="events-count-badge">0</span>):</h5>
             <div id="admin-events-list" class="admin-cases-table-wrap">
               <!-- Hidratado dinámicamente -->
             </div>

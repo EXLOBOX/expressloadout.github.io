@@ -28,7 +28,9 @@ const defaultEvents = [
     discount: 'Hasta 80% OFF • Millones de Ofertas',
     logisticsTip: 'Evento cumbre mundial. Para compras voluminosas o carga pesada, despacha por flete marítimo antes del 15 de Noviembre para recibir antes de Navidad en Panamá.',
     url: 'https://www.aliexpress.com',
-    badge: '11.11 Día del Soltero'
+    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80',
+    badge: '11.11 Día del Soltero',
+    hidden: false
   },
   {
     id: 'evt-2',
@@ -39,7 +41,9 @@ const defaultEvents = [
     discount: 'Descuentos Relámpago en Electrónica & Prime',
     logisticsTip: 'Mayor volumen del año en Miami. Despacha vía Aéreo Express con casillero EXLO-PA para tener tus regalos listos sin demoras.',
     url: 'https://www.amazon.com',
-    badge: 'Black Friday Global'
+    image: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=800&q=80',
+    badge: 'Black Friday Global',
+    hidden: false
   },
   {
     id: 'evt-3',
@@ -50,7 +54,9 @@ const defaultEvents = [
     discount: 'Hasta 70% OFF Exclusivo Membresía Prime',
     logisticsTip: 'Laptops, smart home, calzado y ropa. Los paquetes llegan en 24h a nuestra bodega de Miami y en 3 a 5 días hábiles están en Panamá.',
     url: 'https://www.amazon.com/primeday',
-    badge: 'Prime Day Exclusivo'
+    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80',
+    badge: 'Prime Day Exclusivo',
+    hidden: false
   },
   {
     id: 'evt-4',
@@ -61,7 +67,9 @@ const defaultEvents = [
     discount: 'Descuentos por confirmar por la tienda',
     logisticsTip: 'Ideal para ropa, accesorios y calzado. Los paquetes se consolidan en Miami para entrega ágil en Panamá.',
     url: 'https://www.shein.com',
-    badge: 'Fecha por Confirmar'
+    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+    badge: 'Fecha por Confirmar',
+    hidden: false
   },
   {
     id: 'evt-5',
@@ -72,7 +80,9 @@ const defaultEvents = [
     discount: 'Ofertas de temporada por confirmar',
     logisticsTip: 'Excelente para juguetes, electrónica y hogar. Se despacha directo a nuestro casillero Miami con entrega ágil en Panamá.',
     url: 'https://www.walmart.com',
-    badge: 'Fecha por Confirmar'
+    image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80',
+    badge: 'Fecha por Confirmar',
+    hidden: false
   },
   {
     id: 'evt-6',
@@ -83,7 +93,9 @@ const defaultEvents = [
     discount: 'Precios de fábrica en accesorios y novedades',
     logisticsTip: 'Excelente para accesorios, novedades y paquetes livianos. Coloca tu código EXLO-PA en la dirección para clasificación inmediata.',
     url: 'https://www.temu.com',
-    badge: 'Fecha por Confirmar'
+    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80',
+    badge: 'Fecha por Confirmar',
+    hidden: false
   },
   {
     id: 'evt-7',
@@ -94,7 +106,9 @@ const defaultEvents = [
     discount: 'Muestras Gratis & Contenedores LCL Compartidos',
     logisticsTip: 'Pensado para importadores y comercios en Panamá. Te asesoramos en la verificación de proveedores y flete marítimo en CBM.',
     url: 'https://www.alibaba.com',
-    badge: 'Fecha por Confirmar'
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
+    badge: 'Fecha por Confirmar',
+    hidden: false
   }
 ];
 
@@ -189,7 +203,10 @@ function loadStoredData() {
 
     const storedCases = localStorage.getItem(STORAGE_KEYS.CASES);
     if (storedCases) {
-      currentCases = JSON.parse(storedCases);
+      currentCases = JSON.parse(storedCases).map(c => ({
+        ...c,
+        hidden: c.hidden === true
+      }));
     } else {
       currentCases = [...defaultCases];
       localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
@@ -197,7 +214,14 @@ function loadStoredData() {
 
     const storedEvents = localStorage.getItem(STORAGE_KEYS.EVENTS);
     if (storedEvents) {
-      currentEvents = JSON.parse(storedEvents);
+      currentEvents = JSON.parse(storedEvents).map(e => {
+        const def = defaultEvents.find(d => d.id === e.id);
+        return {
+          ...e,
+          hidden: e.hidden === true,
+          image: e.image || (def ? def.image : '')
+        };
+      });
     } else {
       currentEvents = [...defaultEvents];
       localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
@@ -2454,7 +2478,15 @@ function renderSuccessCases() {
   const container = document.getElementById('cases-container');
   if (!container) return;
 
-  container.innerHTML = currentCases.map(c => `
+  const visibleCases = currentCases.filter(c => !c.hidden);
+
+  if (visibleCases.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:0.95rem;">Próximamente más testimonios y casos de éxito de clientes.</div>';
+    renderAdminCasesList();
+    return;
+  }
+
+  container.innerHTML = visibleCases.map(c => `
     <article class="case-card glass-panel" id="card-${c.id}">
       <div class="case-image-wrap">
         <img src="${c.image || 'images/banner.jpg'}" alt="${c.title}" class="case-image" loading="lazy" />
@@ -2820,6 +2852,7 @@ function switchAdminTab(tabName) {
 
 // Manejo de imagen para casos de éxito (Base64 o URL)
 let currentCasePhotoData = '';
+let editingCaseId = null;
 
 function previewCaseImage(event) {
   const file = event.target.files[0];
@@ -2858,6 +2891,77 @@ function clearCaseImage() {
   if (urlInput) urlInput.value = '';
 }
 
+function editCase(caseId) {
+  const c = currentCases.find(item => item.id === caseId);
+  if (!c) return;
+
+  editingCaseId = c.id;
+
+  const clientInput = document.getElementById('case-client');
+  const titleInput = document.getElementById('case-title');
+  const modeSelect = document.getElementById('case-mode');
+  const statInput = document.getElementById('case-stat');
+  const descInput = document.getElementById('case-desc');
+  const urlInput = document.getElementById('case-img-url');
+  const submitBtn = document.getElementById('case-submit-btn');
+  const cancelBtn = document.getElementById('case-cancel-edit-btn');
+
+  if (clientInput) clientInput.value = c.client || '';
+  if (titleInput) titleInput.value = c.title || '';
+  if (modeSelect) modeSelect.value = c.mode || 'China • Marítimo';
+  if (statInput) statInput.value = c.stat || '';
+  if (descInput) descInput.value = c.desc || '';
+
+  if (c.image) {
+    currentCasePhotoData = c.image;
+    displayPhotoPreview(c.image);
+    if (urlInput && c.image.startsWith('http')) {
+      urlInput.value = c.image;
+    }
+  } else {
+    clearCaseImage();
+  }
+
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="ph ph-check-circle"></i> Guardar Cambios del Caso';
+  }
+  if (cancelBtn) {
+    cancelBtn.classList.remove('hidden');
+  }
+
+  document.getElementById('new-case-form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cancelEditCase() {
+  editingCaseId = null;
+  resetCaseForm();
+}
+
+function resetCaseForm() {
+  editingCaseId = null;
+  document.getElementById('new-case-form')?.reset();
+  clearCaseImage();
+
+  const submitBtn = document.getElementById('case-submit-btn');
+  const cancelBtn = document.getElementById('case-cancel-edit-btn');
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> Publicar Caso de Éxito';
+  }
+  if (cancelBtn) {
+    cancelBtn.classList.add('hidden');
+  }
+}
+
+function toggleHideCase(caseId) {
+  const c = currentCases.find(item => item.id === caseId);
+  if (!c) return;
+
+  c.hidden = !c.hidden;
+  localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
+  renderSuccessCases();
+  renderAdminCasesList();
+}
+
 function handleSaveCase(e) {
   e.preventDefault();
   const client = document.getElementById('case-client').value.trim();
@@ -2865,6 +2969,27 @@ function handleSaveCase(e) {
   const mode = document.getElementById('case-mode').value;
   const stat = document.getElementById('case-stat').value.trim();
   const desc = document.getElementById('case-desc').value.trim();
+
+  if (editingCaseId) {
+    const idx = currentCases.findIndex(c => c.id === editingCaseId);
+    if (idx !== -1) {
+      currentCases[idx] = {
+        ...currentCases[idx],
+        client,
+        title,
+        mode,
+        stat,
+        desc,
+        image: currentCasePhotoData || currentCases[idx].image || 'images/banner.jpg',
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
+      renderSuccessCases();
+      resetCaseForm();
+      alert('✅ ¡Caso de éxito y fotografía actualizados con éxito!');
+      return;
+    }
+  }
 
   const newCase = {
     id: 'case-' + Date.now(),
@@ -2874,6 +2999,7 @@ function handleSaveCase(e) {
     stat,
     desc,
     image: currentCasePhotoData || 'images/banner.jpg',
+    hidden: false,
     createdAt: new Date().toISOString()
   };
 
@@ -2885,13 +3011,9 @@ function handleSaveCase(e) {
   alert('🎉 ¡Caso de éxito publicado en la web con éxito!');
 }
 
-function resetCaseForm() {
-  document.getElementById('new-case-form')?.reset();
-  clearCaseImage();
-}
-
 function deleteCase(caseId) {
-  if (!confirm('¿Deseas eliminar este caso de éxito de la página web?')) return;
+  if (!confirm('¿Deseas eliminar definitivamente este caso de éxito? (Si solo deseas que no se vea en la web, puedes usar el botón Ocultar)')) return;
+  if (editingCaseId === caseId) cancelEditCase();
   currentCases = currentCases.filter(c => c.id !== caseId);
   localStorage.setItem(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
   renderSuccessCases();
@@ -2904,24 +3026,41 @@ function renderAdminCasesList() {
   if (!container) return;
 
   if (currentCases.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No hay casos guardados.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; padding:12px; text-align:center;">No hay casos guardados.</p>';
     return;
   }
 
-  container.innerHTML = currentCases.map(c => `
-    <div class="admin-case-item">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="${c.image || 'images/banner.jpg'}" style="width:36px; height:36px; object-fit:cover; border-radius:4px;" />
-        <div>
-          <strong>${c.title}</strong>
-          <div style="font-size:0.75rem; color:var(--text-muted);">${c.client} • ${c.mode}</div>
+  container.innerHTML = currentCases.map(c => {
+    const isHidden = c.hidden === true;
+    return `
+    <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
+      <div class="admin-case-info">
+        <img src="${c.image || 'images/banner.jpg'}" class="admin-item-thumb" />
+        <div style="min-width:0;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">${c.title}</strong>
+            ${isHidden 
+              ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
+              : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+            ${c.client} • ${c.mode} • ${c.stat}
+          </div>
         </div>
       </div>
-      <button class="btn btn-outline btn-xs" style="color:var(--brand-red); border-color:var(--brand-red);" onclick="deleteCase('${c.id}')">
-        <i class="ph ph-trash"></i>
-      </button>
+      <div class="admin-case-actions">
+        <button type="button" class="btn btn-outline btn-xs ${isHidden ? 'btn-action-show' : 'btn-action-hide'}" onclick="toggleHideCase('${c.id}')" title="${isHidden ? 'Mostrar en la página' : 'Ocultar de la página'}">
+          <i class="ph ${isHidden ? 'ph-eye' : 'ph-eye-slash'}"></i> ${isHidden ? 'Mostrar' : 'Ocultar'}
+        </button>
+        <button type="button" class="btn btn-outline btn-xs btn-action-edit" onclick="editCase('${c.id}')" title="Editar datos y fotografía">
+          <i class="ph ph-pencil-simple"></i> Editar
+        </button>
+        <button type="button" class="btn btn-outline btn-xs btn-action-delete" onclick="deleteCase('${c.id}')" title="Eliminar definitivamente">
+          <i class="ph ph-trash"></i>
+        </button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // Guardar y cargar tarifas desde Admin
@@ -3089,9 +3228,11 @@ function renderEvents(platform = 'all') {
   const container = document.getElementById('events-container');
   if (!container) return;
 
+  const visibleEvents = currentEvents.filter(e => !e.hidden);
+
   const filtered = platform === 'all' 
-    ? currentEvents 
-    : currentEvents.filter(e => e.platform === platform);
+    ? visibleEvents 
+    : visibleEvents.filter(e => e.platform === platform);
 
   if (filtered.length === 0) {
     container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">No hay eventos programados en esta categoría actualmente.</div>';
@@ -3142,12 +3283,16 @@ function renderEvents(platform = 'all') {
 
     return `
       <article class="event-card glass-panel" id="event-${evt.id}">
-        <div class="event-flyer-header">
-          <span class="event-platform-tag tag-${evt.platform}">
-            <i class="ph ph-calendar-blank"></i> ${platformLabel}
-          </span>
-          <h3 class="event-title">${evt.title}</h3>
-          <span class="event-discount-badge">${evt.discount}</span>
+        <div class="event-flyer-header ${evt.image ? 'has-flyer-image' : ''}">
+          ${evt.image ? `<img src="${evt.image}" alt="${evt.title}" class="event-flyer-bg-img" loading="lazy" />` : ''}
+          <div class="event-flyer-overlay"></div>
+          <div class="event-flyer-content">
+            <span class="event-platform-tag tag-${evt.platform}">
+              <i class="ph ph-calendar-blank"></i> ${platformLabel}
+            </span>
+            <h3 class="event-title">${evt.title}</h3>
+            <span class="event-discount-badge">${evt.discount}</span>
+          </div>
         </div>
 
         <div class="event-body">
@@ -3177,7 +3322,7 @@ function renderEvents(platform = 'all') {
 function updateCountdowns() {
   const now = Date.now();
   currentEvents.forEach(evt => {
-    if (!evt.hasTimer || !evt.date) return;
+    if (evt.hidden || !evt.hasTimer || !evt.date) return;
     const target = new Date(evt.date).getTime();
     let diff = target - now;
 
@@ -3247,7 +3392,7 @@ function downloadIcsCalendar() {
     'X-WR-TIMEZONE:America/Panama'
   ];
 
-  currentEvents.forEach(evt => {
+  currentEvents.filter(e => !e.hidden).forEach(evt => {
     const eventDate = new Date(evt.date);
     const startStr = eventDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
     const endDate = new Date(eventDate.getTime() + 48 * 60 * 60 * 1000);
@@ -3285,13 +3430,14 @@ function downloadIcsCalendar() {
 
 // Modal RSS Feed
 function openRssFeedModal() {
+  const visible = currentEvents.filter(e => !e.hidden);
   const rssXml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
   <title>Express Loadout - Ofertas & Calendario de Importación</title>
   <link>https://www.expressloadout.com/</link>
   <description>Picos de descuento en Amazon, AliExpress 11.11, Temu y ferias de China para Panamá</description>
-  ${currentEvents.map(e => `
+  ${visible.map(e => `
   <item>
     <title>${e.title} - ${e.discount}</title>
     <link>${e.url}</link>
@@ -3304,7 +3450,122 @@ function openRssFeedModal() {
   prompt('Feed RSS de eventos y ofertas de Express Loadout (Copia para tu lector de feeds):', rssXml.substring(0, 320) + '...');
 }
 
-// Admin CMS - Gestión de Eventos y Suscriptores
+// =============================================================================
+// ADMIN CMS - GESTIÓN DE EVENTOS, FOTOS DE FLYER & SUSCRIPTORES
+// =============================================================================
+let currentEventPhotoData = '';
+let editingEventId = null;
+
+function previewEventImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    currentEventPhotoData = e.target.result;
+    displayEventPhotoPreview(currentEventPhotoData);
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewEventUrl(url) {
+  if (!url) return;
+  currentEventPhotoData = url;
+  displayEventPhotoPreview(url);
+}
+
+function displayEventPhotoPreview(src) {
+  const previewWrap = document.getElementById('event-img-preview-wrap');
+  const previewImg = document.getElementById('event-img-preview');
+  if (previewWrap && previewImg) {
+    previewImg.src = src;
+    previewWrap.classList.remove('hidden');
+  }
+}
+
+function clearEventImage() {
+  currentEventPhotoData = '';
+  const previewWrap = document.getElementById('event-img-preview-wrap');
+  const fileInput = document.getElementById('event-file-input');
+  const urlInput = document.getElementById('event-img-url');
+  if (previewWrap) previewWrap.classList.add('hidden');
+  if (fileInput) fileInput.value = '';
+  if (urlInput) urlInput.value = '';
+}
+
+function editEvent(eventId) {
+  const evt = currentEvents.find(e => e.id === eventId);
+  if (!evt) return;
+
+  editingEventId = evt.id;
+
+  const platformSelect = document.getElementById('event-platform');
+  const titleInput = document.getElementById('event-title');
+  const dateInput = document.getElementById('event-date');
+  const discountInput = document.getElementById('event-discount');
+  const recInput = document.getElementById('event-recommendation');
+  const urlInput = document.getElementById('event-url');
+  const imgUrlInput = document.getElementById('event-img-url');
+  const submitBtn = document.getElementById('event-submit-btn');
+  const cancelBtn = document.getElementById('event-cancel-edit-btn');
+
+  if (platformSelect) platformSelect.value = evt.platform || 'amazon';
+  if (titleInput) titleInput.value = evt.title || '';
+  if (dateInput) dateInput.value = evt.date ? evt.date.split('T')[0] : '';
+  if (discountInput) discountInput.value = evt.discount || '';
+  if (recInput) recInput.value = evt.logisticsTip || '';
+  if (urlInput) urlInput.value = evt.url || '';
+
+  if (evt.image) {
+    currentEventPhotoData = evt.image;
+    displayEventPhotoPreview(evt.image);
+    if (imgUrlInput && evt.image.startsWith('http')) {
+      imgUrlInput.value = evt.image;
+    }
+  } else {
+    clearEventImage();
+  }
+
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="ph ph-check-circle"></i> Guardar Cambios del Evento';
+  }
+  if (cancelBtn) {
+    cancelBtn.classList.remove('hidden');
+  }
+
+  document.getElementById('new-event-form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cancelEditEvent() {
+  editingEventId = null;
+  resetEventForm();
+}
+
+function resetEventForm() {
+  editingEventId = null;
+  document.getElementById('new-event-form')?.reset();
+  clearEventImage();
+
+  const submitBtn = document.getElementById('event-submit-btn');
+  const cancelBtn = document.getElementById('event-cancel-edit-btn');
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="ph ph-plus-circle"></i> Publicar Evento en la Web';
+  }
+  if (cancelBtn) {
+    cancelBtn.classList.add('hidden');
+  }
+}
+
+function toggleHideEvent(eventId) {
+  const evt = currentEvents.find(e => e.id === eventId);
+  if (!evt) return;
+
+  evt.hidden = !evt.hidden;
+  localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
+  renderEvents(activeEventsFilter);
+  renderAdminEventsList();
+}
+
 function handleSaveEvent(e) {
   e.preventDefault();
   const platform = document.getElementById('event-platform').value;
@@ -3314,27 +3575,59 @@ function handleSaveEvent(e) {
   const logisticsTip = document.getElementById('event-recommendation').value.trim();
   const url = document.getElementById('event-url').value.trim();
 
+  const formattedDate = dateInput ? (dateInput.includes('T') ? dateInput : `${dateInput}T00:00:00`) : '';
+  const hasTimer = !!dateInput;
+
+  if (editingEventId) {
+    const idx = currentEvents.findIndex(evt => evt.id === editingEventId);
+    if (idx !== -1) {
+      currentEvents[idx] = {
+        ...currentEvents[idx],
+        platform,
+        title,
+        date: formattedDate,
+        hasTimer,
+        discount,
+        logisticsTip,
+        url: url || 'https://www.expressloadout.com',
+        image: currentEventPhotoData || currentEvents[idx].image || '',
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
+      renderEvents(activeEventsFilter);
+      renderAdminEventsList();
+      resetEventForm();
+      alert('✅ ¡Evento y fotografía del encabezado actualizados con éxito!');
+      return;
+    }
+  }
+
   const newEvt = {
     id: 'evt-' + Date.now(),
     platform,
     title,
-    date: `${dateInput}T00:00:00`,
+    date: formattedDate,
+    hasTimer,
     discount,
     logisticsTip,
     url: url || 'https://www.expressloadout.com',
-    badge: 'Evento Destacado'
+    image: currentEventPhotoData || '',
+    badge: 'Evento Destacado',
+    hidden: false,
+    createdAt: new Date().toISOString()
   };
 
   currentEvents.unshift(newEvt);
   localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
   renderEvents(activeEventsFilter);
   renderAdminEventsList();
-  document.getElementById('new-event-form')?.reset();
+  resetEventForm();
   alert('🎉 ¡Evento publicado con éxito en el calendario público!');
 }
 
 function deleteEvent(id) {
-  if (!confirm('¿Deseas eliminar este evento del calendario?')) return;
+  if (!confirm('¿Deseas eliminar definitivamente este evento del calendario? (Si solo deseas que no aparezca en la web, puedes usar el botón Ocultar)')) return;
+  if (editingEventId === id) cancelEditEvent();
   currentEvents = currentEvents.filter(e => e.id !== id);
   localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
   renderEvents(activeEventsFilter);
@@ -3343,26 +3636,49 @@ function deleteEvent(id) {
 
 function renderAdminEventsList() {
   const container = document.getElementById('admin-events-list');
+  const badge = document.getElementById('events-count-badge');
+  if (badge) badge.innerText = currentEvents.length;
   if (!container) return;
 
   if (currentEvents.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No hay eventos guardados.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; padding:12px; text-align:center;">No hay eventos guardados.</p>';
     return;
   }
 
-  container.innerHTML = currentEvents.map(e => `
-    <div class="admin-case-item">
-      <div>
-        <strong>${e.title}</strong>
-        <div style="font-size:0.75rem; color:var(--text-muted);">
-          ${e.platform.toUpperCase()} • Fecha: ${e.date.split('T')[0]} • ${e.discount}
+  container.innerHTML = currentEvents.map(e => {
+    const isHidden = e.hidden === true;
+    const dateFormatted = e.date ? e.date.split('T')[0] : 'Por confirmar';
+    return `
+    <div class="admin-case-item ${isHidden ? 'is-hidden-item' : ''}">
+      <div class="admin-case-info">
+        ${e.image 
+          ? `<img src="${e.image}" class="admin-item-thumb" />` 
+          : `<div class="admin-item-icon-wrap"><i class="ph ph-calendar-star"></i></div>`}
+        <div style="min-width:0;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">${e.title}</strong>
+            ${isHidden 
+              ? '<span class="badge-tag badge-hidden"><i class="ph ph-eye-slash"></i> Oculto</span>' 
+              : '<span class="badge-tag badge-visible"><i class="ph ph-eye"></i> Visible</span>'}
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+            ${(e.platform || 'general').toUpperCase()} • Fecha: ${dateFormatted} • ${e.discount || ''}
+          </div>
         </div>
       </div>
-      <button class="btn btn-outline btn-xs" style="color:var(--brand-red); border-color:var(--brand-red);" onclick="deleteEvent('${e.id}')">
-        <i class="ph ph-trash"></i>
-      </button>
+      <div class="admin-case-actions">
+        <button type="button" class="btn btn-outline btn-xs ${isHidden ? 'btn-action-show' : 'btn-action-hide'}" onclick="toggleHideEvent('${e.id}')" title="${isHidden ? 'Mostrar en el calendario' : 'Ocultar del calendario'}">
+          <i class="ph ${isHidden ? 'ph-eye' : 'ph-eye-slash'}"></i> ${isHidden ? 'Mostrar' : 'Ocultar'}
+        </button>
+        <button type="button" class="btn btn-outline btn-xs btn-action-edit" onclick="editEvent('${e.id}')" title="Editar texto, fecha y foto del flyer">
+          <i class="ph ph-pencil-simple"></i> Editar
+        </button>
+        <button type="button" class="btn btn-outline btn-xs btn-action-delete" onclick="deleteEvent('${e.id}')" title="Eliminar definitivamente">
+          <i class="ph ph-trash"></i>
+        </button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function renderAdminSubscribersList() {
