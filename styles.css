@@ -3660,3 +3660,104 @@ button, input, select, textarea {
     margin: 8px 0;
   }
 }
+
+/* =============================================================================
+   TACTICAL MICRO-CARD (OPTIMIZACIÓN HERO SIN ESTIRAMIENTO DE FONDO)
+   ============================================================================= */
+.tactical-micro-card {
+  background: rgba(11, 17, 30, 0.95);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-top: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.tactical-micro-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #f59e0b, transparent);
+}
+
+.tactical-micro-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tactical-micro-tracknum {
+  font-family: Consolas, monospace;
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: #f8fafc;
+}
+
+.tactical-micro-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--trans-fast);
+}
+.tactical-micro-close:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tactical-micro-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tactical-micro-eta {
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+.tactical-micro-stepper {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.tactical-micro-step-dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all var(--trans-fast);
+}
+
+.tactical-micro-step-dot.completed {
+  background: #10b981;
+}
+
+.tactical-micro-step-dot.active {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+}
+
+.tactical-micro-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tactical-micro-actions .btn {
+  padding: 8px 12px;
+  font-size: 0.78rem;
+}

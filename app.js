@@ -879,6 +879,57 @@ async function query17Track(cleanTrack, cfg) {
   return normalize17TrackData(item, cleanTrack);
 }
 
+// =============================================================================
+// GLOSARIO OFICIAL DE ESTADOS ELIZAAPP ERP
+// RECEIVED: Bodega origen (Recibido en bodega origen Miami) -> Hito 1
+// IN_TRANSIT: En tránsito (Enviado hacia el destino) -> Hito 2
+// ARRIVED: Recibido (Recibido en destino: puerto | aeropuerto | aduanas) -> Hito 3
+// WAREHOUSED: Bodega destino (Recibido en bodega destino: sucursal) -> Hito 4
+// DELIVERED: Entregado (Entregado al cliente final) -> Hito 4
+// =============================================================================
+const ELIZA_GLOSSARY = {
+  RECEIVED: {
+    statusKey: 'warehouse',
+    label: 'Bodega Origen (Miami)',
+    desc: 'Recibido en bodega origen Miami. Paquete verificado, pesado y registrado en el sistema.',
+    milestone: 1,
+    location: 'Warehouse Miami (Doral, FL)',
+    icon: 'ph-warehouse'
+  },
+  IN_TRANSIT: {
+    statusKey: 'transit',
+    label: 'En Tránsito Internacional',
+    desc: 'Carga manifestada y despachada en vuelo de interconexión con destino a Tocumen (PTY).',
+    milestone: 2,
+    location: 'En Vuelo / Tránsito Aéreo',
+    icon: 'ph-airplane-takeoff'
+  },
+  ARRIVED: {
+    statusKey: 'customs',
+    label: 'Recibido en Destino / Aduana',
+    desc: 'Arribo a Panamá confirmado (Aeropuerto Tocumen / Recinto Aduanero). En trámite de liberación y clasificación.',
+    milestone: 3,
+    location: 'Aeropuerto Tocumen (PTY)',
+    icon: 'ph-shield-check'
+  },
+  WAREHOUSED: {
+    statusKey: 'ready',
+    label: 'Listo en Sucursal Panamá',
+    desc: 'Recibido en bodega destino (Sucursal San Francisco). Paquete disponible para retiro inmediato o reparto a domicilio.',
+    milestone: 4,
+    location: 'Sucursal Express Loadout (PTY)',
+    icon: 'ph-package'
+  },
+  DELIVERED: {
+    statusKey: 'delivered',
+    label: 'Entregado al Destinatario',
+    desc: 'Paquete entregado y recibido a satisfacción por el cliente final.',
+    milestone: 4,
+    location: 'Entregado al Cliente',
+    icon: 'ph-check-circle'
+  }
+};
+
 // Consulta a ElizaApp ERP
 async function queryElizaApp(cleanTrack, cfg) {
   const tenant = cfg.eliza?.tenant || 'nelconcargo';
@@ -897,6 +948,12 @@ async function queryElizaApp(cleanTrack, cfg) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
+    
+    if (res.status === 403) {
+      console.warn('ElizaApp 403 Forbidden: La api_access_key es inválida o no ha sido ingresada en el panel CMS.');
+      return null;
+    }
+
     if (!res.ok) return null;
     const json = await res.json();
     if (json.code === 200 && json.data) {
@@ -986,51 +1043,47 @@ function normalize17TrackData(item, cleanTrack) {
   };
 }
 
-// Normalización de datos de ElizaApp ERP
+// Normalización de datos de ElizaApp ERP según glosario oficial
 function normalizeElizaData(data, cleanTrack) {
-  const currentStatus = (data.current_status || '').toUpperCase();
+  const currentCode = (data.current_status || 'RECEIVED').toUpperCase();
+  const currentMeta = ELIZA_GLOSSARY[currentCode] || ELIZA_GLOSSARY.IN_TRANSIT;
   const history = data.list_status_history || [];
 
-  let statusKey = 'transit';
-  let statusLabel = 'En Tránsito Internacional';
-  let milestone = 2;
+  const events = history.map(h => {
+    const code = (h.status || '').toUpperCase();
+    const meta = ELIZA_GLOSSARY[code] || {
+      desc: `Movimiento registrado: ${code}`,
+      location: 'Centro Logístico EXLO'
+    };
+    return {
+      time: h.date || 'Reciente',
+      location: meta.location,
+      desc: meta.desc,
+      statusCode: code
+    };
+  });
 
-  if (currentStatus === 'ARRIVED') {
-    statusKey = 'warehouse';
-    statusLabel = 'Recibido en Bodega Origen';
-    milestone = 1;
-  } else if (currentStatus === 'IN_TRANSIT' || currentStatus === 'TRANSIT') {
-    statusKey = 'transit';
-    statusLabel = 'En Vuelo hacia Panamá';
-    milestone = 2;
-  } else if (currentStatus === 'CUSTOMS') {
-    statusKey = 'customs';
-    statusLabel = 'Clasificación Aduanal PTY';
-    milestone = 3;
-  } else if (currentStatus === 'READY' || currentStatus === 'DELIVERED') {
-    statusKey = currentStatus === 'DELIVERED' ? 'delivered' : 'ready';
-    statusLabel = currentStatus === 'DELIVERED' ? 'Entregado al Destinatario' : 'Listo para Retiro en Sucursal';
-    milestone = 4;
+  if (events.length === 0) {
+    events.push({
+      time: 'Reciente',
+      location: currentMeta.location,
+      desc: currentMeta.desc,
+      statusCode: currentCode
+    });
   }
-
-  const events = history.map(h => ({
-    time: h.date || 'Reciente',
-    location: 'Warehouse & Clasificación',
-    desc: `Estado registrado: ${h.status || 'Actualización de inventario'}`
-  }));
 
   return {
     trackingNumber: data.tracking_id || cleanTrack,
     carrier: 'ElizaApp ERP Logistics',
-    statusKey: statusKey,
-    statusLabel: statusLabel,
-    currentMilestone: milestone,
-    origin: { name: 'Warehouse Miami (FL)', flag: '🇺🇸', hub: 'Bodega EXLO Doral' },
-    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Centro Logístico PTY' },
+    statusKey: currentMeta.statusKey,
+    statusLabel: currentMeta.label,
+    currentMilestone: currentMeta.milestone,
+    origin: { name: 'Warehouse Miami (FL)', flag: '🇺🇸', hub: 'Bodega EXLO Doral 8400' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Sucursal San Francisco PTY' },
     mode: 'Aéreo Express PTY',
     refCode: data.list_ref || `REF-${cleanTrack.slice(-6)}`,
-    lastUpdate: history.length > 0 ? history[0].date : 'Hoy',
-    estimatedArrival: 'En 24 a 48 horas',
+    lastUpdate: events.length > 0 ? events[0].time : 'Reciente',
+    estimatedArrival: currentMeta.milestone === 4 ? 'Disponible de inmediato' : 'En 24 a 48 horas hábiles',
     events: events
   };
 }
@@ -1055,45 +1108,56 @@ function normalizeGASData(data, cleanTrack) {
   };
 }
 
-// Generador de simulación táctica enriquecida (Modo Demo & Fallback de Visualización)
+// Generador de simulación táctica dinámica (cada tracking genera su propio estado e historial realista)
 function generateTacticalDemo(cleanTrack, carrierInfo) {
   const isChina = /^(LP|SY|YT|VR|CP)/i.test(cleanTrack);
-  const now = new Date();
-  const dToday = now.toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
-  const dYesterday = new Date(Date.now() - 86400000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
-  const dTwoDays = new Date(Date.now() - 172800000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  
+  // Hash simple para que diferentes trackings tengan estados y fechas distintas y coherentes
+  let hash = 0;
+  for (let i = 0; i < cleanTrack.length; i++) {
+    hash = (hash << 5) - hash + cleanTrack.charCodeAt(i);
+    hash |= 0;
+  }
+  const positiveHash = Math.abs(hash);
+  const statusCycle = ['RECEIVED', 'IN_TRANSIT', 'ARRIVED', 'WAREHOUSED'];
+  const statusCode = statusCycle[positiveHash % statusCycle.length];
+  const meta = ELIZA_GLOSSARY[statusCode] || ELIZA_GLOSSARY.IN_TRANSIT;
+
+  const now = Date.now();
+  const dHourAgo = new Date(now - (positiveHash % 3600000)).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  const dYesterday = new Date(now - 86400000 - (positiveHash % 7200000)).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  const dTwoDays = new Date(now - 172800000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+  const dThreeDays = new Date(now - 259200000).toLocaleString('es-PA', { dateStyle: 'medium', timeStyle: 'short' });
+
+  // Historial según el estado asignado
+  const demoEvents = [];
+  if (meta.milestone >= 4) {
+    demoEvents.push({ time: dHourAgo, location: 'Sucursal Express Loadout (PTY)', desc: 'Recibido en bodega destino (Sucursal San Francisco). Paquete clasificado y disponible para entrega.' });
+  }
+  if (meta.milestone >= 3) {
+    demoEvents.push({ time: dYesterday, location: 'Aeropuerto Tocumen (PTY)', desc: 'Arribo a Panamá confirmado (Aeropuerto Tocumen / Recinto Aduanero). En trámite de liberación.' });
+  }
+  if (meta.milestone >= 2) {
+    demoEvents.push({ time: dTwoDays, location: isChina ? 'Aeropuerto Shenzhen' : 'Aeropuerto Internacional de Miami (MIA)', desc: 'Manifiesto emitido. Carga despachada en vuelo de interconexión hacia Panamá.' });
+  }
+  demoEvents.push({ time: dThreeDays, location: isChina ? 'Almacén Guangzhou (China)' : 'Warehouse Miami (Doral, FL)', desc: 'Recibido en bodega origen. Paquete verificado, pesado y etiquetado con código EXLO.' });
 
   return {
     trackingNumber: cleanTrack,
-    carrier: carrierInfo.name,
-    statusKey: 'transit',
-    statusLabel: 'En Tránsito Internacional (En Vuelo)',
-    currentMilestone: 2,
+    carrier: carrierInfo.name || 'EXLO Cargo Network',
+    statusKey: meta.statusKey,
+    statusLabel: meta.label,
+    currentMilestone: meta.milestone,
     origin: isChina
-      ? { name: 'Shenzhen Hub (Guangdong)', flag: '🇨🇳', hub: 'Almacén de Consolidación China' }
+      ? { name: 'Shenzhen Hub (Guangdong)', flag: '🇨🇳', hub: 'Almacén Consolidación China' }
       : { name: 'Warehouse Miami (FL)', flag: '🇺🇸', hub: 'Bodega EXLO Doral 8400' },
-    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Hub Central San Francisco PTY' },
+    destination: { name: 'Ciudad de Panamá', flag: '🇵🇦', hub: 'Sucursal San Francisco PTY' },
     mode: isChina ? 'Marítimo / Aéreo Consolidado' : 'Aéreo Express PTY',
     refCode: `EXLO-${cleanTrack.slice(-6)}`,
-    lastUpdate: dToday,
-    estimatedArrival: 'En 24 - 48 horas hábiles',
-    events: [
-      {
-        time: dToday,
-        location: isChina ? 'Aeropuerto Internacional Shenzhen' : 'Aeropuerto Internacional de Miami (MIA)',
-        desc: 'Manifiesto aduanal de exportación emitido. Carga en vuelo de interconexión con destino a Tocumen (PTY).'
-      },
-      {
-        time: dYesterday,
-        location: isChina ? 'Centro Logístico Guangdong' : 'Bodega Miami (Doral, FL)',
-        desc: 'Recepción física de paquete confirmada, verificación de peso y etiquetado con código de casillero EXLO.'
-      },
-      {
-        time: dTwoDays,
-        location: 'Instalaciones del Proveedor',
-        desc: 'Etiqueta de despacho generada por el transportista original.'
-      }
-    ]
+    lastUpdate: demoEvents[0]?.time || dHourAgo,
+    estimatedArrival: meta.milestone === 4 ? 'Disponible para retiro' : 'En 24 - 48 horas hábiles',
+    events: demoEvents,
+    isDemo: true
   };
 }
 
@@ -1104,6 +1168,12 @@ async function executeTacticalTracking(trackNum, targetResultId) {
 
   const cleanTrack = trackNum.trim().toUpperCase();
   if (!cleanTrack) return;
+
+  // Si estamos en el Hero, ocultar la caja de direcciones para evitar estiramiento del fondo
+  if (targetResultId === 'quick-track-result') {
+    const addrBox = document.getElementById('hero-quick-address-box');
+    if (addrBox) addrBox.classList.add('hidden');
+  }
 
   resultBox.classList.remove('hidden');
   resultBox.innerHTML = `
@@ -1124,7 +1194,7 @@ async function executeTacticalTracking(trackNum, targetResultId) {
 
   try {
     if (cfg.provider === 'demo') {
-      await new Promise(r => setTimeout(r, 650));
+      await new Promise(r => setTimeout(r, 450));
       trackingResult = generateTacticalDemo(cleanTrack, carrierInfo);
     } else if (cfg.provider === 'eliza' || (cfg.provider === 'hybrid' && carrierInfo.type === 'internal')) {
       trackingResult = await queryElizaApp(cleanTrack, cfg);
@@ -1150,7 +1220,18 @@ async function executeTacticalTracking(trackNum, targetResultId) {
   renderTacticalVisualizer(trackingResult, targetResultId, targetResultId === 'quick-track-result');
 }
 
-// Renderizado del Visualizador Táctico Obsidian & Gold
+// Cierra el resultado del Hero y restaura la dirección de warehouse
+function closeHeroTrackResult() {
+  const resultBox = document.getElementById('quick-track-result');
+  if (resultBox) {
+    resultBox.classList.add('hidden');
+    resultBox.innerHTML = '';
+  }
+  const addrBox = document.getElementById('hero-quick-address-box');
+  if (addrBox) addrBox.classList.remove('hidden');
+}
+
+// Renderizado del Visualizador Táctico (Micro-HUD en Hero vs Ficha Completa en Tracking)
 function renderTacticalVisualizer(data, containerId, compact = false) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -1170,6 +1251,57 @@ function renderTacticalVisualizer(data, containerId, compact = false) {
   const finalMsg = encodeURIComponent(defaultMsg.replace('{NUMBER}', data.trackingNumber));
   const waUrl = `https://wa.me/${waNum}?text=${finalMsg}`;
 
+  // =========================================================================
+  // VISTA A: MICRO-HUD ULTRA-COMPACTO PARA EL HERO (SIN ESTIRAR FONDO)
+  // =========================================================================
+  if (compact) {
+    const stepsDots = [1, 2, 3, 4].map(num => {
+      let dotClass = '';
+      if (num < data.currentMilestone) dotClass = 'completed';
+      else if (num === data.currentMilestone) dotClass = 'active';
+      return `<div class="tactical-micro-step-dot ${dotClass}"></div>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="tactical-micro-card">
+        <div class="tactical-micro-header">
+          <div class="tactical-track-id-group">
+            <span class="tactical-carrier-badge"><i class="ph ph-package"></i> ${data.carrier}</span>
+            <span class="tactical-micro-tracknum">${data.trackingNumber}</span>
+          </div>
+          <button type="button" class="tactical-micro-close" onclick="closeHeroTrackResult()" title="Cerrar"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="tactical-micro-body">
+          <div class="tactical-status-pill ${statusClass}">
+            <span class="tactical-radar-dot"></span>
+            <span>${data.statusLabel}</span>
+          </div>
+          <div class="tactical-micro-eta">
+            <span>📍 Arribo: <strong style="color:#fbbf24;">${data.estimatedArrival}</strong></span>
+          </div>
+        </div>
+
+        <div class="tactical-micro-stepper" title="Progreso de 4 etapas logísticas">
+          ${stepsDots}
+        </div>
+
+        <div class="tactical-micro-actions">
+          <button type="button" class="btn btn-primary btn-sm btn-block" onclick="expandTrackingInAdvanced('${data.trackingNumber}')">
+            <i class="ph ph-arrows-out-simple"></i> Ver Bitácora & Ficha Completa
+          </button>
+          <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+            <i class="ph ph-whatsapp-logo"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // =========================================================================
+  // VISTA B: VISUALIZADOR COMPLETO OBSIDIAN & GOLD PARA SECCIÓN TRACKING
+  // =========================================================================
   const steps = [
     { num: 1, title: 'Recepción en Bodega', sub: data.origin.name, icon: 'ph-warehouse' },
     { num: 2, title: 'Tránsito Internacional', sub: data.mode, icon: 'ph-airplane-takeoff' },
@@ -1199,7 +1331,7 @@ function renderTacticalVisualizer(data, containerId, compact = false) {
     <div class="tactical-history-section">
       <div class="tactical-history-title">
         <span><i class="ph ph-clock-counter-clockwise"></i> Bitácora Cronológica de Movimientos</span>
-        <span style="font-size:0.75rem; color:#94a3b8;">${data.events.length} Registros</span>
+        <span style="font-size:0.75rem; color:#94a3b8;">${data.events.length} Registros Oficiales</span>
       </div>
       <div class="tactical-checkpoints-list">
         ${data.events.map(ev => `
@@ -1227,15 +1359,10 @@ function renderTacticalVisualizer(data, containerId, compact = false) {
       <a href="https://t.17track.net/es#nums=${encodeURIComponent(data.trackingNumber)}" target="_blank" rel="noopener" class="tactical-action-btn carrier">
         <i class="ph ph-arrow-square-out"></i> Portal 17Track Oficial
       </a>
-      ${compact ? `
-        <button type="button" class="tactical-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="expandTrackingInAdvanced('${data.trackingNumber}')">
-          <i class="ph ph-arrows-out-simple"></i> Ver Vista Completa
-        </button>
-      ` : ''}
     </div>
   `;
 
-  const html = `
+  container.innerHTML = `
     <div class="tactical-track-card">
       <!-- HUD HEADER -->
       <div class="tactical-hud-header">
@@ -1300,20 +1427,18 @@ function renderTacticalVisualizer(data, containerId, compact = false) {
           <span class="tactical-dossier-val">${data.lastUpdate}</span>
         </div>
         <div class="tactical-dossier-item">
-          <span class="tactical-dossier-label">Estimación Arribo PTY</span>
+          <span class="tactical-dossier-label">Disponibilidad en PTY</span>
           <span class="tactical-dossier-val" style="color:var(--brand-yellow);">${data.estimatedArrival}</span>
         </div>
       </div>
 
       <!-- CHECKPOINTS HISTORIAL -->
-      ${compact ? '' : checkpointsHtml}
+      ${checkpointsHtml}
 
       <!-- ACCIONES TÁCTICAS -->
       ${actionsHtml}
     </div>
   `;
-
-  container.innerHTML = html;
 }
 
 // Helpers de portapapeles y navegación
