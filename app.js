@@ -318,18 +318,26 @@ async function syncContentToCloud(type, data) {
     }
   }
 
-  // MÉTODO 2 (Fallback): Vercel Serverless Function
-  try {
-    const res = await fetch('/api/sync-content', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, data })
-    });
-    if (res.ok) {
-      showToast('¡Despliegue Global en Curso!', 'Vercel detectó el cambio y está actualizando la web (15-20s).', 'success', 6000);
-      return true;
-    }
-  } catch (e) {}
+  // MÉTODO 2 (Vercel Serverless Function):
+  const vercelEndpoints = [
+    '/api/sync-content',
+    'https://expressloadoutgithubio.vercel.app/api/sync-content'
+  ];
+
+  for (const endpoint of vercelEndpoints) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, data })
+      });
+      if (res.ok) {
+        const result = await res.json().catch(() => ({}));
+        showToast('¡Despliegue Global en Curso!', (result.message || 'Vercel detectó el cambio y está actualizando la web (15-20s).'), 'success', 6000);
+        return true;
+      }
+    } catch (e) {}
+  }
 
   // Si no hay token configurado y Vercel no respondió:
   showToast('Guardado Localmente', 'Para publicar automáticamente en todo el mundo, ve a la pestaña "Sincronización GitHub" del CMS e ingresa tu token.', 'warning', 7000);
