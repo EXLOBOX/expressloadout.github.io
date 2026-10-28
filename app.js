@@ -12,7 +12,8 @@ const STORAGE_KEYS = {
   GAS_URL: 'exlo_gas_webhook_url',
   THEME: 'exlo_active_theme',
   EVENTS: 'exlo_events_v4',
-  SUBSCRIBERS: 'exlo_event_subscribers_v4'
+  SUBSCRIBERS: 'exlo_event_subscribers_v4',
+  GITHUB_TOKEN: 'exlo_github_pat_token'
 };
 
 const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec';
@@ -253,28 +254,91 @@ async function fetchCloudContent() {
   }
 }
 
-async function syncContentToVercel(type, data) {
+async function syncContentToCloud(type, data) {
+  const token = localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN);
+
+  // MÉTODO 1: Commit directo a GitHub API con Personal Access Token
+  if (token) {
+    try {
+      showToast('Sincronizando con GitHub...', `Enviando actualización de ${type} a la rama main...`, 'info', 4000);
+      const githubUrl = `https://api.github.com/repos/EXLOBOX/expressloadout.github.io/contents/data/${type}.json`;
+
+      let sha = null;
+      try {
+        const getRes = await fetch(githubUrl, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'ExpressLoadout-CMS'
+          }
+        });
+        if (getRes.ok) {
+          const fileInfo = await getRes.json();
+          sha = fileInfo.sha;
+        }
+      } catch (e) {
+        console.warn('No se pudo obtener SHA previo:', e);
+      }
+
+      const jsonStr = JSON.stringify(data, null, 2);
+      const base64Content = btoa(unescape(encodeURIComponent(jsonStr)));
+
+      const commitPayload = {
+        message: `cms(auto-sync): actualización de ${type} en vivo vía CMS [auto-deploy]`,
+        content: base64Content,
+        branch: 'main'
+      };
+      if (sha) commitPayload.sha = sha;
+
+      const putRes = await fetch(githubUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'ExpressLoadout-CMS'
+        },
+        body: JSON.stringify(commitPayload)
+      });
+
+      if (putRes.ok) {
+        const resData = await putRes.json();
+        const shortSha = resData.commit ? resData.commit.sha.substring(0, 7) : '';
+        showToast('¡Despliegue Global en Curso!', `Commit ${shortSha} creado con éxito en GitHub. En 15-30s estará en vivo para todas las computadoras.`, 'success', 6000);
+        return true;
+      } else {
+        const errJson = await putRes.json().catch(() => ({}));
+        showToast('Error al Publicar en GitHub', errJson.message || 'Verifica los permisos de tu token (debe tener permisos de escritura / contents).', 'error', 6000);
+        return false;
+      }
+    } catch (err) {
+      console.error('Error en syncContentToCloud:', err);
+      showToast('Error de Conexión', 'No se pudo conectar con la API de GitHub: ' + err.message, 'error', 5000);
+      return false;
+    }
+  }
+
+  // MÉTODO 2 (Fallback): Vercel Serverless Function
   try {
-    showToast('Sincronizando con la nube...', 'Creando commit en GitHub para auto-deploy en Vercel...', 'info', 4000);
     const res = await fetch('/api/sync-content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, data })
     });
-
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      console.warn('Vercel sync response:', errJson);
-      return;
+    if (res.ok) {
+      showToast('¡Despliegue Global en Curso!', 'Vercel detectó el cambio y está actualizando la web (15-20s).', 'success', 6000);
+      return true;
     }
+  } catch (e) {}
 
-    const result = await res.json();
-    if (result.success) {
-      showToast('¡Despliegue Global en Curso!', 'Vercel detectó el commit en GitHub y está actualizando la web para todas las computadoras (15-20s).', 'success', 6000);
-    }
-  } catch (err) {
-    console.debug('syncContentToVercel (modo offline/local):', err);
-  }
+  // Si no hay token configurado y Vercel no respondió:
+  showToast('Guardado Localmente', 'Para publicar automáticamente en todo el mundo, ve a la pestaña "Sincronización GitHub" del CMS e ingresa tu token.', 'warning', 7000);
+  return false;
+}
+
+// Alias para compatibilidad total con llamadas existentes
+async function syncContentToVercel(type, data) {
+  return syncContentToCloud(type, data);
 }
 
 function loadStoredData() {
@@ -2939,6 +3003,7 @@ function showAdminDashboard() {
   loadRatesInAdmin();
   loadGasConfig();
   loadTrackingConfigInAdmin();
+  loadGithubConfigInAdmin();
 }
 
 function handleAdminLogout() {
@@ -3576,6 +3641,108 @@ function handleRestoreFile(event) {
     }
   };
   reader.readAsText(file);
+}
+
+// =============================================================================
+// GESTIÓN DE SINCRONIZACIÓN AUTOMÁTICA CON GITHUB API (CMS CLOUD SYNC)
+// =============================================================================
+function loadGithubConfigInAdmin() {
+  const token = localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN) || '';
+  const input = document.getElementById('github-pat-input');
+  const badge = document.getElementById('github-sync-status-badge');
+  if (input) input.value = token;
+  if (badge) {
+    if (token) {
+      badge.textContent = 'Token Configurado';
+      badge.style.background = 'rgba(16, 185, 129, 0.2)';
+      badge.style.color = '#10b981';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+    } else {
+      badge.textContent = 'Sin Token';
+      badge.style.background = 'rgba(245, 158, 11, 0.2)';
+      badge.style.color = '#f59e0b';
+      badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+    }
+  }
+}
+
+function saveGithubToken() {
+  const input = document.getElementById('github-pat-input');
+  const token = (input?.value || '').trim();
+  if (!token) {
+    localStorage.removeItem(STORAGE_KEYS.GITHUB_TOKEN);
+    loadGithubConfigInAdmin();
+    showToast('Token Eliminado', 'Se ha removido el token de este navegador.', 'info', 3500);
+    return;
+  }
+  localStorage.setItem(STORAGE_KEYS.GITHUB_TOKEN, token);
+  loadGithubConfigInAdmin();
+  showToast('¡Token Guardado con Éxito!', 'Tus cambios en el CMS ahora se sincronizarán directamente con GitHub y Vercel.', 'success', 4500);
+}
+
+function toggleGithubTokenVisibility() {
+  const input = document.getElementById('github-pat-input');
+  const icon = document.getElementById('icon-toggle-pat');
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) {
+      icon.classList.remove('ph-eye');
+      icon.classList.add('ph-eye-slash');
+    }
+  } else {
+    input.type = 'password';
+    if (icon) {
+      icon.classList.remove('ph-eye-slash');
+      icon.classList.add('ph-eye');
+    }
+  }
+}
+
+async function testGithubConnection() {
+  const input = document.getElementById('github-pat-input');
+  const token = (input?.value || localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN) || '').trim();
+  if (!token) {
+    showToast('Campo Vacío', 'Ingresa tu Personal Access Token de GitHub para probar la conexión.', 'error', 4000);
+    return;
+  }
+  showToast('Probando Conexión...', 'Verificando acceso a EXLOBOX/expressloadout.github.io...', 'info', 3000);
+  try {
+    const res = await fetch('https://api.github.com/repos/EXLOBOX/expressloadout.github.io', {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'ExpressLoadout-CMS'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      saveGithubToken();
+      showToast('¡Conexión Exitosa con GitHub!', `Conectado al repositorio ${data.full_name} (${data.default_branch}). Permisos de despliegue activos.`, 'success', 5000);
+    } else {
+      const err = await res.json().catch(() => ({}));
+      showToast(`Error de Conexión (${res.status})`, err.message || 'Token inválido o sin permisos sobre EXLOBOX/expressloadout.github.io. Verifica los scopes "repo" o "Contents: Read & Write".', 'error', 6000);
+    }
+  } catch (err) {
+    showToast('Error de Red', 'No se pudo comunicar con GitHub API: ' + err.message, 'error', 4500);
+  }
+}
+
+async function forceSyncAllToGithub() {
+  const token = localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN);
+  if (!token) {
+    showToast('Token Requerido', 'Primero ingresa y guarda tu Personal Access Token de GitHub en esta pestaña.', 'error', 4500);
+    return;
+  }
+  showToast('Iniciando Sincronización Total...', 'Enviando eventos, casos y tarifas a GitHub...', 'info', 4000);
+  try {
+    await syncContentToCloud('events', currentEvents);
+    await syncContentToCloud('cases', currentCases);
+    await syncContentToCloud('rates', currentRates);
+    showToast('¡Sincronización Total Completada!', 'Todos los cambios locales fueron enviados a GitHub. En 15-30s la web estará actualizada.', 'success', 6000);
+  } catch (err) {
+    showToast('Error en Sincronización Total', err.message, 'error', 5000);
+  }
 }
 
 // =============================================================================

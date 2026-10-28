@@ -1496,6 +1496,9 @@
           <button class="admin-tab-btn" data-tab="backup" onclick="switchAdminTab('backup')">
             <i class="ph ph-floppy-disk"></i> Backup JSON
           </button>
+          <button class="admin-tab-btn" data-tab="github" onclick="switchAdminTab('github')">
+            <i class="ph ph-git-branch"></i> Sincronización GitHub
+          </button>
         </div>
 
         <!-- TAB 1: CASOS DE ÉXITO & SUBIDA DE FOTOS -->
@@ -1943,7 +1946,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: BACKUP Y EXPORTACIÓN -->
+        <!-- TAB 5: BACKUP Y EXPORTACIÓN -->
         <div class="admin-tab-pane" id="tab-pane-backup">
           <div class="admin-pane-header">
             <h4>Copia de Seguridad y Migración</h4>
@@ -1960,6 +1963,49 @@
             <input type="file" id="backup-file-input" accept=".json" class="hidden" onchange="handleRestoreFile(event)" />
           </div>
         </div>
+
+        <!-- TAB 6: SINCRONIZACIÓN AUTOMÁTICA GITHUB -->
+        <div class="admin-tab-pane" id="tab-pane-github">
+          <div class="admin-pane-header">
+            <h4>Sincronización Automática con GitHub</h4>
+            <span class="badge-tag" id="github-sync-status-badge">Sin Token</span>
+          </div>
+          <p style="margin-bottom:14px; font-size:0.875rem; color:#94a3b8; line-height:1.5;">
+            Conecta tu <strong>Personal Access Token de GitHub</strong> para que cada cambio, foto o evento que guardes en el CMS se publique automáticamente en la web mundial en menos de 30 segundos.
+          </p>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Personal Access Token (GitHub):</label>
+            <div class="input-with-button" style="display:flex; gap:8px;">
+              <input type="password" id="github-pat-input" class="form-input" placeholder="ghp_... o github_pat_..." autocomplete="off" style="flex:1;" />
+              <button type="button" class="btn btn-outline" onclick="toggleGithubTokenVisibility()" id="btn-toggle-pat" title="Ver / Ocultar Token">
+                <i class="ph ph-eye" id="icon-toggle-pat"></i>
+              </button>
+            </div>
+            <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+              🔒 El token se almacena de forma 100% privada en el navegador de tu equipo. Ningún visitante externo tiene acceso a él.
+            </small>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+            <button type="button" class="btn btn-primary" onclick="saveGithubToken()">
+              <i class="ph ph-check-circle"></i> Guardar Token
+            </button>
+            <button type="button" class="btn btn-outline" onclick="testGithubConnection()">
+              <i class="ph ph-plug"></i> Probar Conexión
+            </button>
+            <button type="button" class="btn btn-accent" onclick="forceSyncAllToGithub()">
+              <i class="ph ph-cloud-arrow-up"></i> Sincronizar Todo a la Nube Ahora
+            </button>
+          </div>
+
+          <div id="github-sync-info-box" style="background:#090d16; border:1px solid #1e293b; border-radius:8px; padding:12px; font-size:0.8rem; color:#94a3b8;">
+            <div style="font-weight:600; color:#38bdf8; margin-bottom:4px;">
+              <i class="ph ph-info"></i> Repositorio Conectado: EXLOBOX/expressloadout.github.io
+            </div>
+            <div>Rama de producción: <code>main</code> (Despliegue automático en GitHub Pages & Vercel)</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1968,6 +2014,6 @@
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- SCRIPT PRINCIPAL MODERNO -->
-  <script src="app.js?v=3.5.0"></script>
+  <script src="app.js?v=3.6.0"></script>
 </body>
 </html>
