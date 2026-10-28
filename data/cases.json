@@ -6,36 +6,38 @@
     "title": "Importación de 10 Reformers desde China",
     "mode": "China • Marítimo",
     "stat": "1,850 lbs • $3,400 Ahorro",
-    "image": "images/banner.jpg",
-    "link": "https://www.instagram.com/expressloadout",
-    "hideUrlButton": false,
+    "image": "images/case-1.jpg",
+    "desc": "“Con Express Loadout importé sin complicaciones 10 reformers para mi gimnasio de pilates. Fueron rápidos, transparentes y hasta me ayudaron a subir toda la carga a mi segundo piso. ¡Servicio impecable!”",
     "hidden": false,
-    "desc": "“Con Express Loadout importé sin complicaciones 10 reformers para mi gimnasio de pilates. Fueron rápidos, transparentes y hasta me ayudaron a subir toda la carga a mi segundo piso. ¡Servicio impecable!”"
+    "link": "https://www.instagram.com/expressloadout/p/DJm-huPxwRI/",
+    "updatedAt": "2026-10-27T22:49:31.639Z",
+    "hideUrlButton": true
   },
   {
     "id": "case-2",
-    "client": "Taller Mecánico David",
-    "company": "Chiriquí Auto Parts",
-    "title": "Repuestos de Transmisión desde Miami",
+    "client": "Boquete Chiriqui",
+    "company": "Emprendedora Digital",
+    "title": "Equipos Electronicos, Tecnológicos & Laptops (Amazon USA)",
     "mode": "Miami, USA • Aéreo",
-    "stat": "95 lbs • 4 días tránsito",
-    "image": "images/banner.jpg",
-    "link": "https://www.instagram.com/expressloadout",
-    "hideUrlButton": false,
+    "stat": "4 Días de Entrega • 0 Daños",
+    "image": "images/case-2.jpg",
+    "desc": "“Necesitaba tus compras de Navidad traer equipos delicados comprados en Amazon. Nos encargamos de la recepción y embalaje en Miami. En 4 días antes de Navidad tenias en tus manos sin cargos ocultos.”",
     "hidden": false,
-    "desc": "“Necesitábamos con urgencia una caja de cambios de USA para un cliente varado. Llegó en 4 días a David, Chiriquí, sin cobros ocultos ni sorpresas en aduana. 100% recomendados.”"
+    "link": "https://www.instagram.com/reel/DR57FFbjAZZ/?rpxt=YTdxZHprMGQzYThm",
+    "hideUrlButton": true,
+    "updatedAt": "2026-10-27T22:59:19.320Z"
   },
   {
     "id": "case-3",
-    "client": "Boutique Bella PTY",
-    "company": "Moda & Accesorios",
-    "title": "Consolidación de Ropa SHEIN & TEMU",
-    "mode": "Miami, USA • Aéreo",
-    "stat": "220 lbs • Entrega express",
+    "client": "Lena E.",
+    "company": "Cliente Frecuente",
+    "title": "Carga Continua con Envío a Boquete, Chiriquí",
+    "mode": "USA • Marítimo & Aéreo",
+    "stat": "Entrega en Tierras Altas",
     "image": "images/banner.jpg",
-    "link": "https://www.instagram.com/expressloadout",
-    "hideUrlButton": false,
+    "desc": "“Uso su casillero en Miami desde hace más de un año. Recibo mis compras no solo en la capital sino hasta Boquete Chiriquí con despacho directo y atención personalizada.”",
     "hidden": false,
-    "desc": "“Compro en liquidaciones de ropa en USA y China. Express Loadout me consolida los paquetes en una sola caja ahorrándome cientos de dólares en flete cada mes.”"
+    "link": "",
+    "hideUrlButton": false
   }
 ]

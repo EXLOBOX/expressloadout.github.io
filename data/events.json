@@ -7,11 +7,12 @@
     "hasTimer": true,
     "discount": "Hasta 80% OFF • Millones de Ofertas",
     "logisticsTip": "Evento cumbre mundial. Para compras voluminosas o carga pesada, despacha por flete marítimo antes del 15 de Noviembre para recibir antes de Navidad en Panamá.",
-    "url": "https://www.aliexpress.com",
-    "image": "images/events/aliexpress-11-11.png",
+    "url": "https://www.aliexpress.com/ssr/300002660/Deals-HomePage?spm=a2g0o.home.superdeal.1.468a627895ENch&disableNav=YES&pha_manifest=ssr&_immersiveMode=true&businessCode=guide&source=superdeals&_gl=1*n0ja9h*_gcl_au*NzI4NTY4MTgzLjE3OTMxNDI5NzE.*_ga*ODM5NjEwOTM2LjE3OTMxMzY2MjM.*_ga_VED1YSGNC7*czE3OTMxNDI5NzEkbzEkZzAkdDE3OTMxNDI5NzEkajYwJGwwJGgw",
     "badge": "11.11 Día del Soltero",
-    "hideUrlButton": false,
-    "hidden": false
+    "hidden": false,
+    "hideUrlButton": true,
+    "image": "images/events/event-aliexpress-1.jpg",
+    "updatedAt": "2026-10-28T01:56:18.497Z"
   },
   {
     "id": "evt-2",
@@ -22,10 +23,11 @@
     "discount": "Descuentos Relámpago en Electrónica & Prime",
     "logisticsTip": "Mayor volumen del año en Miami. Despacha vía Aéreo Express con casillero EXLO-PA para tener tus regalos listos sin demoras.",
     "url": "https://www.amazon.com",
-    "image": "images/events/amazon-black-friday.png",
     "badge": "Black Friday Global",
-    "hideUrlButton": false,
-    "hidden": false
+    "hidden": false,
+    "hideUrlButton": true,
+    "image": "images/events/event-amazon-2.png",
+    "updatedAt": "2026-10-28T00:07:51.312Z"
   },
   {
     "id": "evt-3",
@@ -36,38 +38,40 @@
     "discount": "Hasta 70% OFF Exclusivo Membresía Prime",
     "logisticsTip": "Laptops, smart home, calzado y ropa. Los paquetes llegan en 24h a nuestra bodega de Miami y en 3 a 5 días hábiles están en Panamá.",
     "url": "https://www.amazon.com/primeday",
-    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80",
     "badge": "Prime Day Exclusivo",
+    "hidden": true,
     "hideUrlButton": false,
-    "hidden": false
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80"
   },
   {
     "id": "evt-4",
     "platform": "shein",
     "title": "SHEIN Mega Sale & Flash Friday",
-    "date": "",
-    "hasTimer": false,
+    "date": "2026-11-27T00:00:00",
+    "hasTimer": true,
     "discount": "Descuentos por confirmar por la tienda",
     "logisticsTip": "Ideal para ropa, accesorios y calzado. Los paquetes se consolidan en Miami para entrega ágil en Panamá.",
-    "url": "https://www.shein.com",
-    "image": "images/events/shein-black-friday.png",
+    "url": "https://www.shein.com/super-deals?pagefrom=page_home&fromPageType=home&src_module=all&src_identifier=on%3DFLEXIBLE_LAYOUT_COMPONENT%60cn%3Dsuperdeals%60hz%3Drefresh_0%60jc%3DthriftyFind_%60ps%3D3_1&src_tab_page_id=page_home1793144015990&ici=CCCSN%3Dall_ON%3DFLEXIBLE_LAYOUT_COMPONENT_OI%3D0_CN%3DFLEXIBLE_LAYOUT_FOR_SALEZONE_TI%3D50001_aod%3D0_PS%3D3-1_ABT%3D0&adp=57121994&flash_adp=57302745&eventTimestamp=1793144022895",
     "badge": "Fecha por Confirmar",
-    "hideUrlButton": false,
-    "hidden": false
+    "hidden": false,
+    "hideUrlButton": true,
+    "image": "images/events/event-shein-4.webp",
+    "updatedAt": "2026-10-27T23:54:00.746Z"
   },
   {
     "id": "evt-5",
     "platform": "walmart",
     "title": "Walmart Deals & Early Black Friday",
-    "date": "",
-    "hasTimer": false,
+    "date": "2026-11-27T00:00:00",
+    "hasTimer": true,
     "discount": "Ofertas de temporada por confirmar",
     "logisticsTip": "Excelente para juguetes, electrónica y hogar. Se despacha directo a nuestro casillero Miami con entrega ágil en Panamá.",
-    "url": "https://www.walmart.com",
-    "image": "images/events/walmart-black-friday.jpg",
+    "url": "https://www.walmart.com/shop/deals/black-friday",
     "badge": "Fecha por Confirmar",
-    "hideUrlButton": false,
-    "hidden": false
+    "hidden": false,
+    "hideUrlButton": true,
+    "image": "images/events/event-walmart-5.jpg",
+    "updatedAt": "2026-10-27T23:19:31.067Z"
   },
   {
     "id": "evt-6",
@@ -78,10 +82,11 @@
     "discount": "Precios de fábrica en accesorios y novedades",
     "logisticsTip": "Excelente para accesorios, novedades y paquetes livianos. Coloca tu código EXLO-PA en la dirección para clasificación inmediata.",
     "url": "https://www.temu.com",
-    "image": "images/events/temu-black-friday.webp",
     "badge": "Fecha por Confirmar",
+    "hidden": false,
     "hideUrlButton": false,
-    "hidden": false
+    "image": "images/events/event-temu-6.png",
+    "updatedAt": "2026-10-27T23:59:20.666Z"
   },
   {
     "id": "evt-7",
@@ -92,9 +97,9 @@
     "discount": "Muestras Gratis & Contenedores LCL Compartidos",
     "logisticsTip": "Pensado para importadores y comercios en Panamá. Te asesoramos en la verificación de proveedores y flete marítimo en CBM.",
     "url": "https://www.alibaba.com",
-    "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
     "badge": "Fecha por Confirmar",
+    "hidden": true,
     "hideUrlButton": false,
-    "hidden": false
+    "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
   }
 ]
