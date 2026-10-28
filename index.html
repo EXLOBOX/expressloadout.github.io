@@ -1544,7 +1544,7 @@
               <div class="photo-inputs-row">
                 <input type="file" id="case-file-input" accept="image/*" class="file-input-custom" onchange="previewCaseImage(event)" />
                 <span class="or-separator">ó URL:</span>
-                <input type="url" id="case-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewCaseUrl(this.value)" onchange="previewCaseUrl(this.value)" />
+                <input type="text" id="case-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewCaseUrl(this.value)" onchange="previewCaseUrl(this.value)" />
               </div>
               <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
                 💡 Puedes subir una foto desde tu equipo o pegar el link directo de una imagen de Google, Instagram, Facebook o web.
@@ -1560,7 +1560,7 @@
               <label class="form-label">
                 <i class="ph ph-link"></i> Opción 2: Hipervínculo / URL de Redirección (Opcional):
               </label>
-              <input type="url" id="case-link" class="form-input" placeholder="https://instagram.com/..., https://facebook.com/..., https://ejemplo.com" />
+              <input type="text" id="case-link" class="form-input" placeholder="https://instagram.com/..., https://facebook.com/..., https://ejemplo.com" />
               
               <div class="url-btn-toggle-row" style="margin-top:10px; display:flex; align-items:center; gap:8px;">
                 <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-main);">
@@ -1644,7 +1644,7 @@
               <div class="photo-inputs-row">
                 <input type="file" id="event-file-input" accept="image/*" class="file-input-custom" onchange="previewEventImage(event)" />
                 <span class="or-separator">ó URL:</span>
-                <input type="url" id="event-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewEventUrl(this.value)" onchange="previewEventUrl(this.value)" />
+                <input type="text" id="event-img-url" class="form-input" placeholder="Pega link de Google, Instagram, Facebook o web (https://...)" oninput="previewEventUrl(this.value)" onchange="previewEventUrl(this.value)" />
               </div>
               <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
                 💡 Sube una imagen desde tu equipo o pega el link directo de alguna publicidad de Google, Instagram o Facebook.
@@ -1658,9 +1658,9 @@
             <!-- Opción 2: Hipervínculo / Enlace de la Oferta + Control Ocultar Botón -->
             <div class="form-group" style="margin-top:14px;">
               <label class="form-label">
-                <i class="ph ph-link"></i> Opción 2: Hipervínculo / Enlace de la Oferta o Publicidad:
+                <i class="ph ph-link"></i> Opción 2: Hipervínculo / Enlace de la Oferta o Publicidad (Opcional):
               </label>
-              <input type="url" id="event-url" class="form-input" placeholder="https://www.amazon.com/..., https://instagram.com/..., etc." required />
+              <input type="text" id="event-url" class="form-input" placeholder="https://www.amazon.com/..., https://instagram.com/..., etc." />
               
               <div class="url-btn-toggle-row" style="margin-top:10px; display:flex; align-items:center; gap:8px;">
                 <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-main);">
@@ -1963,6 +1963,9 @@
       </div>
     </div>
   </div>
+
+  <!-- CONTENEDOR FLOTANTE PARA TOAST NOTIFICATIONS PROFESIONALES -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- SCRIPT PRINCIPAL MODERNO -->
   <script src="app.js"></script>
