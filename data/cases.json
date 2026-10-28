@@ -1,0 +1,41 @@
+[
+  {
+    "id": "case-1",
+    "client": "Adriana S.",
+    "company": "Pilates Studio Panamá",
+    "title": "Importación de 10 Reformers desde China",
+    "mode": "China • Marítimo",
+    "stat": "1,850 lbs • $3,400 Ahorro",
+    "image": "images/banner.jpg",
+    "link": "https://www.instagram.com/expressloadout",
+    "hideUrlButton": false,
+    "hidden": false,
+    "desc": "“Con Express Loadout importé sin complicaciones 10 reformers para mi gimnasio de pilates. Fueron rápidos, transparentes y hasta me ayudaron a subir toda la carga a mi segundo piso. ¡Servicio impecable!”"
+  },
+  {
+    "id": "case-2",
+    "client": "Taller Mecánico David",
+    "company": "Chiriquí Auto Parts",
+    "title": "Repuestos de Transmisión desde Miami",
+    "mode": "Miami, USA • Aéreo",
+    "stat": "95 lbs • 4 días tránsito",
+    "image": "images/banner.jpg",
+    "link": "https://www.instagram.com/expressloadout",
+    "hideUrlButton": false,
+    "hidden": false,
+    "desc": "“Necesitábamos con urgencia una caja de cambios de USA para un cliente varado. Llegó en 4 días a David, Chiriquí, sin cobros ocultos ni sorpresas en aduana. 100% recomendados.”"
+  },
+  {
+    "id": "case-3",
+    "client": "Boutique Bella PTY",
+    "company": "Moda & Accesorios",
+    "title": "Consolidación de Ropa SHEIN & TEMU",
+    "mode": "Miami, USA • Aéreo",
+    "stat": "220 lbs • Entrega express",
+    "image": "images/banner.jpg",
+    "link": "https://www.instagram.com/expressloadout",
+    "hideUrlButton": false,
+    "hidden": false,
+    "desc": "“Compro en liquidaciones de ropa en USA y China. Express Loadout me consolida los paquetes en una sola caja ahorrándome cientos de dólares en flete cada mes.”"
+  }
+]

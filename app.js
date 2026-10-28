@@ -29,7 +29,7 @@ const defaultEvents = [
     logisticsTip: 'Evento cumbre mundial. Para compras voluminosas o carga pesada, despacha por flete marítimo antes del 15 de Noviembre para recibir antes de Navidad en Panamá.',
     url: 'https://www.aliexpress.com',
     socialUrl: 'https://www.instagram.com/expressloadout',
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80',
+    image: 'images/events/aliexpress-11-11.png',
     badge: '11.11 Día del Soltero',
     hidden: false
   },
@@ -42,7 +42,7 @@ const defaultEvents = [
     discount: 'Descuentos Relámpago en Electrónica & Prime',
     logisticsTip: 'Mayor volumen del año en Miami. Despacha vía Aéreo Express con casillero EXLO-PA para tener tus regalos listos sin demoras.',
     url: 'https://www.amazon.com',
-    image: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=800&q=80',
+    image: 'images/events/amazon-black-friday.png',
     badge: 'Black Friday Global',
     hidden: false
   },
@@ -68,7 +68,7 @@ const defaultEvents = [
     discount: 'Descuentos por confirmar por la tienda',
     logisticsTip: 'Ideal para ropa, accesorios y calzado. Los paquetes se consolidan en Miami para entrega ágil en Panamá.',
     url: 'https://www.shein.com',
-    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+    image: 'images/events/shein-black-friday.png',
     badge: 'Fecha por Confirmar',
     hidden: false
   },
@@ -81,7 +81,7 @@ const defaultEvents = [
     discount: 'Ofertas de temporada por confirmar',
     logisticsTip: 'Excelente para juguetes, electrónica y hogar. Se despacha directo a nuestro casillero Miami con entrega ágil en Panamá.',
     url: 'https://www.walmart.com',
-    image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80',
+    image: 'images/events/walmart-black-friday.jpg',
     badge: 'Fecha por Confirmar',
     hidden: false
   },
@@ -94,7 +94,7 @@ const defaultEvents = [
     discount: 'Precios de fábrica en accesorios y novedades',
     logisticsTip: 'Excelente para accesorios, novedades y paquetes livianos. Coloca tu código EXLO-PA en la dirección para clasificación inmediata.',
     url: 'https://www.temu.com',
-    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80',
+    image: 'images/events/temu-black-friday.webp',
     badge: 'Fecha por Confirmar',
     hidden: false
   },
@@ -192,6 +192,7 @@ let isAdminUnlocked = false;
 // =============================================================================
 document.addEventListener('DOMContentLoaded', () => {
   loadStoredData();
+  fetchCloudContent(); // Sincroniza en segundo plano con data/events.json y data/cases.json en Vercel/GitHub
   initTheme();
   initHeroIconMesh(); // Animación de iconos vectoriales heredada del login ERP
   initCalculator();
@@ -202,6 +203,63 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollNav();
   initMobileMenu();
 });
+
+async function fetchCloudContent() {
+  try {
+    const t = Date.now();
+    const [eventsRes, casesRes] = await Promise.allSettled([
+      fetch(`data/events.json?t=${t}`).then(r => r.ok ? r.json() : null),
+      fetch(`data/cases.json?t=${t}`).then(r => r.ok ? r.json() : null)
+    ]);
+
+    let updated = false;
+    if (eventsRes.status === 'fulfilled' && Array.isArray(eventsRes.value) && eventsRes.value.length > 0) {
+      currentEvents = eventsRes.value;
+      safeSetLocalStorage(STORAGE_KEYS.EVENTS, JSON.stringify(currentEvents));
+      renderEvents(activeEventsFilter);
+      renderAdminEventsList();
+      updated = true;
+    }
+
+    if (casesRes.status === 'fulfilled' && Array.isArray(casesRes.value) && casesRes.value.length > 0) {
+      currentCases = casesRes.value;
+      safeSetLocalStorage(STORAGE_KEYS.CASES, JSON.stringify(currentCases));
+      renderSuccessCases();
+      renderAdminCasesList();
+      updated = true;
+    }
+
+    if (updated) {
+      console.log('✅ Contenido global actualizado en vivo desde GitHub / Vercel.');
+    }
+  } catch (err) {
+    console.debug('Cloud sync fallback a cache local:', err);
+  }
+}
+
+async function syncContentToVercel(type, data) {
+  try {
+    showToast('Sincronizando con la nube...', 'Creando commit en GitHub para auto-deploy en Vercel...', 'info', 4000);
+    const res = await fetch('/api/sync-content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, data })
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      console.warn('Vercel sync response:', errJson);
+      return;
+    }
+
+    const result = await res.json();
+    if (result.success) {
+      showToast('¡Despliegue Global en Curso!', 'Vercel detectó el commit en GitHub y está actualizando la web para todas las computadoras (15-20s).', 'success', 6000);
+    }
+  } catch (err) {
+    console.debug('syncContentToVercel (modo offline/local):', err);
+  }
+}
 
 function loadStoredData() {
   try {
@@ -3232,6 +3290,7 @@ function toggleHideCase(caseId) {
   renderSuccessCases();
   renderAdminCasesList();
   showToast(c.hidden ? 'Caso Oculto' : 'Caso Visible', c.hidden ? 'El caso ha sido ocultado de la web pública.' : 'El caso ahora es visible nuevamente para el público.', 'info');
+  syncContentToVercel('cases', currentCases);
 }
 
 function handleSaveCase(e) {
@@ -3269,6 +3328,7 @@ function handleSaveCase(e) {
       } else {
         showToast('Atención de Memoria', 'Caso actualizado en la vista activa.', 'info');
       }
+      syncContentToVercel('cases', currentCases);
       return;
     }
   }
@@ -3298,6 +3358,7 @@ function handleSaveCase(e) {
   } else {
     showToast('Atención', 'Caso publicado en la vista activa.', 'info');
   }
+  syncContentToVercel('cases', currentCases);
 }
 
 function deleteCase(caseId) {
@@ -3308,6 +3369,7 @@ function deleteCase(caseId) {
   renderSuccessCases();
   renderAdminCasesList();
   showToast('Caso Eliminado', 'El caso de éxito fue removido.', 'info');
+  syncContentToVercel('cases', currentCases);
 }
 
 function renderAdminCasesList() {
@@ -3923,6 +3985,7 @@ function toggleHideEvent(eventId) {
   renderEvents(activeEventsFilter);
   renderAdminEventsList();
   showToast(evt.hidden ? 'Evento Oculto' : 'Evento Visible', evt.hidden ? 'El evento ha sido ocultado del calendario público.' : 'El evento ya es visible nuevamente para el público.', 'info');
+  syncContentToVercel('events', currentEvents);
 }
 
 function handleSaveEvent(e) {
@@ -3965,6 +4028,7 @@ function handleSaveEvent(e) {
       } else {
         showToast('Atención de Memoria', 'Evento actualizado en la vista activa.', 'info');
       }
+      syncContentToVercel('events', currentEvents);
       return;
     }
   }
@@ -3995,6 +4059,7 @@ function handleSaveEvent(e) {
   } else {
     showToast('Atención', 'Evento publicado en la vista activa.', 'info');
   }
+  syncContentToVercel('events', currentEvents);
 }
 
 function deleteEvent(id) {
@@ -4005,6 +4070,7 @@ function deleteEvent(id) {
   renderEvents(activeEventsFilter);
   renderAdminEventsList();
   showToast('Evento Eliminado', 'El evento fue removido del calendario.', 'info');
+  syncContentToVercel('events', currentEvents);
 }
 
 function renderAdminEventsList() {
