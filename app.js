@@ -948,7 +948,7 @@ function loadTrackingConfigInAdmin() {
   if (elizaUrl) elizaUrl.value = cfg.eliza?.endpoint || '';
 
   const kappaUrl = document.getElementById('track-cfg-kappa-url');
-  if (kappaUrl) kappaUrl.value = cfg.kappa?.endpoint || '';
+  if (kappaUrl) kappaUrl.value = cfg.kappa?.endpoint || '/api/track-kappa';
 
   const gasUrl = document.getElementById('track-cfg-gas-url');
   if (gasUrl) gasUrl.value = cfg.gas?.endpoint || '';
@@ -980,8 +980,8 @@ function handleSaveTrackingConfig(e) {
     provider: document.getElementById('track-cfg-provider')?.value || 'hybrid',
     track17: {
       apiKey: document.getElementById('track-cfg-17key')?.value.trim() || '',
-      apiUrl: document.getElementById('track-cfg-17url')?.value.trim() || 'https://api.17track.net/track/v2.4/gettrackinfo',
-      registerUrl: document.getElementById('track-cfg-17register-url')?.value.trim() || 'https://api.17track.net/track/v2.4/register',
+      apiUrl: document.getElementById('track-cfg-17url')?.value.trim() || '/api/track-17track?action=gettrackinfo',
+      registerUrl: document.getElementById('track-cfg-17register-url')?.value.trim() || '/api/track-17track?action=register',
       autoRegister: document.getElementById('track-cfg-17autoreg')?.checked !== false,
       corsProxy: document.getElementById('track-cfg-17cors')?.value.trim() || ''
     },
@@ -991,7 +991,7 @@ function handleSaveTrackingConfig(e) {
       endpoint: document.getElementById('track-cfg-eliza-url')?.value.trim() || 'https://{tenant}.elizaapp.com/api/tracking/status'
     },
     kappa: {
-      endpoint: document.getElementById('track-cfg-kappa-url')?.value.trim() || '',
+      endpoint: document.getElementById('track-cfg-kappa-url')?.value.trim() || '/api/track-kappa',
       directUrl: 'http://192.99.227.184:8096/TrackingPage.aspx'
     },
     gas: {
@@ -1028,8 +1028,10 @@ async function query17Track(cleanTrack, cfg) {
   const apiKey = cfg.track17?.apiKey || '708C2EF0CA32A784D0432D8572AB883A';
   if (!apiKey) return null;
 
-  const endpoint = cfg.track17?.apiUrl || 'https://api.17track.net/track/v2.4/gettrackinfo';
-  const registerEndpoint = cfg.track17?.registerUrl || 'https://api.17track.net/track/v2.4/register';
+  let endpoint = cfg.track17?.apiUrl || '/api/track-17track?action=gettrackinfo';
+  let registerEndpoint = cfg.track17?.registerUrl || '/api/track-17track?action=register';
+  if (endpoint.includes('api.17track.net')) endpoint = '/api/track-17track?action=gettrackinfo';
+  if (registerEndpoint.includes('api.17track.net')) registerEndpoint = '/api/track-17track?action=register';
   const corsProxy = cfg.track17?.corsProxy || '';
 
   async function apiFetch(url, body) {
@@ -1185,9 +1187,9 @@ async function queryElizaApp(cleanTrack, cfg) {
 
 // Consulta a Kappa Logistics ERP (Verificación de llegada física a Panamá)
 async function queryKappaLogistics(cleanTrack, cfg) {
-  const proxyUrl = cfg?.kappa?.endpoint;
+  const proxyUrl = cfg?.kappa?.endpoint || '/api/track-kappa';
 
-  // 1. Si hay endpoint de proxy / worker / webhook configurado en CMS
+  // 1. Consulta al Serverless Endpoint de Vercel / Proxy Nativo
   if (proxyUrl) {
     try {
       const res = await fetch(proxyUrl, {
@@ -1197,10 +1199,13 @@ async function queryKappaLogistics(cleanTrack, cfg) {
       });
       if (res.ok) {
         const json = await res.json();
+        // Si tiene éxito y fue cargado o confirmado en sucursal Panamá:
         if (json.success && json.isLoaded) return json;
+        // Si responde válidamente desde el servidor Kappa:
+        if (json.provider) return json;
       }
     } catch (e) {
-      console.warn('Error al consultar proxy de Kappa Logistics:', e);
+      console.warn('Error al consultar endpoint de Kappa Logistics:', e);
     }
   }
 
@@ -2071,7 +2076,10 @@ async function runLiveTrackingTest() {
       }
       return;
     } else {
-      endpoint = cfg.track17?.apiUrl || 'https://api.17track.net/track/v2.4/gettrackinfo';
+      endpoint = cfg.track17?.apiUrl || '/api/track-17track?action=gettrackinfo';
+      if (!endpoint || endpoint.includes('api.17track.net')) {
+        endpoint = '/api/track-17track?action=gettrackinfo';
+      }
       headers['17token'] = cfg.track17?.apiKey || '708C2EF0CA32A784D0432D8572AB883A';
       body = [{ number: testInput }];
     }

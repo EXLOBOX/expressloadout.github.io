@@ -1829,13 +1829,13 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Endpoint de Consulta (gettrackinfo):</label>
-                  <input type="url" id="track-cfg-17url" class="form-input" value="https://api.17track.net/track/v2.4/gettrackinfo" />
+                  <input type="text" id="track-cfg-17url" class="form-input" value="/api/track-17track?action=gettrackinfo" />
                 </div>
               </div>
               <div class="form-group-grid">
                 <div class="form-group">
                   <label class="form-label">Endpoint de Auto-Registro (register):</label>
-                  <input type="url" id="track-cfg-17register-url" class="form-input" value="https://api.17track.net/track/v2.4/register" />
+                  <input type="text" id="track-cfg-17register-url" class="form-input" value="/api/track-17track?action=register" />
                 </div>
                 <div class="form-group">
                   <label class="form-label">Relay CORS Proxy (para llamadas directas desde navegador):</label>
@@ -1882,7 +1882,7 @@
               </p>
               <div class="form-group">
                 <label class="form-label">URL del Endpoint Proxy / Worker para Kappa:</label>
-                <input type="url" id="track-cfg-kappa-url" class="form-input" placeholder="https://api.expressloadout.com/api/tracking o Cloudflare Worker URL" />
+                <input type="text" id="track-cfg-kappa-url" class="form-input" value="/api/track-kappa" placeholder="/api/track-kappa (Vercel Serverless Nativo)" />
                 <small style="color:var(--text-muted); font-size:0.75rem;">Si no se define, el sistema procesa guías verificadas y proyecta la ventana aduanal de Tocumen (24-48 hrs hábiles).</small>
               </div>
             </div>
@@ -2014,6 +2014,6 @@
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- SCRIPT PRINCIPAL MODERNO -->
-  <script src="app.js?v=3.6.1"></script>
+  <script src="app.js?v=3.8.0"></script>
 </body>
 </html>
