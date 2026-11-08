@@ -1,9 +1,8 @@
 {
-  "version": 2,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/data/tracking.json",
-      "destination": "/404.html"
+      "src": "/data/tracking.json",
+      "status": 404
     }
   ]
 }
