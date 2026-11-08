@@ -34,9 +34,9 @@ module.exports = async (req, res) => {
   }
 
   const { type, data } = req.body || {};
-  if (!type || !['events', 'cases', 'rates'].includes(type) || !data) {
+  if (!type || !['events', 'cases', 'rates', 'tracking'].includes(type) || !data) {
     return res.status(400).json({
-      error: 'Parámetros inválidos. Se requiere type (events|cases|rates) y payload de datos.'
+      error: 'Parámetros inválidos. Se requiere type (events|cases|rates|tracking) y payload de datos.'
     });
   }
 

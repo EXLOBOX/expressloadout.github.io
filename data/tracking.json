@@ -1,0 +1,24 @@
+{
+  "provider": "hybrid",
+  "track17": {
+    "apiKey": "708C2EF0CA32A784D0432D8572AB883A",
+    "apiUrl": "/api/track-17track?action=gettrackinfo",
+    "registerUrl": "/api/track-17track?action=register",
+    "autoRegister": true,
+    "corsProxy": "https://corsproxy.io/?url="
+  },
+  "eliza": {
+    "tenant": "nelconcargo",
+    "apiKey": "",
+    "endpoint": "/api/track-eliza"
+  },
+  "kappa": {
+    "endpoint": "/api/track-kappa",
+    "directUrl": "http://192.99.227.184:8096/TrackingPage.aspx"
+  },
+  "gas": {
+    "endpoint": "https://script.google.com/macros/s/AKfycby7xcnj6xxmRHDUT_GX6YdckfHXaGaJyVOD8QK6o5ZkRT3f3mjEjZXcQombVK5UW_dILg/exec"
+  },
+  "supportWhatsapp": "50765210278",
+  "wameMsg": "Hola Jonathan, deseo consultar actualización sobre mi tracking {NUMBER}"
+}

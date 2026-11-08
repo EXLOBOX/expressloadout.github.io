@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/data/tracking.json",
+      "destination": "/404.html"
+    }
+  ]
+}

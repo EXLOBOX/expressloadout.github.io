@@ -945,7 +945,7 @@ function loadTrackingConfigInAdmin() {
   const elizaKey = document.getElementById('track-cfg-eliza-key');
   if (elizaKey) elizaKey.value = cfg.eliza?.apiKey || '';
   const elizaUrl = document.getElementById('track-cfg-eliza-url');
-  if (elizaUrl) elizaUrl.value = cfg.eliza?.endpoint || '';
+  if (elizaUrl) elizaUrl.value = cfg.eliza?.endpoint || '/api/track-eliza';
 
   const kappaUrl = document.getElementById('track-cfg-kappa-url');
   if (kappaUrl) kappaUrl.value = cfg.kappa?.endpoint || '/api/track-kappa';
@@ -988,7 +988,7 @@ function handleSaveTrackingConfig(e) {
     eliza: {
       tenant: document.getElementById('track-cfg-eliza-tenant')?.value.trim() || 'nelconcargo',
       apiKey: document.getElementById('track-cfg-eliza-key')?.value.trim() || '',
-      endpoint: document.getElementById('track-cfg-eliza-url')?.value.trim() || 'https://{tenant}.elizaapp.com/api/tracking/status'
+      endpoint: '/api/track-eliza'
     },
     kappa: {
       endpoint: document.getElementById('track-cfg-kappa-url')?.value.trim() || '/api/track-kappa',
@@ -1002,6 +1002,8 @@ function handleSaveTrackingConfig(e) {
   };
 
   saveTrackingConfig(cfg);
+  showToast('Sincronizando Tracking...', 'Guardando credenciales protegidas en Vercel para toda la plataforma...', 'info', 3500);
+  syncContentToCloud('tracking', cfg);
   const note = document.getElementById('track-cfg-status-note');
   if (note) {
     note.textContent = 'Configuración de Tracking y APIs guardada correctamente.';
@@ -1150,16 +1152,13 @@ const ELIZA_GLOSSARY = {
   }
 };
 
-// Consulta a ElizaApp ERP
+// Consulta a ElizaApp ERP vía Vercel Serverless Shield
 async function queryElizaApp(cleanTrack, cfg) {
-  const tenant = cfg.eliza?.tenant || 'nelconcargo';
-  let endpoint = cfg.eliza?.endpoint || 'https://{tenant}.elizaapp.com/api/tracking/status';
-  endpoint = endpoint.replace('{tenant}', tenant);
-  const apiKey = cfg.eliza?.apiKey || '';
-
+  const endpoint = '/api/track-eliza';
   const body = {
-    api_access_key: apiKey,
-    tracking_id: cleanTrack
+    tracking_id: cleanTrack,
+    apiKey: cfg?.eliza?.apiKey || undefined,
+    tenant: cfg?.eliza?.tenant || undefined
   };
 
   try {
@@ -1168,22 +1167,21 @@ async function queryElizaApp(cleanTrack, cfg) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    
-    if (res.status === 403) {
-      console.warn('ElizaApp 403 Forbidden: La api_access_key es inválida o no ha sido ingresada en el panel CMS.');
-      return null;
-    }
 
     if (!res.ok) return null;
     const json = await res.json();
     if (json.code === 200 && json.data) {
       return json.data;
     }
+    if (json.code === 403) {
+      console.warn('ElizaApp Serverless Shield 403:', json.message);
+    }
   } catch (err) {
     console.warn('ElizaApp request failed:', err);
   }
   return null;
 }
+
 
 // Consulta a Kappa Logistics ERP (Verificación de llegada física a Panamá)
 async function queryKappaLogistics(cleanTrack, cfg) {
@@ -2034,9 +2032,12 @@ async function runLiveTrackingTest() {
 
     let combinedResult = {};
     if (prov === 'eliza' || (prov === 'hybrid' && /^(EXLO|EL|NEL|TB)/i.test(testInput))) {
-      const tenant = cfg.eliza?.tenant || 'nelconcargo';
-      endpoint = (cfg.eliza?.endpoint || 'https://{tenant}.elizaapp.com/api/tracking/status').replace('{tenant}', tenant);
-      body = { api_access_key: cfg.eliza?.apiKey || 'TEST_KEY', tracking_id: testInput };
+      endpoint = '/api/track-eliza';
+      body = {
+        tracking_id: testInput,
+        apiKey: cfg.eliza?.apiKey || undefined,
+        tenant: cfg.eliza?.tenant || undefined
+      };
 
       // Consultar ElizaApp
       try {
