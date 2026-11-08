@@ -2,14 +2,14 @@
   "provider": "hybrid",
   "track17": {
     "apiKey": "708C2EF0CA32A784D0432D8572AB883A",
-    "apiUrl": "/api/track-17track?action=gettrackinfo",
-    "registerUrl": "/api/track-17track?action=register",
+    "apiUrl": "https://api.17track.net/track/v2.4/gettrackinfo",
+    "registerUrl": "https://api.17track.net/track/v2.4/register",
     "autoRegister": true,
     "corsProxy": "https://corsproxy.io/?url="
   },
   "eliza": {
     "tenant": "nelconcargo",
-    "apiKey": "",
+    "apiKey": "elz_6oep9qZTYJSJ1aKxQas9xNZFfZ-tFVV1Ff03578armQ",
     "endpoint": "/api/track-eliza"
   },
   "kappa": {
